@@ -25,7 +25,7 @@ public final class Util {
 	 * 
 	 */
 	public static boolean isPressed(int buttonID) {
-		return (Button.readButtons() & buttonID) == 0;
+		return (Button.readButtons() & buttonID) != 0;
 	}
 	
 	/**
