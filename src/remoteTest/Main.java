@@ -17,6 +17,7 @@ public class Main {
 	{
 		
 		robot = new Robot(new DefaultBehavior(0.5f));
+		RobotComponents.initialize();
 
 		LCD.drawString("Running!", 0,0);
 		
