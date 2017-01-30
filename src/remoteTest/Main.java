@@ -8,27 +8,26 @@ import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
+import robot.Robot;
+import robot.RobotComponents;
+import robot.behavior.DefaultBehavior;
 
 public class Main {
 
-    static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
-    static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.B);
-    static EV3MediumRegulatedMotor mediumMotor = new EV3MediumRegulatedMotor(MotorPort.C);
-    static EV3UltrasonicSensor ultraSens = new EV3UltrasonicSensor(SensorPort.S1);
+    private static Robot robot;
     
     static boolean ultraLooksDown = false;
     
 	public static void main(String[] args)
 	{
-		leftMotor.setSpeed(leftMotor.getMaxSpeed() * 0.5f);
-		rightMotor.setSpeed(rightMotor.getMaxSpeed() * 0.5f);
-		mediumMotor.setSpeed(mediumMotor.getMaxSpeed() * 1.0f);
+		
+		robot = new Robot(new DefaultBehavior(0.5f));
 
 		LCD.drawString("Ultra: ", 0,0);
 		
 		while (cancelProgram() == false)
 		{
-			SampleProvider sP = ultraSens.getDistanceMode();
+			SampleProvider sP = RobotComponents.getUV().getDistanceMode();
 			float[] samples = new float[sP.sampleSize()];
 			sP.fetchSample(samples, 0);
 			float mid = 0f;
@@ -42,32 +41,30 @@ public class Main {
 			
 			if (buttonForwardPressed())
 			{
-				leftMotor.backward();
-				rightMotor.backward();
+				robot.moveStraight();
 			}
 			
 			if (buttonEnterPressed())
 			{
-				leftMotor.stop();
-				rightMotor.stop();
+				robot.stop();
 			}
 			
 			if (buttonPressed(Button.ID_LEFT))
 			{
-				leftMotor.forward();
-				rightMotor.backward();
+				RobotComponents.getLeftMotor().forward();
+				RobotComponents.getRightMotor().backward();
 			}
 			
 			if (buttonPressed(Button.ID_RIGHT))
 			{
-				leftMotor.backward();
-				rightMotor.forward();
+				RobotComponents.getLeftMotor().backward();
+				RobotComponents.getRightMotor().forward();
 			}
 			
 			if (buttonPressed(Button.ID_DOWN))
 			{
 				ultraLooksDown = !ultraLooksDown;
-				mediumMotor.rotate(ultraLooksDown ? 90 : -90);
+				RobotComponents.getMediumMotor().rotate(ultraLooksDown ? 90 : -90);
 			}
 		}
 	}

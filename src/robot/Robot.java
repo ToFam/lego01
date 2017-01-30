@@ -4,16 +4,18 @@ import robot.behavior.RobotBehavior;
 
 public class Robot {
 
-	private RobotComponents components;
 	private RobotBehavior behavior;
 	
-	public Robot(RobotComponents components, RobotBehavior behavior) {
-		this.components = components;
+	public Robot(RobotBehavior behavior) {
 		this.behavior = behavior;
 	}
 	
 	public void moveStraight() {
 		behavior.moveStraight();
+	}
+	
+	public void stop() {
+		this.behavior.stop();
 	}
 
 	/**
@@ -23,10 +25,6 @@ public class Robot {
 	 */
 	public void turnOnSpot(float degree) {
 		behavior.turnOnSpot(degree);
-	}
-	
-	public RobotComponents getComponents() {
-		return this.components;
 	}
 	
 	public RobotBehavior getBehavior() {

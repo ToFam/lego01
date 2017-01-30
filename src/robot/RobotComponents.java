@@ -9,31 +9,33 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 public final class RobotComponents {
 
-	private EV3LargeRegulatedMotor left;
-	private EV3LargeRegulatedMotor right;
-	private EV3MediumRegulatedMotor medium;
-	private EV3UltrasonicSensor uv;
+	private static EV3LargeRegulatedMotor left;
+	private static EV3LargeRegulatedMotor right;
+	private static EV3MediumRegulatedMotor medium;
+	private static EV3UltrasonicSensor uv;
 	
-	public RobotComponents() {
+	private RobotComponents() {	}
+	
+	public static void initialise() {
 		left = new EV3LargeRegulatedMotor(MotorPort.A);
 		right = new EV3LargeRegulatedMotor(MotorPort.B);
 		medium = new EV3MediumRegulatedMotor(MotorPort.C);
 		uv = new EV3UltrasonicSensor(SensorPort.S1);
 	}
 	
-	public EV3LargeRegulatedMotor getLeftMotor() {
+	public static EV3LargeRegulatedMotor getLeftMotor() {
 		return left;
 	}
 
-	public EV3LargeRegulatedMotor getRightMotor() {
+	public static EV3LargeRegulatedMotor getRightMotor() {
 		return right;
 	}
 
-	public EV3MediumRegulatedMotor getMediumMotor() {
+	public static EV3MediumRegulatedMotor getMediumMotor() {
 		return medium;
 	}
 
-	public EV3UltrasonicSensor getUV() {
+	public static EV3UltrasonicSensor getUV() {
 		return uv;
 	}
 	
