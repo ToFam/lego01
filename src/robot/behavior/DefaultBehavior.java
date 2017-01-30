@@ -46,7 +46,7 @@ public class DefaultBehavior implements RobotBehavior {
 		RobotComponents.getLeftMotor().backward();
 		RobotComponents.getRightMotor().backward();
 		
-	};
+	}
 	
 	/**
 	 * The Robot stops in place.
@@ -56,14 +56,21 @@ public class DefaultBehavior implements RobotBehavior {
 		RobotComponents.getLeftMotor().stop();
 		RobotComponents.getRightMotor().stop();
 		
-	};
+	}
 	
 	/**
 	 * The Robot follows the Line.
 	 */
 	public void followLine() {
 		
-	};
+	}
+
+	/**
+	 * Turn the Robot around its axis.
+	 */
+	public void turnOnSpot() {
+		
+	}
 
 	/**
 	 * Turn the Robot around its axis.
@@ -72,6 +79,6 @@ public class DefaultBehavior implements RobotBehavior {
 	 */
 	public void turnOnSpot(float degree) {
 		
-	};
+	}
 	
 }

@@ -26,6 +26,12 @@ public interface RobotBehavior {
 	 */
 	public void followLine();
 
+
+	/**
+	 * Turn the Robot around its axis.
+	 */
+	public void turnOnSpot();
+	
 	/**
 	 * Turn the Robot around its axis.
 	 * 

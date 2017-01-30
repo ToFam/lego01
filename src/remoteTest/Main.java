@@ -22,6 +22,14 @@ public class Main {
 	public static void main(String[] args)
 	{
 		
+		/* 
+		 * IMPORTANT
+		 * call RobotComponents.initialize();
+		 * else NullPointerException
+		 * END IMPORTANT
+		 */
+		
+		
 		robot = new Robot(new DefaultBehavior(0.5f));
 		RobotComponents.initialize();
 
@@ -69,6 +77,14 @@ public class Main {
 				RobotComponents.getRightMotor().forward();
 			}
 		}
+	}
+	
+	/**
+	 * Returns the main Robot.
+	 * @return The main Robot.
+	 */
+	public static Robot getRobot() {
+		return robot;
 	}
 	
 	private static boolean cancelProgram()

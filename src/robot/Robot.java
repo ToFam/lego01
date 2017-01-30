@@ -43,6 +43,13 @@ public class Robot {
 	public void stop() {
 		this.behavior.stop();
 	}
+	
+	/**
+	 * Turn the Robot around it's axis.
+	 */
+	public void turnOnSpot() {
+		behavior.turnOnSpot();
+	}
 
 	/**
 	 * Turn the Robot around its axis.
