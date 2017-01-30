@@ -1,5 +1,10 @@
 package music;
 
+/**
+ * 
+ * @author	Team AndreasBot: Simon
+ *
+ */
 public enum Note {
 	C0(0), CS0(0), D0(0), DS0(0), E0(0), F0(0), FS0(0), G0(0), GS0(0), A0(110), AS0(0), H0(0),
 	C1(0), CS1(0), D1(0), DS1(0), E1(0), F1(0), FS1(0), G1(0), GS1(0), A1(220), AS1(0), H1(0), 

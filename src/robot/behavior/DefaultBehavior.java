@@ -2,8 +2,22 @@ package robot.behavior;
 
 import robot.RobotComponents;
 
+/**
+ * 
+ * The <code>DefaultBehavior</code> class makes use of a single scale
+ * to dynamically adjust the movement property of the Robot.
+ * 
+ * @author	Team AndreasBot: Adrian
+ *
+ */
 public class DefaultBehavior implements RobotBehavior {
 	
+	/**
+	 * The constructor calls the method <code>setSpeedScale</code>
+	 * to initialize the scale. Setting or changing the scale has immediate effect.
+	 * 
+	 * @param speedScale
+	 */
 	public DefaultBehavior(float speedScale) {
 		this.setSpeedScale(speedScale);
 	}
@@ -24,6 +38,9 @@ public class DefaultBehavior implements RobotBehavior {
 		RobotComponents.getRightMotor().setSpeed(speed);
 	}
 	
+	/**
+	 * The Robot moves in a straight line.
+	 */
 	public void moveStraight() {
 		
 		RobotComponents.getLeftMotor().backward();
@@ -31,6 +48,9 @@ public class DefaultBehavior implements RobotBehavior {
 		
 	};
 	
+	/**
+	 * The Robot stops in place.
+	 */
 	public void stop() {
 		
 		RobotComponents.getLeftMotor().stop();
@@ -38,6 +58,9 @@ public class DefaultBehavior implements RobotBehavior {
 		
 	};
 	
+	/**
+	 * The Robot follows the Line.
+	 */
 	public void followLine() {
 		
 	};

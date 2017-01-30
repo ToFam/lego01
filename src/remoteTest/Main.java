@@ -6,7 +6,13 @@ import lejos.robotics.SampleProvider;
 import robot.Robot;
 import robot.RobotComponents;
 import robot.behavior.DefaultBehavior;
-
+/**
+ * 
+ * @author	Team AndreasBot: Simon,
+ * 			Team AndreasBot: Tobias,
+ * 			Team AndreasBot: Adrian
+ *
+ */
 public class Main {
 
     private static Robot robot;
