@@ -3,13 +3,14 @@ package remoteTest;
 import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.Motor;
+import lejos.hardware.port.MotorPort;
 import lejos.internal.ev3.EV3MotorPort;
 import lejos.robotics.RegulatedMotor;
 
 public class Main {
 
-    static EV3LargeRegulatedMotor leftMotor = Motor.B;
-    static EV3LargeRegulatedMotor rightMotor = Motor.C;
+    static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
+    static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.B);
     
 	public static void main(String[] args)
 	{
