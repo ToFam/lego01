@@ -2,8 +2,18 @@ package util;
 
 import lejos.hardware.Button;
 
+/**
+ * 
+ * This class consists of a collection of useful methods.
+ * 
+ * @author	Team AndreasBot: Adrian
+ *
+ */
 public final class Util {
 	
+	/**
+	 * Default private constructor.
+	 */
 	private Util() {
 		
 	}

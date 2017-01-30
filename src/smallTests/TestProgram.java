@@ -7,6 +7,11 @@ import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3TouchSensor;
 
+/**
+ * 
+ * @author	Team AndreasBot: Simon
+ *
+ */
 public class TestProgram {
 
 	static EV3LargeRegulatedMotor left = new EV3LargeRegulatedMotor(MotorPort.A);

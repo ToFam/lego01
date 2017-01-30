@@ -2,6 +2,11 @@ package music;
 
 import lejos.hardware.Sound;
 
+/**
+ * 
+ * @author	Team AndreasBot: Simon
+ *
+ */
 public class MusicPlayer
 {
 	public MusicPlayer()

@@ -6,7 +6,13 @@ import lejos.robotics.SampleProvider;
 import robot.Robot;
 import robot.RobotComponents;
 import robot.behavior.DefaultBehavior;
-
+/**
+ * 
+ * @author	Team AndreasBot: Simon,
+ * 			Team AndreasBot: Tobias,
+ * 			Team AndreasBot: Adrian
+ *
+ */
 public class Main {
 
     private static Robot robot;
@@ -17,6 +23,7 @@ public class Main {
 	{
 		
 		robot = new Robot(new DefaultBehavior(0.5f));
+		RobotComponents.initialize();
 
 		LCD.drawString("Running!", 0,0);
 		
