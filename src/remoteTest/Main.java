@@ -13,8 +13,8 @@ public class Main {
 
     static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
     static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.B);
-    static EV3MediumRegulatedMotor mediumMotor = new EV3MediumRegulatedMotor(MotorPort.C);
-    static EV3UltrasonicSensor ultraSens = new EV3UltrasonicSensor(SensorPort.S1);
+    //static EV3MediumRegulatedMotor mediumMotor = new EV3MediumRegulatedMotor(MotorPort.C);
+    //static EV3UltrasonicSensor ultraSens = new EV3UltrasonicSensor(SensorPort.S1);
     
     static boolean ultraLooksDown = false;
     
@@ -22,13 +22,13 @@ public class Main {
 	{
 		leftMotor.setSpeed(leftMotor.getMaxSpeed() * 0.5f);
 		rightMotor.setSpeed(rightMotor.getMaxSpeed() * 0.5f);
-		mediumMotor.setSpeed(mediumMotor.getMaxSpeed() * 1.0f);
+		//mediumMotor.setSpeed(mediumMotor.getMaxSpeed() * 1.0f);
 
-		LCD.drawString("Ultra: ", 0,0);
+		LCD.drawString("Running!", 0,0);
 		
 		while (cancelProgram() == false)
 		{
-			SampleProvider sP = ultraSens.getDistanceMode();
+			/*SampleProvider sP = ultraSens.getDistanceMode();
 			float[] samples = new float[sP.sampleSize()];
 			sP.fetchSample(samples, 0);
 			float mid = 0f;
@@ -37,7 +37,7 @@ public class Main {
 				mid += samples[i];
 			}
 			mid /= samples.length;
-			LCD.drawString(String.valueOf(mid), 7, 0);
+			LCD.drawString(String.valueOf(mid), 7, 0);*/
 			
 			
 			if (buttonForwardPressed())
@@ -66,8 +66,8 @@ public class Main {
 			
 			if (buttonPressed(Button.ID_DOWN))
 			{
-				ultraLooksDown = !ultraLooksDown;
-				mediumMotor.rotate(ultraLooksDown ? 90 : -90);
+				leftMotor.forward();
+				rightMotor.forward();
 			}
 		}
 	}
