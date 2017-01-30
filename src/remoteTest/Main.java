@@ -8,8 +8,8 @@ import lejos.robotics.RegulatedMotor;
 
 public class Main {
 
-    static RegulatedMotor leftMotor = Motor.B;
-    static RegulatedMotor rightMotor = Motor.C;
+    static EV3LargeRegulatedMotor leftMotor = Motor.B;
+    static EV3LargeRegulatedMotor rightMotor = Motor.C;
     
 	public static void main(String[] args)
 	{
