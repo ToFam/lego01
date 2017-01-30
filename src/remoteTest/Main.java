@@ -58,8 +58,8 @@ public class Main {
 			
 			if (buttonPressed(Button.ID_DOWN))
 			{
-				leftMotor.forward();
-				RobotComponents.getMediumMotor().rotate(ultraLooksDown ? 90 : -90);
+				RobotComponents.getLeftMotor().forward();
+				RobotComponents.getRightMotor().forward();
 			}
 		}
 	}
