@@ -30,23 +30,33 @@ public class Main {
             mid += samples[i];
         }
         mid /= samples.length;
-        LCD.drawString(String.valueOf(mid), 7, 0);
+        LCD.drawString(String.valueOf(mid), 2, y);
+    }
+    
+    public static void gyrosTest()
+    {
+        float sample[] = {0, 0};
+        RobotComponents.inst().getGyroSensor().getAngleAndRateMode().fetchSample(sample, 0);
+        LCD.drawString(String.valueOf(sample[1]), 7, 2);
+        LCD.drawString(String.valueOf(sample[0]), 7, 3);
     }
     
 	public static void main(String[] args)
 	{
 		robot = new Robot(new DefaultBehavior(0.5f));
-
-		LCD.drawString("Running!", 0,0);
+		
+		RobotComponents.inst().getGyroSensor().reset();
 		
 		while (Util.isRunning())
 		{
-			SampleProvider sP = RobotComponents.inst().getColorSensor();
-			sampelus(sP, 0);
-			
-			sP = RobotComponents.inst().getUV();
-			sampelus(sP, 1);
-			
+            SampleProvider sP = RobotComponents.inst().getColorSensor();
+            sampelus(sP, 0);
+            
+            sP = RobotComponents.inst().getUV();
+            sampelus(sP, 1);
+            
+            gyrosTest();
+		    
 			if (Util.isPressed(Button.ID_UP))
 			{
 				robot.moveStraight();
@@ -74,6 +84,14 @@ public class Main {
 				RobotComponents.inst().getLeftMotor().forward();
 				RobotComponents.inst().getRightMotor().forward();
 			}
+			
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
 		}
 	}
 

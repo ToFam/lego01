@@ -5,6 +5,7 @@ import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
@@ -27,6 +28,7 @@ public final class RobotComponents {
 	private EV3ColorSensor color = null;
 	private EV3TouchSensor touchA = null;
 	private EV3TouchSensor touchB = null;
+	private EV3GyroSensor gyros = null; 
 	
 	private static RobotComponents instance;
 	
@@ -97,5 +99,11 @@ public final class RobotComponents {
         if (touchB == null)
             touchB = new EV3TouchSensor(SensorPort.S4);
         return touchB;
+    }
+    
+    public EV3GyroSensor getGyroSensor() {
+        if (gyros == null)
+            gyros = new EV3GyroSensor(SensorPort.S3);
+        return gyros;
     }
 }
