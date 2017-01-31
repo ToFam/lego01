@@ -1,5 +1,6 @@
 package state;
 
+import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
 import util.Util;
@@ -7,9 +8,11 @@ import util.Util;
 public class TestState implements ParcourState {
     
     private Robot robot;
+    private LCDGui gui;
     
-    public TestState(Robot robot) {
+    public TestState(Robot robot, LCDGui gui) {
         this.robot = robot;
+        this.gui = gui;
     }
 
     @Override
