@@ -11,6 +11,7 @@ import robot.RobotComponents;
 import sensor.ColorSensorThread;
 import sensor.UVSensorThread;
 import sensor.WriteBackStorage;
+import state.LineState;
 import state.ParcourState;
 import state.TestState;
 import util.Util;
@@ -70,7 +71,8 @@ public class Main {
         
         
         
-        state = new TestState(robot, gui);
+        //state = new TestState(robot, gui);
+        state = new LineState(robot, gui, storage);
         state.init();
         
         while (Util.isRunning())
