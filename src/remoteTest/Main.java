@@ -44,13 +44,13 @@ public class Main {
     
 	public static void main(String[] args)
 	{
-		robot = new Robot(new HumpbackBridgeBehavior(0.5f));
+		robot = new Robot(new HumpbackBridgeBehavior(1f));
 		
-		RobotComponents.inst().getGyroSensor().reset();
+		//RobotComponents.inst().getGyroSensor().reset();
 		
 		while (Util.isRunning())
 		{
-			SampleProvider sP;
+			/*SampleProvider sP;
             
 			sP = RobotComponents.inst().getColorSensor();
             sampelus(sP, 0);
@@ -58,7 +58,7 @@ public class Main {
             sP = RobotComponents.inst().getUV();
             sampelus(sP, 1);
             
-            gyrosTest();
+            gyrosTest();*/
 		    
 			if (Util.isPressed(Button.ID_UP))
 			{
