@@ -36,6 +36,6 @@ public final class Util {
 	 * @return Whether to continue iterating an infinite while loop.
 	 */
 	public static boolean isRunning() {
-		return isPressed(Button.ID_ESCAPE);
+		return !isPressed(Button.ID_ESCAPE);
 	}
 }

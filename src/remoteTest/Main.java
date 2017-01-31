@@ -6,6 +6,7 @@ import lejos.robotics.SampleProvider;
 import robot.Robot;
 import robot.RobotComponents;
 import robot.behavior.DefaultBehavior;
+import util.Util;
 /**
  * 
  * @author	Team AndreasBot: Simon,
@@ -19,82 +20,61 @@ public class Main {
     
     static boolean ultraLooksDown = false;
     
+    public static void sampelus(SampleProvider sP, int y)
+    {
+        float[] samples = new float[sP.sampleSize()];
+        sP.fetchSample(samples, 0);
+        float mid = 0f;
+        for (int i = 0; i < samples.length; i++)
+        {
+            mid += samples[i];
+        }
+        mid /= samples.length;
+        LCD.drawString(String.valueOf(mid), 7, 0);
+    }
+    
 	public static void main(String[] args)
 	{
 		robot = new Robot(new DefaultBehavior(0.5f));
 
 		LCD.drawString("Running!", 0,0);
 		
-		while (cancelProgram() == false)
+		while (Util.isRunning())
 		{
-			/*SampleProvider sP = RobotComponents.inst().getUV().getDistanceMode();
-			float[] samples = new float[sP.sampleSize()];
-			sP.fetchSample(samples, 0);
-			float mid = 0f;
-			for (int i = 0; i < samples.length; i++)
-			{
-				mid += samples[i];
-			}
-			mid /= samples.length;
-			LCD.drawString(String.valueOf(mid), 7, 0);*/
+			SampleProvider sP = RobotComponents.inst().getColorSensor();
+			sampelus(sP, 0);
 			
+			sP = RobotComponents.inst().getUV();
+			sampelus(sP, 1);
 			
-			if (buttonForwardPressed())
+			if (Util.isPressed(Button.ID_UP))
 			{
 				robot.moveStraight();
 			}
 			
-			if (buttonEnterPressed())
+			if (Util.isPressed(Button.ID_ENTER))
 			{
 				robot.stop();
 			}
 			
-			if (buttonPressed(Button.ID_LEFT))
+			if (Util.isPressed(Button.ID_LEFT))
 			{
 				RobotComponents.inst().getLeftMotor().forward();
 				RobotComponents.inst().getRightMotor().backward();
 			}
 			
-			if (buttonPressed(Button.ID_RIGHT))
+			if (Util.isPressed(Button.ID_RIGHT))
 			{
 				RobotComponents.inst().getLeftMotor().backward();
 				RobotComponents.inst().getRightMotor().forward();
 			}
 			
-			if (buttonPressed(Button.ID_DOWN))
+			if (Util.isPressed(Button.ID_DOWN))
 			{
 				RobotComponents.inst().getLeftMotor().forward();
 				RobotComponents.inst().getRightMotor().forward();
 			}
 		}
-	}
-	
-	/**
-	 * Returns the main Robot.
-	 * @return The main Robot.
-	 */
-	public static Robot getRobot() {
-		return robot;
-	}
-	
-	private static boolean cancelProgram()
-	{
-		return (Button.readButtons() & Button.ID_ESCAPE) != 0;
-	}
-	
-	private static boolean buttonForwardPressed()
-	{
-		return (Button.readButtons() & Button.ID_UP) != 0;
-	}
-	
-	private static boolean buttonEnterPressed()
-	{
-		return (Button.readButtons() & Button.ID_ENTER) != 0;
-	}
-	
-	private static boolean buttonPressed(int button)
-	{
-		return (Button.readButtons() & button) != 0;
 	}
 
 }
