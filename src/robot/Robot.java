@@ -34,7 +34,7 @@ public class Robot {
 	 * The Robot moves in a straight line.
 	 */
 	public void moveStraight() {
-		behavior.moveStraight();
+		behavior.moveForward();
 	}
 	
 	/**
@@ -43,12 +43,21 @@ public class Robot {
 	public void stop() {
 		this.behavior.stop();
 	}
-	
+
 	/**
-	 * Turn the Robot around it's axis.
+	 * The Robot moves in a curved line.
+	 * @param direction Direction of the curve. 
 	 */
-	public void turnOnSpot() {
-		behavior.turnOnSpot();
+	public void curveLeft() {
+		this.behavior.curveLeft();
+	}
+
+	/**
+	 * The Robot moves in a curved line.
+	 * @param direction Direction of the curve. 
+	 */
+	public void curveRight() {
+		this.behavior.curveRight();
 	}
 
 	/**
@@ -57,7 +66,7 @@ public class Robot {
 	 * @param degree Makes the Robot turn by the given amount.
 	 */
 	public void turnOnSpot(float degree) {
-		behavior.turnOnSpot(degree);
+		this.behavior.turnOnSpot(degree);
 	}
 	
 	/**

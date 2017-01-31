@@ -6,6 +6,7 @@ import lejos.robotics.SampleProvider;
 import robot.Robot;
 import robot.RobotComponents;
 import robot.behavior.DefaultBehavior;
+import robot.behavior.HumpbackBridgeBehavior;
 import util.Util;
 /**
  * 
@@ -43,13 +44,15 @@ public class Main {
     
 	public static void main(String[] args)
 	{
-		robot = new Robot(new DefaultBehavior(0.5f));
+		robot = new Robot(new HumpbackBridgeBehavior(0.5f));
 		
 		RobotComponents.inst().getGyroSensor().reset();
 		
 		while (Util.isRunning())
 		{
-            SampleProvider sP = RobotComponents.inst().getColorSensor();
+			SampleProvider sP;
+            
+			sP = RobotComponents.inst().getColorSensor();
             sampelus(sP, 0);
             
             sP = RobotComponents.inst().getUV();
@@ -69,14 +72,12 @@ public class Main {
 			
 			if (Util.isPressed(Button.ID_LEFT))
 			{
-				RobotComponents.inst().getLeftMotor().forward();
-				RobotComponents.inst().getRightMotor().backward();
+				robot.curveLeft();
 			}
 			
 			if (Util.isPressed(Button.ID_RIGHT))
 			{
-				RobotComponents.inst().getLeftMotor().backward();
-				RobotComponents.inst().getRightMotor().forward();
+				robot.curveRight();
 			}
 			
 			if (Util.isPressed(Button.ID_DOWN))
@@ -86,7 +87,7 @@ public class Main {
 			}
 			
             try {
-                Thread.sleep(500);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

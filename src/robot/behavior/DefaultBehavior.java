@@ -12,6 +12,8 @@ import robot.RobotComponents;
  */
 public class DefaultBehavior implements RobotBehavior {
 	
+	protected float speedScale;
+	
 	/**
 	 * The constructor calls the method <code>setSpeedScale</code>
 	 * to initialize the scale. Setting or changing the scale has immediate effect.
@@ -19,7 +21,8 @@ public class DefaultBehavior implements RobotBehavior {
 	 * @param speedScale
 	 */
 	public DefaultBehavior(float speedScale) {
-		this.setSpeedScale(speedScale);
+		this.speedScale = speedScale;
+		this.setSpeedScale(speedScale, speedScale);
 	}
 	
 	/**
@@ -28,23 +31,33 @@ public class DefaultBehavior implements RobotBehavior {
 	 * 
 	 * @param speedScale Scales the Robot's maximum Speed.
 	 */
-	public void setSpeedScale(float speedScale) {
+	public void setSpeedScale(float leftScale, float rightScale) {
 		
 		float speed = Math.min(
 				RobotComponents.inst().getLeftMotor().getMaxSpeed(),
 				RobotComponents.inst().getRightMotor().getMaxSpeed()
-				) * speedScale;
-		RobotComponents.inst().getLeftMotor().setSpeed(speed);
-		RobotComponents.inst().getRightMotor().setSpeed(speed);
+				);
+		RobotComponents.inst().getLeftMotor().setSpeed(speed * leftScale);
+		RobotComponents.inst().getRightMotor().setSpeed(speed * rightScale);
 	}
 	
 	/**
-	 * The Robot moves in a straight line.
+	 * The Robot forward moves in a straight line.
 	 */
-	public void moveStraight() {
+	public void moveForward() {
 		
 		RobotComponents.inst().getLeftMotor().backward();
 		RobotComponents.inst().getRightMotor().backward();
+		
+	}
+	
+	/**
+	 * The Robot backward moves in a straight line.
+	 */
+	public void moveBackward() {
+		
+		RobotComponents.inst().getLeftMotor().forward();
+		RobotComponents.inst().getRightMotor().forward();
 		
 	}
 	
@@ -66,9 +79,18 @@ public class DefaultBehavior implements RobotBehavior {
 	}
 
 	/**
-	 * Turn the Robot around its axis.
+	 * The Robot moves in a curved line.
+	 * @param direction Direction of the curve. 
 	 */
-	public void turnOnSpot() {
+	public void curveLeft() {
+		
+	}
+
+	/**
+	 * The Robot moves in a curved line.
+	 * @param direction Direction of the curve. 
+	 */
+	public void curveRight() {
 		
 	}
 

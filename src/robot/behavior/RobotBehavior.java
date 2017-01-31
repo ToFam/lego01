@@ -11,9 +11,14 @@ package robot.behavior;
 public interface RobotBehavior {
 	
 	/**
-	 * The Robot moves in a straight line.
+	 * The Robot forward moves in a straight line.
 	 */
-	public void moveStraight();
+	public void moveForward();
+
+	/**
+	 * The Robot backward moves in a straight line.
+	 */
+	public void moveBackward();
 	
 	/**
 	 * The Robot stop in place.
@@ -26,11 +31,17 @@ public interface RobotBehavior {
 	 */
 	public void followLine();
 
+	/**
+	 * The Robot moves in a curved line.
+	 * @param direction Direction of the curve. 
+	 */
+	public void curveLeft();
 
 	/**
-	 * Turn the Robot around its axis.
+	 * The Robot moves in a curved line.
+	 * @param direction Direction of the curve. 
 	 */
-	public void turnOnSpot();
+	public void curveRight();
 	
 	/**
 	 * Turn the Robot around its axis.
