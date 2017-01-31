@@ -1,12 +1,11 @@
 package sensor;
 
-import lejos.robotics.SampleProvider;
+import lejos.hardware.sensor.EV3ColorSensor;
 import robot.RobotComponents;
-import util.Util;
 
 public class ColorSensorThread extends SensorThread {
 
-	SampleProvider provider;
+	EV3ColorSensor sensor;
 	float[] sample;
 	
 	public ColorSensorThread(WriteBackStorage storage) {
@@ -16,7 +15,8 @@ public class ColorSensorThread extends SensorThread {
 	@Override
 	public void run() {
 
-		provider = RobotComponents.inst().getUV();
+		sensor = RobotComponents.inst().getColorSensor();
+		sample = new float[sensor.sampleSize()];
 		running = true;
 		
 		while (true) {
@@ -29,8 +29,8 @@ public class ColorSensorThread extends SensorThread {
 				}
 			}
 			
-			provider.fetchSample(sample, 0);
-			storage.setColor(Util.average(sample));
+			sensor.fetchSample(sample, 0);
+			storage.setColor(sample);
 			
 		}
 		

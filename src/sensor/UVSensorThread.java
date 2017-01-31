@@ -1,12 +1,11 @@
 package sensor;
 
-import lejos.robotics.SampleProvider;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
 import robot.RobotComponents;
-import util.Util;
 
 public class UVSensorThread extends SensorThread {
 
-	SampleProvider provider;
+	EV3UltrasonicSensor sensor;
 	float[] sample;
 	
 	public UVSensorThread(WriteBackStorage storage) {
@@ -16,7 +15,8 @@ public class UVSensorThread extends SensorThread {
 	@Override
 	public void run() {
 
-		provider = RobotComponents.inst().getUV();
+		sensor = RobotComponents.inst().getUV();
+		sample = new float[sensor.sampleSize()];
 		running = true;
 		
 		while (true) {
@@ -29,8 +29,8 @@ public class UVSensorThread extends SensorThread {
 				}
 			}
 			
-			provider.fetchSample(sample, 0);
-			storage.setUV(Util.average(sample));
+			sensor.fetchSample(sample, 0);
+			storage.setUV(sample);
 			
 		}
 		
