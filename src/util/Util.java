@@ -44,6 +44,25 @@ public final class Util {
 	 * @param samples The array with float values.
 	 * @return The arrays average value.
 	 */
+	public static int average(int[] samples) {
+		float sum = 0.f;
+		int weight = 0;
+		
+		for (int i = 0; i < samples.length; i++) {
+			if (samples[i] != Integer.MIN_VALUE || samples[i] != Integer.MAX_VALUE) {
+				sum += samples[i];
+				weight++;
+			}
+		}
+		
+		return Math.round(sum / weight);
+	}
+	
+	/**
+	 * Calculate the average value of the float array ignoring infinite values.
+	 * @param samples The array with float values.
+	 * @return The arrays average value.
+	 */
 	public static float average(float[] samples) {
 		float sum = 0.f;
 		int weight = 0;

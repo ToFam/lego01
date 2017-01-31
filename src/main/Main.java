@@ -8,6 +8,9 @@ import lejos.hardware.lcd.LCD;
 import lejos.robotics.SampleProvider;
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.ColorSensorThread;
+import sensor.UVSensorThread;
+import sensor.WriteBackStorage;
 import state.ParcourState;
 import state.TestState;
 import util.Util;
@@ -22,6 +25,10 @@ public class Main {
 
     private Robot robot;
     private ParcourState state;
+    
+    private ColorSensorThread colorSensorThread;
+    private UVSensorThread uvSensorThread;
+    private WriteBackStorage storage;
     
     static boolean ultraLooksDown = false;
     
@@ -49,7 +56,19 @@ public class Main {
     public void run()
     {
         robot = new Robot();
+        colorSensorThread = new ColorSensorThread(storage);
+        uvSensorThread = new UVSensorThread(storage);
+        
+        colorSensorThread.start();
+        colorSensorThread.setRunning(false);
+        
+        uvSensorThread.start();
+        uvSensorThread.setRunning(false);
+        
+        storage = new WriteBackStorage();
         LCDGui gui = new LCDGui();
+        
+        
         
         state = new TestState(robot, gui);
         state.init();
