@@ -9,20 +9,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
+import communication.EV3Server;
 import remoteTest.Main;
 import robot.Robot;
 
-public class ControlPanel extends JFrame{
+public class ControlPanel extends JFrame {
 	
-	public ControlPanel() {	}
-	
+	private EV3Server server;
 	private JTextArea tArea;
 	private JScrollPane sPane;
 	private boolean forward;
 	
-	public static void main(String[] args) {
-		ControlPanel canvas = new ControlPanel();
-		canvas.initialize();
+	public ControlPanel(EV3Server server) {
+		this.server = server;
+		this.initialize();
+	}
+	
+	public void append(String s) {
+		this.tArea.append("\t" + s + "\n");
 	}
 	
 	private void initialize() {
@@ -38,8 +42,11 @@ public class ControlPanel extends JFrame{
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				
+
 				switch(e.getKeyCode()) {
+				case 27:
+					server.close();
+					break;
 				case 32:
 					if (!forward) {
 						forward = true;
@@ -78,5 +85,7 @@ public class ControlPanel extends JFrame{
 			
 		});
 		this.setVisible(true);
-	}
+	
+
+}
 }
