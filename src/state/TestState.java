@@ -17,7 +17,7 @@ public class TestState implements ParcourState {
 
     @Override
     public void init() {
-        robot.setSpeed(0.5f);
+        robot.setSpeed(1f);
     }
 
     @Override

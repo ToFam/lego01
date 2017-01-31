@@ -11,6 +11,6 @@ public class LCDGui
 	
 	public void writeLine(String line)
 	{
-		
+		LCD.drawString(line, 0, 0);
 	}
 }

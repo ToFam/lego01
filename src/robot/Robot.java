@@ -50,6 +50,8 @@ public class Robot {
 	 * The Robot stops in place.
 	 */
 	public void stop() {
+		RobotComponents.inst().getLeftMotor().stop();
+		RobotComponents.inst().getRightMotor().stop();
 	}
 
 	/**
