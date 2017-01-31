@@ -1,5 +1,9 @@
 package remoteTest;
 
+import java.io.IOException;
+import java.net.Socket;
+
+import communication.EV3Server;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.robotics.SampleProvider;
@@ -36,8 +40,15 @@ public class Main {
 	public static void main(String[] args)
 	{
 		robot = new Robot(new DefaultBehavior(0.5f));
+		Socket socket = new EV3Server(4444).getLocalSocket();
 
 		LCD.drawString("Running!", 0,0);
+		
+		try {
+			socket.getOutputStream().write(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		while (Util.isRunning())
 		{

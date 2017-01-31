@@ -34,15 +34,26 @@ public class EV3Server {
 	}
 	
 	public static void main(String[] args) {
-		EV3Server server = new EV3Server(4444);
+		EV3Server server = new EV3Server(4443);
 		String input;
 		
 		while(true) {
-			
+			input = server.readLine();
+			System.out.println(input);
 		}
 	}
 	
+	public Socket getLocalSocket() {
+		return this.localClient;
+	}
+	
 	public void close() {
+		try {
+			serverSocket.close();
+			localClient.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		System.exit(0);
 	}
 	
