@@ -56,6 +56,13 @@ public class Main {
     
     public void run()
     {
+    	/*
+    	 * ***************
+    	 * NOT TESTED YET!
+    	 * ***************
+    	 */
+    	(new ExitProgrammThread()).start();
+    	
         robot = new Robot();
         colorSensorThread = new ColorSensorThread(storage);
         uvSensorThread = new UVSensorThread(storage);
@@ -75,7 +82,7 @@ public class Main {
         state = new LineState(robot, gui, storage);
         state.init();
         
-        while (Util.isRunning())
+        while (true)
         {
             
             state.update();
@@ -105,6 +112,15 @@ public class Main {
 		
 	    Main m = new Main();
 	    m.run();
+	}
+	
+	public class ExitProgrammThread extends Thread {
+		
+		@Override
+		public void run() {
+			Button.ESCAPE.waitForPress();
+			System.exit(0);
+		}
 	}
 
 }
