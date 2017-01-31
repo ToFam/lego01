@@ -1,5 +1,6 @@
 package robot;
 
+import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
@@ -89,6 +90,7 @@ public final class RobotComponents {
 	    	{
 	    		LCD.clear();
 	    		LCD.drawString("No UV sensor found on S1", 0, 0);
+	    		Sound.beep();
 	    	}
 	    }
 		return uv;
@@ -97,7 +99,16 @@ public final class RobotComponents {
 	public EV3ColorSensor getColorSensor() {
 	    if (color == null)
 	    {
-	        color = new EV3ColorSensor(SensorPort.S2);
+	    	try
+	    	{
+		        color = new EV3ColorSensor(SensorPort.S2);
+	    	}
+	    	catch (IllegalArgumentException exception)
+	    	{
+	    		LCD.clear();
+	    		LCD.drawString("No color sensor found on S2", 0, 0);
+	    		Sound.beep();
+	    	}
 	    }
 	    return color;
 	}
@@ -105,7 +116,16 @@ public final class RobotComponents {
 	public EV3TouchSensor getTouchSensorA() {
 	    if (touchA == null)
 	    {
-	        touchA = new EV3TouchSensor(SensorPort.S3);
+	    	try
+	    	{
+		        touchA = new EV3TouchSensor(SensorPort.S3);
+	    	}
+	    	catch (IllegalArgumentException exception)
+	    	{
+	    		LCD.clear();
+	    		LCD.drawString("No touch sensor found on S3", 0, 0);
+	    		Sound.beep();
+	    	}
 	    }
 	    return touchA;
 	}
@@ -113,7 +133,16 @@ public final class RobotComponents {
     public EV3TouchSensor getTouchSensorB() {
         if (touchB == null)
         {
-            touchB = new EV3TouchSensor(SensorPort.S4);
+	    	try
+	    	{
+	            touchB = new EV3TouchSensor(SensorPort.S4);
+	    	}
+	    	catch (IllegalArgumentException exception)
+	    	{
+	    		LCD.clear();
+	    		LCD.drawString("No touch sensor found on S4", 0, 0);
+	    		Sound.beep();
+	    	}
         }
         return touchB;
     }
@@ -121,7 +150,16 @@ public final class RobotComponents {
     public EV3GyroSensor getGyroSensor() {
         if (gyros == null)
         {
-            gyros = new EV3GyroSensor(SensorPort.S3);
+	    	try
+	    	{
+	            gyros = new EV3GyroSensor(SensorPort.S3);
+	    	}
+	    	catch (IllegalArgumentException exception)
+	    	{
+	    		LCD.clear();
+	    		LCD.drawString("No gyros sensor found on S3", 0, 0);
+	    		Sound.beep();
+	    	}
         }
         return gyros;
     }
