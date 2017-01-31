@@ -1,12 +1,11 @@
-package remoteTest;
+package main;
 
-import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.robotics.SampleProvider;
 import robot.Robot;
 import robot.RobotComponents;
-import robot.behavior.DefaultBehavior;
-import robot.behavior.HumpbackBridgeBehavior;
+import state.ParcourState;
+import state.TestState;
 import util.Util;
 /**
  * 
@@ -17,7 +16,8 @@ import util.Util;
  */
 public class Main {
 
-    private static Robot robot;
+    private Robot robot;
+    private ParcourState state;
     
     static boolean ultraLooksDown = false;
     
@@ -42,50 +42,29 @@ public class Main {
         LCD.drawString(String.valueOf(sample[0]), 7, 3);
     }
     
-	public static void main(String[] args)
-	{
-		robot = new Robot(new HumpbackBridgeBehavior(1f));
-		
-		//RobotComponents.inst().getGyroSensor().reset();
-		
-		while (Util.isRunning())
-		{
-			/*SampleProvider sP;
+    public void run()
+    {
+        robot = new Robot();
+        
+        //RobotComponents.inst().getGyroSensor().reset();
+        
+        state = new TestState(robot);
+        state.init();
+        
+        while (Util.isRunning())
+        {
+            /*SampleProvider sP;
             
-			sP = RobotComponents.inst().getColorSensor();
+            sP = RobotComponents.inst().getColorSensor();
             sampelus(sP, 0);
             
             sP = RobotComponents.inst().getUV();
             sampelus(sP, 1);
             
             gyrosTest();*/
-		    
-			if (Util.isPressed(Button.ID_UP))
-			{
-				robot.moveStraight();
-			}
-			
-			if (Util.isPressed(Button.ID_ENTER))
-			{
-				robot.stop();
-			}
-			
-			if (Util.isPressed(Button.ID_LEFT))
-			{
-				robot.curveLeft();
-			}
-			
-			if (Util.isPressed(Button.ID_RIGHT))
-			{
-				robot.curveRight();
-			}
-			
-			if (Util.isPressed(Button.ID_DOWN))
-			{
-				RobotComponents.inst().getLeftMotor().forward();
-				RobotComponents.inst().getRightMotor().forward();
-			}
-			
+            
+            state.update();
+            
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
@@ -93,7 +72,13 @@ public class Main {
                 e.printStackTrace();
             }
             
-		}
+        }
+    }
+    
+	public static void main(String[] args)
+	{
+	    Main m = new Main();
+	    m.run();
 	}
 
 }

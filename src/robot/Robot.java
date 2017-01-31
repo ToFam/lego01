@@ -1,7 +1,5 @@
 package robot;
 
-import robot.behavior.RobotBehavior;
-
 /**
  * 
  * This class serves as an interface to control the Robot.
@@ -15,10 +13,6 @@ import robot.behavior.RobotBehavior;
  */
 public class Robot {
 
-	/**
-	 * Strategy Design Pattern
-	 */
-	private RobotBehavior behavior;
 	
 	/**
 	 * 
@@ -26,22 +20,36 @@ public class Robot {
 	 * 
 	 * @param behavior
 	 */
-	public Robot(RobotBehavior behavior) {
-		this.behavior = behavior;
+	public Robot() {
 	}
 	
-	/**
-	 * The Robot moves in a straight line.
-	 */
-	public void moveStraight() {
-		behavior.moveForward();
+	public void setSpeed(float speed) {
+	    float max = Math.min(RobotComponents.inst().getLeftMotor().getMaxSpeed(), RobotComponents.inst().getRightMotor().getMaxSpeed());
+	    RobotComponents.inst().getLeftMotor().setSpeed(max * speed);
+        RobotComponents.inst().getRightMotor().setSpeed(max * speed);
 	}
+	
+    public void setSpeed(float speedLeft, float speedRight) {
+        float max = Math.min(RobotComponents.inst().getLeftMotor().getMaxSpeed(), RobotComponents.inst().getRightMotor().getMaxSpeed());
+        RobotComponents.inst().getLeftMotor().setSpeed(max * speedLeft);
+        RobotComponents.inst().getRightMotor().setSpeed(max * speedRight);
+    }
+
+
+    public void forward() {
+        RobotComponents.inst().getLeftMotor().forward();
+        RobotComponents.inst().getRightMotor().forward();
+    }
+    
+    public void backward() {
+        RobotComponents.inst().getLeftMotor().backward();
+        RobotComponents.inst().getRightMotor().backward();
+    }
 	
 	/**
 	 * The Robot stops in place.
 	 */
 	public void stop() {
-		this.behavior.stop();
 	}
 
 	/**
@@ -49,7 +57,6 @@ public class Robot {
 	 * @param direction Direction of the curve. 
 	 */
 	public void curveLeft() {
-		this.behavior.curveLeft();
 	}
 
 	/**
@@ -57,7 +64,6 @@ public class Robot {
 	 * @param direction Direction of the curve. 
 	 */
 	public void curveRight() {
-		this.behavior.curveRight();
 	}
 
 	/**
@@ -66,23 +72,6 @@ public class Robot {
 	 * @param degree Makes the Robot turn by the given amount.
 	 */
 	public void turnOnSpot(float degree) {
-		this.behavior.turnOnSpot(degree);
-	}
-	
-	/**
-	 * Returns the Robots current <code>RobotBehavior</code>.
-	 * @return The Robots current <code>RobotBehavior</code>.
-	 */
-	public RobotBehavior getBehavior() {
-		return this.behavior;
-	}
-	
-	/**
-	 * Changes the Robots <code>RobotBehavior</code>.
-	 * @param behavior The new <code>RobotBehavior</code>.
-	 */
-	public void setBehavior(RobotBehavior behavior) {
-		this.behavior = behavior;
 	}
 	
 	
