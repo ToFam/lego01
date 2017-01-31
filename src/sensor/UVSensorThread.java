@@ -29,6 +29,12 @@ public class UVSensorThread extends SensorThread {
 				}
 			}
 			
+			if (sensor.getCurrentMode() != oldMode)
+			{
+				sample = new float[sensor.sampleSize()];
+				oldMode = sensor.getCurrentMode();
+			}
+			
 			sensor.fetchSample(sample, 0);
 			storage.setUV(sample);
 			

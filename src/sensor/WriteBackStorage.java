@@ -4,6 +4,9 @@ public class WriteBackStorage {
 	
 	private float[] uvSamples;
 	private float[] colorSamples;
+	private float[] gyroSamples;
+	private float[] touchASamples;
+	private float[] touchBSamples;
 	
 	public WriteBackStorage() {
 		uvSamples = new float[1];
@@ -56,5 +59,74 @@ public class WriteBackStorage {
 	
 	public void setColor(float[] colors) {
 		this.colorSamples = colors;
+	}
+	
+	public float getGyro() {
+		if (gyroSamples.length > 0)
+			return this.gyroSamples[0];
+		return -1f;
+	}
+	
+	public float getGyro(int index) {
+		if (index >= 0 && index < gyroSamples.length)
+		{
+			return this.gyroSamples[index];
+		}
+		return -1f;
+	}
+	
+	public int gyroSampleSize()
+	{
+		return gyroSamples.length;
+	}
+	
+	public void setGyro(float[] gyros) {
+		this.gyroSamples = gyros;
+	}
+	
+	public float getTouchA() {
+		if (touchASamples.length > 0)
+			return this.touchASamples[0];
+		return -1f;
+	}
+	
+	public float getTouchA(int index) {
+		if (index >= 0 && index < touchASamples.length)
+		{
+			return this.touchASamples[index];
+		}
+		return -1f;
+	}
+	
+	public int touchASampleSize()
+	{
+		return touchASamples.length;
+	}
+	
+	public void setTouchA(float[] touchAs) {
+		this.touchASamples = touchAs;
+	}
+	
+	public float getTouchB() {
+		if (touchBSamples.length > 0)
+			return this.touchBSamples[0];
+		return -1f;
+	}
+	
+	public float getTouchB(int index) {
+		if (index >= 0 && index < touchBSamples.length)
+		{
+			return this.touchBSamples[index];
+		}
+		return -1f;
+	}
+	
+	public int touchBSampleSize()
+	{
+		return touchBSamples.length;
+	}
+	
+	public void setTouchB(float[] touchBs) {
+		this.touchBSamples = touchBs;
 	}
 }
