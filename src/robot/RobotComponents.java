@@ -1,5 +1,6 @@
 package robot;
 
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
@@ -79,31 +80,49 @@ public final class RobotComponents {
 	 */
 	public EV3UltrasonicSensor getUV() {
 	    if (uv == null)
-	        uv = new EV3UltrasonicSensor(SensorPort.S1);
+	    {
+	    	try
+	    	{
+		        uv = new EV3UltrasonicSensor(SensorPort.S1);
+	    	}
+	    	catch (IllegalArgumentException exception)
+	    	{
+	    		LCD.clear();
+	    		LCD.drawString("No UV sensor found on S1", 0, 0);
+	    	}
+	    }
 		return uv;
 	}
 	
 	public EV3ColorSensor getColorSensor() {
 	    if (color == null)
+	    {
 	        color = new EV3ColorSensor(SensorPort.S2);
+	    }
 	    return color;
 	}
 	
 	public EV3TouchSensor getTouchSensorA() {
 	    if (touchA == null)
+	    {
 	        touchA = new EV3TouchSensor(SensorPort.S3);
+	    }
 	    return touchA;
 	}
 	
     public EV3TouchSensor getTouchSensorB() {
         if (touchB == null)
+        {
             touchB = new EV3TouchSensor(SensorPort.S4);
+        }
         return touchB;
     }
     
     public EV3GyroSensor getGyroSensor() {
         if (gyros == null)
+        {
             gyros = new EV3GyroSensor(SensorPort.S3);
+        }
         return gyros;
     }
 }

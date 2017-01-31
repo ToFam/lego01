@@ -1,5 +1,7 @@
 package robot;
 
+import sensor.modes.ColorSensorMode;
+
 /**
  * 
  * This class serves as an interface to control the Robot.
@@ -75,6 +77,23 @@ public class Robot {
 	 */
 	public void turnOnSpot(float degree) {
 	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Sensors
+	 */
+	
+	
+	public void setColorMode(ColorSensorMode mode)
+	{
+		RobotComponents.inst().getColorSensor().setCurrentMode(mode.getIdf());
+	}
+	
+	
 	
 	
 }
