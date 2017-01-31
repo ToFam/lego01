@@ -21,23 +21,13 @@ public class Main {
     
 	public static void main(String[] args)
 	{
-		
-		/* 
-		 * IMPORTANT
-		 * call RobotComponents.initialize();
-		 * else NullPointerException
-		 * END IMPORTANT
-		 */
-		
-		
 		robot = new Robot(new DefaultBehavior(0.5f));
-		RobotComponents.initialize();
 
 		LCD.drawString("Running!", 0,0);
 		
 		while (cancelProgram() == false)
 		{
-			/*SampleProvider sP = RobotComponents.getUV().getDistanceMode();
+			/*SampleProvider sP = RobotComponents.inst().getUV().getDistanceMode();
 			float[] samples = new float[sP.sampleSize()];
 			sP.fetchSample(samples, 0);
 			float mid = 0f;
@@ -61,20 +51,20 @@ public class Main {
 			
 			if (buttonPressed(Button.ID_LEFT))
 			{
-				RobotComponents.getLeftMotor().forward();
-				RobotComponents.getRightMotor().backward();
+				RobotComponents.inst().getLeftMotor().forward();
+				RobotComponents.inst().getRightMotor().backward();
 			}
 			
 			if (buttonPressed(Button.ID_RIGHT))
 			{
-				RobotComponents.getLeftMotor().backward();
-				RobotComponents.getRightMotor().forward();
+				RobotComponents.inst().getLeftMotor().backward();
+				RobotComponents.inst().getRightMotor().forward();
 			}
 			
 			if (buttonPressed(Button.ID_DOWN))
 			{
-				RobotComponents.getLeftMotor().forward();
-				RobotComponents.getRightMotor().forward();
+				RobotComponents.inst().getLeftMotor().forward();
+				RobotComponents.inst().getRightMotor().forward();
 			}
 		}
 	}

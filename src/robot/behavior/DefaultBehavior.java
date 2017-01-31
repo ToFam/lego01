@@ -31,11 +31,11 @@ public class DefaultBehavior implements RobotBehavior {
 	public void setSpeedScale(float speedScale) {
 		
 		float speed = Math.min(
-				RobotComponents.getLeftMotor().getMaxSpeed(),
-				RobotComponents.getRightMotor().getMaxSpeed()
+				RobotComponents.inst().getLeftMotor().getMaxSpeed(),
+				RobotComponents.inst().getRightMotor().getMaxSpeed()
 				) * speedScale;
-		RobotComponents.getLeftMotor().setSpeed(speed);
-		RobotComponents.getRightMotor().setSpeed(speed);
+		RobotComponents.inst().getLeftMotor().setSpeed(speed);
+		RobotComponents.inst().getRightMotor().setSpeed(speed);
 	}
 	
 	/**
@@ -43,8 +43,8 @@ public class DefaultBehavior implements RobotBehavior {
 	 */
 	public void moveStraight() {
 		
-		RobotComponents.getLeftMotor().backward();
-		RobotComponents.getRightMotor().backward();
+		RobotComponents.inst().getLeftMotor().backward();
+		RobotComponents.inst().getRightMotor().backward();
 		
 	}
 	
@@ -53,8 +53,8 @@ public class DefaultBehavior implements RobotBehavior {
 	 */
 	public void stop() {
 		
-		RobotComponents.getLeftMotor().stop();
-		RobotComponents.getRightMotor().stop();
+		RobotComponents.inst().getLeftMotor().stop();
+		RobotComponents.inst().getRightMotor().stop();
 		
 	}
 	

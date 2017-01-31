@@ -4,6 +4,8 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 /**
@@ -17,41 +19,45 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
  */
 public final class RobotComponents {
 
-	private static EV3LargeRegulatedMotor left;
-	private static EV3LargeRegulatedMotor right;
-	private static EV3MediumRegulatedMotor medium;
-	private static EV3UltrasonicSensor uv;
+	private EV3LargeRegulatedMotor left = null;
+	private EV3LargeRegulatedMotor right = null;
+	private EV3MediumRegulatedMotor medium = null;
+	
+	private EV3UltrasonicSensor uv = null;
+	private EV3ColorSensor color = null;
+	private EV3TouchSensor touchA = null;
+	private EV3TouchSensor touchB = null;
+	
+	private static RobotComponents instance;
 	
 	/**
 	 * Default private constructor.
 	 */
 	private RobotComponents() {	}
 	
-	/**
-	 * Instantiates all members with a new value.
-	 * This method has to be called initially or
-	 * else all getters will return <code>null</code>!
-	 */
-	public static void initialize() {
-		left = new EV3LargeRegulatedMotor(MotorPort.A);
-		right = new EV3LargeRegulatedMotor(MotorPort.B);
-		medium = new EV3MediumRegulatedMotor(MotorPort.C);
-		uv = new EV3UltrasonicSensor(SensorPort.S1);
+	public static RobotComponents inst() {
+	    if (instance == null)
+	        instance = new RobotComponents();
+	    return instance;
 	}
 	
 	/**
 	 * Returns the left motor.
 	 * @return The left motor.
 	 */
-	public static EV3LargeRegulatedMotor getLeftMotor() {
-		return left;
+	public EV3LargeRegulatedMotor getLeftMotor() {
+		if (left == null)
+		    left = new EV3LargeRegulatedMotor(MotorPort.A); 
+	    return left;
 	}
 
 	/**
 	 * Returns the right motor.
 	 * @return The right motor.
 	 */
-	public static EV3LargeRegulatedMotor getRightMotor() {
+	public EV3LargeRegulatedMotor getRightMotor() {
+	    if (right == null)
+	        right = new EV3LargeRegulatedMotor(MotorPort.B);
 		return right;
 	}
 
@@ -59,7 +65,9 @@ public final class RobotComponents {
 	 * Returns the medium Motor.
 	 * @return The medium Motor.
 	 */
-	public static EV3MediumRegulatedMotor getMediumMotor() {
+	public EV3MediumRegulatedMotor getMediumMotor() {
+	    if (medium == null)
+	        medium = new EV3MediumRegulatedMotor(MotorPort.C);
 		return medium;
 	}
 
@@ -67,9 +75,27 @@ public final class RobotComponents {
 	 * Returns the ultrasonic sensor.
 	 * @return the ultrasonic sensor.
 	 */
-	public static EV3UltrasonicSensor getUV() {
+	public EV3UltrasonicSensor getUV() {
+	    if (uv == null)
+	        uv = new EV3UltrasonicSensor(SensorPort.S1);
 		return uv;
 	}
 	
+	public EV3ColorSensor getColorSensor() {
+	    if (color == null)
+	        color = new EV3ColorSensor(SensorPort.S2);
+	    return color;
+	}
 	
+	public EV3TouchSensor getTouchSensorA() {
+	    if (touchA == null)
+	        touchA = new EV3TouchSensor(SensorPort.S3);
+	    return touchA;
+	}
+	
+    public EV3TouchSensor getTouchSensorB() {
+        if (touchB == null)
+            touchB = new EV3TouchSensor(SensorPort.S4);
+        return touchB;
+    }
 }
