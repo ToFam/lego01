@@ -29,8 +29,9 @@ public class Main {
         LCDGui gui = new LCDGui();
         
         
-        state = new LineState(robot, gui);
         //state = new LineState(robot, gui);
+        //state = new LineState(robot, gui);
+        state = new TestState(robot, gui);
         state.init();
         
         

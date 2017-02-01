@@ -23,12 +23,13 @@ public class TestState implements ParcourState {
         robot.setSpeed(1f);
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
+        RobotComponents.inst().getUV().setMode(0);
     }
 
     @Override
     public void update() {
 
-    	if (RobotComponents.inst().getColorSensor().sampleSize() >= 3)
+    	if (RobotComponents.inst().getUV().sampleSize() >= 3)
     	{
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[0]), 0);
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[1]), 1);
@@ -36,7 +37,7 @@ public class TestState implements ParcourState {
     		gui.writeLine(String.valueOf(Util.howMuchOnLine(new float[] {RobotComponents.inst().getColorSensor().sample()[0], RobotComponents.inst().getColorSensor().sample()[1], RobotComponents.inst().getColorSensor().sample()[2]})), 0);
     	}
     	else {
-    		gui.writeLine("SampleSize < 3");
+    		gui.writeLine(String.valueOf(RobotComponents.inst().getUV().sample()[0]));
     	}
     	
         if (Util.isPressed(Button.ID_UP))
