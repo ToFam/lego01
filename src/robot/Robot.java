@@ -75,7 +75,10 @@ public class Robot {
 	 * 
 	 * @param degree Makes the Robot turn by the given amount.
 	 */
-	public void turnOnSpot(float degree) {
+	public void turnOnSpot(float degree)
+	{
+		RobotComponents.inst().getGyroSensor().setMode(0);
+		float gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
 	}
 	
 	
