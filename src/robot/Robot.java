@@ -1,6 +1,7 @@
 package robot;
 
 import sensor.modes.ColorSensorMode;
+import sensor.modes.GyroSensorMode;
 
 /**
  * 
@@ -75,8 +76,32 @@ public class Robot {
 	 * 
 	 * @param degree Makes the Robot turn by the given amount.
 	 */
-	public void turnOnSpot(float degree) {
+	public void turnOnSpot(float degree)
+	{
+		RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+		float gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
+		float goalValue = gyroValue + degree;
+		boolean mustBeGreater = gyroValue < goalValue;
+		if (mustBeGreater)
+		{
+	        RobotComponents.inst().getLeftMotor().forward();
+			RobotComponents.inst().getRightMotor().backward();
+		}
+		else
+		{
+	        RobotComponents.inst().getLeftMotor().backward();
+			RobotComponents.inst().getRightMotor().forward();
+		}
+		
+		while (RobotComponents.inst().getGyroSensor().sample()[0] < goalValue != mustBeGreater)
+		{
+	        RobotComponents.inst().getLeftMotor().stop();
+			RobotComponents.inst().getRightMotor().stop();
+		}
+		
 	}
+	
+	
 	
 	
 	

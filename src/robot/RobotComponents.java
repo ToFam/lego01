@@ -85,12 +85,13 @@ public final class RobotComponents {
 	 * Returns the ultrasonic sensor.
 	 * @return the ultrasonic sensor.
 	 */
-	public UVSensor getUV() {
+	public synchronized UVSensor getUV() {
 	    if (uv == null)
 	    {
 	    	try
 	    	{
 		        uv = new UVSensor(new EV3UltrasonicSensor(SensorPort.S1));
+		        uv.start();
 	    	}
 	    	catch (IllegalArgumentException exception)
 	    	{
@@ -102,13 +103,13 @@ public final class RobotComponents {
 		return uv;
 	}
 	
-	public ColorSensor getColorSensor() {
+	public synchronized ColorSensor getColorSensor() {
 	    if (color == null)
 	    {
 	    	try
 	    	{
 	    		color = new ColorSensor(new EV3ColorSensor(SensorPort.S2));
-	    		color.setMode(ColorSensorMode.AMBIENT.getIdf());
+	    		color.start();
 	    	}
 	    	catch (IllegalArgumentException exception)
 	    	{
@@ -120,12 +121,13 @@ public final class RobotComponents {
 	    return color;
 	}
 	
-	public TouchSensorAThread getTouchSensorA() {
+	public synchronized TouchSensorAThread getTouchSensorA() {
 	    if (touchA == null)
 	    {
 	    	try
 	    	{
 		        touchA = new TouchSensorAThread(new EV3TouchSensor(SensorPort.S3));
+		        touchA.start();
 	    	}
 	    	catch (IllegalArgumentException exception)
 	    	{
@@ -137,12 +139,13 @@ public final class RobotComponents {
 	    return touchA;
 	}
 	
-    public TouchSensorBThread getTouchSensorB() {
+    public synchronized TouchSensorBThread getTouchSensorB() {
         if (touchB == null)
         {
 	    	try
 	    	{
 	            touchB = new TouchSensorBThread(new EV3TouchSensor(SensorPort.S4));
+	            touchB.start();
 	    	}
 	    	catch (IllegalArgumentException exception)
 	    	{
@@ -154,12 +157,13 @@ public final class RobotComponents {
         return touchB;
     }
     
-    public GyroSensor getGyroSensor() {
+    public synchronized GyroSensor getGyroSensor() {
         if (gyros == null)
         {
 	    	try
 	    	{
 	            gyros = new GyroSensor(new EV3GyroSensor(SensorPort.S3));
+	            gyros.start();
 	    	}
 	    	catch (IllegalArgumentException exception)
 	    	{

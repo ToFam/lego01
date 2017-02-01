@@ -3,6 +3,8 @@ package state;
 import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
+import robot.RobotComponents;
+import sensor.modes.GyroSensorMode;
 import util.Util;
 
 public class TestState implements ParcourState {
@@ -18,11 +20,14 @@ public class TestState implements ParcourState {
     @Override
     public void init() {
         robot.setSpeed(1f);
+        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
     }
 
     @Override
     public void update() {
-        
+
+		gui.writeLine(String.valueOf(RobotComponents.inst().getGyroSensor().sample()[0]));
+    	
         if (Util.isPressed(Button.ID_UP))
         {
             robot.forward();
@@ -35,14 +40,12 @@ public class TestState implements ParcourState {
         
         if (Util.isPressed(Button.ID_LEFT))
         {
-            robot.setSpeed(0.5f, 1f);
-            robot.forward();
+            robot.turnOnSpot(90);
         }
         
         if (Util.isPressed(Button.ID_RIGHT))
         {
-            robot.setSpeed(1f, 0.5f);
-            robot.forward();
+            robot.turnOnSpot(-90);
         }
         
         if (Util.isPressed(Button.ID_DOWN))
