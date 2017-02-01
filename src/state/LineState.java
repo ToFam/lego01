@@ -150,6 +150,7 @@ public class LineState implements ParcourState {
 	
 	private void adapt() {
 		robot.setSpeed(this.leftScale, this.rightScale);
+		robot.forward();
 	}
 
 }
