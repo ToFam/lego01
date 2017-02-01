@@ -103,13 +103,28 @@ public class Robot {
 	        RobotComponents.inst().getLeftMotor().backward();
 			RobotComponents.inst().getRightMotor().forward();
 		}
-		
+
+		boolean setSpeed = false;
 		while (RobotComponents.inst().getGyroSensor().sample()[0] < goalValue == mustBeGreater)
 		{
-			if (Math.abs(RobotComponents.inst().getGyroSensor().sample()[0] - goalValue) < turnOnSpot_angleToSlowDown)
+			if (setSpeed == false && Math.abs(RobotComponents.inst().getGyroSensor().sample()[0] - goalValue) < turnOnSpot_angleToSlowDown)
 			{
+				setSpeed = true;
+		        RobotComponents.inst().getLeftMotor().stop(true);
+				RobotComponents.inst().getRightMotor().stop(true);
 				RobotComponents.inst().getLeftMotor().setSpeed(oldSpeedL * turnOnSpot_slowDownSpeedFactor);
 				RobotComponents.inst().getRightMotor().setSpeed(oldSpeedR * turnOnSpot_slowDownSpeedFactor);
+				
+				if (mustBeGreater)
+				{
+			        RobotComponents.inst().getLeftMotor().forward();
+					RobotComponents.inst().getRightMotor().backward();
+				}
+				else
+				{
+			        RobotComponents.inst().getLeftMotor().backward();
+					RobotComponents.inst().getRightMotor().forward();
+				}
 			}
 		}
 		
