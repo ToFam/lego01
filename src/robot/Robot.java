@@ -71,6 +71,10 @@ public class Robot {
 	public void curveRight() {
 	}
 
+	
+	private float turnOnSpot_angleToSlowDown = 50f;
+	private float turnOnSpot_slowDownSpeedFactor = 0.4f;
+	private float turnOnSpot_stopBeforeAngle = 10f;
 	/**
 	 * Turn the Robot around its axis.
 	 * 
@@ -78,10 +82,17 @@ public class Robot {
 	 */
 	public void turnOnSpot(float degree)
 	{
-		RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+		float oldSpeedL = RobotComponents.inst().getLeftMotor().getSpeed();
+		float oldSpeedR = RobotComponents.inst().getRightMotor().getSpeed();
+		//RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
 		float gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
 		float goalValue = gyroValue + degree;
 		boolean mustBeGreater = gyroValue < goalValue;
+		
+		float addition = mustBeGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
+		goalValue += addition;
+		
+		
 		if (mustBeGreater)
 		{
 	        RobotComponents.inst().getLeftMotor().forward();
@@ -93,11 +104,20 @@ public class Robot {
 			RobotComponents.inst().getRightMotor().forward();
 		}
 		
-		while (RobotComponents.inst().getGyroSensor().sample()[0] < goalValue != mustBeGreater)
+		while (RobotComponents.inst().getGyroSensor().sample()[0] < goalValue == mustBeGreater)
 		{
-	        RobotComponents.inst().getLeftMotor().stop();
-			RobotComponents.inst().getRightMotor().stop();
+			if (Math.abs(RobotComponents.inst().getGyroSensor().sample()[0] - goalValue) < turnOnSpot_angleToSlowDown)
+			{
+				RobotComponents.inst().getLeftMotor().setSpeed(oldSpeedL * turnOnSpot_slowDownSpeedFactor);
+				RobotComponents.inst().getRightMotor().setSpeed(oldSpeedR * turnOnSpot_slowDownSpeedFactor);
+			}
 		}
+		
+        RobotComponents.inst().getLeftMotor().stop(true);
+		RobotComponents.inst().getRightMotor().stop(true);
+
+		RobotComponents.inst().getLeftMotor().setSpeed(oldSpeedL);
+		RobotComponents.inst().getRightMotor().setSpeed(oldSpeedR);
 		
 	}
 	
