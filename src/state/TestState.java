@@ -4,6 +4,7 @@ import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.modes.GyroSensorMode;
 import util.Util;
 
 public class TestState implements ParcourState {
@@ -19,7 +20,7 @@ public class TestState implements ParcourState {
     @Override
     public void init() {
         robot.setSpeed(1f);
-        RobotComponents.inst().getGyroSensor().setMode(1);
+        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
     }
 
     @Override
