@@ -40,14 +40,12 @@ public class TestState implements ParcourState {
         
         if (Util.isPressed(Button.ID_LEFT))
         {
-            robot.setSpeed(0.5f, 1f);
-            robot.forward();
+            robot.turnOnSpot(90);
         }
         
         if (Util.isPressed(Button.ID_RIGHT))
         {
-            robot.setSpeed(1f, 0.5f);
-            robot.forward();
+            robot.turnOnSpot(-90);
         }
         
         if (Util.isPressed(Button.ID_DOWN))
