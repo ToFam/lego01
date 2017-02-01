@@ -22,7 +22,7 @@ public class TestState implements ParcourState {
         robot.setSpeed(1f);
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         
-        RobotComponents.inst().getMediumMotor().rotate(25);
+        RobotComponents.inst().getMediumMotor().rotate(-25);
     }
 
     @Override
