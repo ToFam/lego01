@@ -1,13 +1,13 @@
 package sensor;
 
-import lejos.hardware.sensor.EV3TouchSensor;
+import lejos.hardware.sensor.EV3ColorSensor;
 
-public class TouchSensorAThread extends SensorThread {
-    
-    public TouchSensorAThread(EV3TouchSensor sensor) {
-        super(sensor);
-    }
-    
+public class ColorSensor extends SensorThread {
+	
+	public ColorSensor(EV3ColorSensor sensor) {
+		super(sensor);
+	}
+
     @Override
     public void run() {
         
@@ -25,5 +25,4 @@ public class TouchSensorAThread extends SensorThread {
         }
         
     }
-
 }

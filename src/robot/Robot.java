@@ -90,7 +90,7 @@ public class Robot {
 	
 	public void setColorMode(ColorSensorMode mode)
 	{
-		RobotComponents.inst().getColorSensor().setCurrentMode(mode.getIdf());
+		RobotComponents.inst().getColorSensor().setMode(mode.getIdf());
 	}
 	
 	
