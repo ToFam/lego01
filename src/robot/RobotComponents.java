@@ -10,6 +10,12 @@ import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
+import sensor.ColorSensorThread;
+import sensor.GyroSensor;
+import sensor.TouchSensorAThread;
+import sensor.TouchSensorBThread;
+import sensor.UVSensorThread;
+import sensor.modes.ColorSensorMode;
 
 /**
  * 
@@ -31,6 +37,12 @@ public final class RobotComponents {
 	private EV3TouchSensor touchA = null;
 	private EV3TouchSensor touchB = null;
 	private EV3GyroSensor gyros = null; 
+	
+	private ColorSensorThread colorThread = null;
+	private GyroSensor gyroThread = null;
+	private TouchSensorAThread touchAThraed = null;
+	private TouchSensorBThread touchBThread = null;
+	private UVSensorThread uvThread = null;
 	
 	private static RobotComponents instance;
 	
@@ -74,6 +86,16 @@ public final class RobotComponents {
 	        medium = new EV3MediumRegulatedMotor(MotorPort.C);
 		return medium;
 	}
+	
+	public UVSensorThread getUVThread()
+	{
+		if (uvThread == null)
+		{
+			uvThread = new UVSensorThread();
+			uvThread.start();
+		}
+		return uvThread;
+	}
 
 	/**
 	 * Returns the ultrasonic sensor.
@@ -97,11 +119,12 @@ public final class RobotComponents {
 	}
 	
 	public EV3ColorSensor getColorSensor() {
-	    if (color == null)
+	    if (instance.color == null)
 	    {
 	    	try
 	    	{
-		        color = new EV3ColorSensor(SensorPort.S2);
+	    		instance.color = new EV3ColorSensor(SensorPort.S2);
+	    		instance.color.setCurrentMode(ColorSensorMode.AMBIENT.getIdf());
 	    	}
 	    	catch (IllegalArgumentException exception)
 	    	{
@@ -110,7 +133,7 @@ public final class RobotComponents {
 	    		Sound.beep();
 	    	}
 	    }
-	    return color;
+	    return instance.color;
 	}
 	
 	public EV3TouchSensor getTouchSensorA() {

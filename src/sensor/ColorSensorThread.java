@@ -29,16 +29,35 @@ public class ColorSensorThread extends SensorThread {
 				}
 			}
 			
-			if (sensor.getCurrentMode() != oldMode)
+			if (running || true)
 			{
-				sample = new float[sensor.sampleSize()];
-				oldMode = sensor.getCurrentMode();
+				if (sensor.getCurrentMode() != oldMode)
+				{
+					sample = new float[sensor.sampleSize()];
+					oldMode = sensor.getCurrentMode();
+				}
+				
+				sensor.fetchSample(sample, 0);
+				storage.setColor(sample);
 			}
 			
-			sensor.fetchSample(sample, 0);
-			storage.setColor(sample);
 			
 		}
 		
+	}
+	
+	/**
+	 * Changes the sensor mode.
+	 * 
+	 * @param mode
+	 * @return If the mode was changed
+	 */
+	public boolean setMode(int mode) {
+		if (sensor != null)
+		{
+			sensor.setCurrentMode(mode);
+			return true;
+		}
+		return false;
 	}
 }

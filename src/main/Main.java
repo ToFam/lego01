@@ -83,7 +83,7 @@ public class Main {
         
         
         //state = new TestState(robot, gui);
-        state = new LineState(robot, gui, storage);
+        state = new LineState(robot, gui, storage, colorSensorThread);
         state.init();
         
         

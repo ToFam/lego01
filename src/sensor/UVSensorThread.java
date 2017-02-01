@@ -6,10 +6,19 @@ import robot.RobotComponents;
 public class UVSensorThread extends SensorThread {
 
 	EV3UltrasonicSensor sensor;
-	float[] sample;
+	private float[] sample;
 	
 	public UVSensorThread(WriteBackStorage storage) {
 		super(storage);
+	}
+
+	public UVSensorThread() {
+		super(null);
+	}
+	
+	public float[] getSamples()
+	{
+		return sample;
 	}
 	
 	@Override
