@@ -24,12 +24,6 @@ public class LabyrinthState implements ParcourState {
     @Override
     public void init() {
     }
-    
-    public void contact() {
-        robot.stop();
-        retreat = 10;
-        free = 0;
-    }
 
     @Override
     public void update() {
@@ -57,7 +51,13 @@ public class LabyrinthState implements ParcourState {
         }
         else {
             if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
-                contact();
+                robot.stop();
+                retreat = 10;
+                free = 0;
+            }
+            else
+            {
+                free++;
             }
             
             if (free > retreat * 1.5) {
