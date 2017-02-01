@@ -7,6 +7,7 @@ import lejos.hardware.KeyListener;
 import robot.Robot;
 import state.LineState;
 import state.ParcourState;
+import state.TestState;
 /**
  * 
  * @author	Team AndreasBot: Simon,
@@ -28,8 +29,8 @@ public class Main {
         LCDGui gui = new LCDGui();
         
         
-        //state = new TestState(robot, gui);
-        state = new LineState(robot, gui);
+        state = new TestState(robot, gui);
+        //state = new LineState(robot, gui);
         state.init();
         
         

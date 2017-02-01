@@ -79,7 +79,12 @@ public class Robot {
 	{
 		RobotComponents.inst().getGyroSensor().setMode(0);
 		float gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
+		float goalValue = gyroValue + degree;
+        RobotComponents.inst().getLeftMotor().forward();
+		RobotComponents.inst().getRightMotor().stop();
 	}
+	
+	
 	
 	
 	
