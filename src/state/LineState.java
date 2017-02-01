@@ -1,6 +1,7 @@
 package state;
 
 import lcdGui.LCDGui;
+import lejos.hardware.lcd.LCD;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
@@ -29,7 +30,7 @@ public class LineState implements ParcourState {
         this.leftScale = 0.f;
         this.rightScale = 0.f;
         
-        this.threshold = 0.02f;
+        this.threshold = 0.5f;
         
         this.sample = new FloatTuple[50000];
         this.endIndex = 0;
@@ -41,7 +42,7 @@ public class LineState implements ParcourState {
 	@Override
 	public void init() {
 
-		RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(25), true);
+		RobotComponents.inst().getMediumMotor().rotate(70, true);
 		this.left = true;
 	}
 
@@ -62,12 +63,12 @@ public class LineState implements ParcourState {
         RobotComponents.inst().getMediumMotor().resetTachoCount();
         
 		if (this.left) {
-			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(-50), true);
+			RobotComponents.inst().getMediumMotor().rotate(-130, true);
 		} else {
-			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(50), true);
+			RobotComponents.inst().getMediumMotor().rotate(130, true);
 		}
 		
-		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < Util.getEffectiveAngle(45)) {
+		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < 125) {
 			this.sample[counter] = RobotComponents.inst().getColorSensor().getFloatTuple();
 			counter++;
 		}
