@@ -35,7 +35,7 @@ public class Robot {
         RobotComponents.inst().getLeftMotor().setSpeed(max * speedLeft);
         RobotComponents.inst().getRightMotor().setSpeed(max * speedRight);
         
-        this.forward();
+        //this.forward();
     }
 
 
@@ -74,7 +74,7 @@ public class Robot {
 	
 	private float turnOnSpot_angleToSlowDown = 50f;
 	private float turnOnSpot_slowDownSpeedFactor = 0.4f;
-	private float turnOnSpot_stopBeforeAngle = 10f;
+	private float turnOnSpot_stopBeforeAngle = 4f;
 	/**
 	 * Turn the Robot around its axis.
 	 * 
