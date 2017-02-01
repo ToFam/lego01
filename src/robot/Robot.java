@@ -26,15 +26,15 @@ public class Robot {
 	}
 	
 	public void setSpeed(float speed) {
-	    float max = Math.min(RobotComponents.inst().getLeftMotor().getMaxSpeed(), RobotComponents.inst().getRightMotor().getMaxSpeed());
-	    RobotComponents.inst().getLeftMotor().setSpeed(max * speed);
-        RobotComponents.inst().getRightMotor().setSpeed(max * speed);
+	    this.setSpeed(speed, speed);
 	}
 	
     public void setSpeed(float speedLeft, float speedRight) {
         float max = Math.min(RobotComponents.inst().getLeftMotor().getMaxSpeed(), RobotComponents.inst().getRightMotor().getMaxSpeed());
         RobotComponents.inst().getLeftMotor().setSpeed(max * speedLeft);
         RobotComponents.inst().getRightMotor().setSpeed(max * speedRight);
+        
+        this.forward();
     }
 
 
