@@ -26,14 +26,17 @@ public class Main {
     {
         robot = new Robot();
         
-        LCDGui gui = new LCDGui();
+        LCDGui gui = new LCDGui(4, 2);
+        
+        gui.writeLine("Starting State...");
         
         
         //state = new LineState(robot, gui);
         //state = new LineState(robot, gui);
         state = new TestState(robot, gui);
         state.init();
-        
+
+        gui.writeLine("Started!");
         
         while (true)
         {
@@ -41,7 +44,7 @@ public class Main {
             state.update();
             
             try {
-                Thread.sleep(500);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

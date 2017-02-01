@@ -29,16 +29,17 @@ public class TestState implements ParcourState {
     @Override
     public void update() {
 
-    	if (RobotComponents.inst().getUV().sampleSize() >= 3)
+    	if (RobotComponents.inst().getColorSensor().sampleSize() >= 3)
     	{
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[0]), 0);
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[1]), 1);
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[2]), 2);
-    		gui.writeLine(String.valueOf(Util.howMuchOnLine(new float[] {RobotComponents.inst().getColorSensor().sample()[0], RobotComponents.inst().getColorSensor().sample()[1], RobotComponents.inst().getColorSensor().sample()[2]})), 0);
+    		//gui.writeLine(String.valueOf(Util.howMuchOnLine(new float[] {RobotComponents.inst().getColorSensor().sample()[0], RobotComponents.inst().getColorSensor().sample()[1], RobotComponents.inst().getColorSensor().sample()[2]})), 0);
+    		gui.setVarValue(0, Util.howMuchOnLine(new float[] {RobotComponents.inst().getColorSensor().sample()[0], RobotComponents.inst().getColorSensor().sample()[1], RobotComponents.inst().getColorSensor().sample()[2]}));
     	}
-    	else {
-    		gui.writeLine(String.valueOf(RobotComponents.inst().getUV().sample()[0]));
-    	}
+    	
+    	gui.setVarValue(1, RobotComponents.inst().getUV().sample()[0]);
+    	
     	
         if (Util.isPressed(Button.ID_UP))
         {
