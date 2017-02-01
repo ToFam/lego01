@@ -29,7 +29,7 @@ public class Main {
         LCDGui gui = new LCDGui();
         
         
-        state = new TestState(robot, gui);
+        state = new LineState(robot, gui);
         //state = new LineState(robot, gui);
         state.init();
         
@@ -40,7 +40,7 @@ public class Main {
             state.update();
             
             try {
-                Thread.sleep(200);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
