@@ -89,7 +89,7 @@ public final class RobotComponents {
 	    	catch (IllegalArgumentException exception)
 	    	{
 	    		LCD.clear();
-	    		LCD.drawString("No UV sensor found on S1", 0, 0);
+	    		LCD.drawString("1No UV sensor found on S1", 0, 0);
 	    		Sound.beep();
 	    	}
 	    }
@@ -106,7 +106,7 @@ public final class RobotComponents {
 	    	catch (IllegalArgumentException exception)
 	    	{
 	    		LCD.clear();
-	    		LCD.drawString("No color sensor found on S2", 0, 0);
+	    		LCD.drawString("2No color sensor found on S2", 0, 0);
 	    		Sound.beep();
 	    	}
 	    }
@@ -123,7 +123,7 @@ public final class RobotComponents {
 	    	catch (IllegalArgumentException exception)
 	    	{
 	    		LCD.clear();
-	    		LCD.drawString("No touch sensor found on S3", 0, 0);
+	    		LCD.drawString("3No touch sensor found on S3", 0, 0);
 	    		Sound.beep();
 	    	}
 	    }
@@ -140,7 +140,7 @@ public final class RobotComponents {
 	    	catch (IllegalArgumentException exception)
 	    	{
 	    		LCD.clear();
-	    		LCD.drawString("No touch sensor found on S4", 0, 0);
+	    		LCD.drawString("4No touch sensor found on S4", 0, 0);
 	    		Sound.beep();
 	    	}
         }
@@ -157,7 +157,7 @@ public final class RobotComponents {
 	    	catch (IllegalArgumentException exception)
 	    	{
 	    		LCD.clear();
-	    		LCD.drawString("No gyros sensor found on S3", 0, 0);
+	    		LCD.drawString("3No gyros sensor found on S3", 0, 0);
 	    		Sound.beep();
 	    	}
         }

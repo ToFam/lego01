@@ -11,6 +11,7 @@ import robot.RobotComponents;
 import sensor.ColorSensorThread;
 import sensor.UVSensorThread;
 import sensor.WriteBackStorage;
+import sensor.modes.ColorSensorMode;
 import state.LineState;
 import state.ParcourState;
 import state.TestState;
@@ -61,19 +62,22 @@ public class Main {
     	 * NOT TESTED YET!
     	 * ***************
     	 */
-    	(new ExitProgrammThread()).start();
-    	
+    	//(new ExitProgrammThread()).start();
+
+        
+        
         robot = new Robot();
+
+        storage = new WriteBackStorage();
+        
         colorSensorThread = new ColorSensorThread(storage);
-        uvSensorThread = new UVSensorThread(storage);
+        //uvSensorThread = new UVSensorThread(storage);
         
         colorSensorThread.start();
         colorSensorThread.setRunning(false);
         
-        uvSensorThread.start();
-        uvSensorThread.setRunning(false);
-        
-        storage = new WriteBackStorage();
+        //uvSensorThread.start();
+        //uvSensorThread.setRunning(false);
         LCDGui gui = new LCDGui();
         
         
@@ -81,6 +85,7 @@ public class Main {
         //state = new TestState(robot, gui);
         state = new LineState(robot, gui, storage);
         state.init();
+        
         
         while (true)
         {

@@ -2,7 +2,9 @@ package state;
 
 import lcdGui.LCDGui;
 import robot.Robot;
+import robot.RobotComponents;
 import sensor.WriteBackStorage;
+import sensor.modes.ColorSensorMode;
 
 public class LineState implements ParcourState {
 	
@@ -21,11 +23,19 @@ public class LineState implements ParcourState {
         robot.setSpeed(1f);
 		
 	}
+	
+	boolean firstCall = true;
 
 	@Override
 	public void update() {
 		
 		gui.writeLine(String.valueOf(storage.getColor()));
+		
+		if (firstCall)
+		{
+			firstCall = false;
+	        RobotComponents.inst().getColorSensor().setCurrentMode("RGB");
+		}
 	}
 
 }
