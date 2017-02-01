@@ -4,6 +4,7 @@ import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import util.Util;
 
@@ -19,11 +20,13 @@ public class LineSlowMode implements ParcourState {
 
     @Override
     public void init() {
-        robot.setSpeed(1f);
+        robot.setSpeed(0.5f);
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+        RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.AMBIENT.getIdf());
+        
     }
 
-    private float param_colorThresh = 0.3f;
+    private float param_colorThresh = 0.02f;
     
     boolean isLeftToLine = true;
     int state = 0;
@@ -34,12 +37,12 @@ public class LineSlowMode implements ParcourState {
     	switch (state)
     	{
     	case 0://Is left to line
-    		RobotComponents.inst().getLeftMotor().forward();
+    		RobotComponents.inst().getLeftMotor().backward();
     		RobotComponents.inst().getRightMotor().stop();
     		state = 2;
     		break;
     	case 1://Is right to line
-    		RobotComponents.inst().getRightMotor().forward();
+    		RobotComponents.inst().getRightMotor().backward();
     		RobotComponents.inst().getLeftMotor().stop();
     		state = 3;
     		break;
@@ -49,18 +52,27 @@ public class LineSlowMode implements ParcourState {
     			state = 4;
     		}
     		break;
-    	case 3:
-    		
+    	case 3://Wait To cross line from right
+    		if (RobotComponents.inst().getColorSensor().sample()[0] > param_colorThresh)
+    		{
+    			state = 5;
+    		}
     		break;
     	case 4://WaitToSeeBlackOnRightSide
     		if (RobotComponents.inst().getColorSensor().sample()[0] <= param_colorThresh)
     		{
-    			state = 6;
+    			state = 1;
+    		}
+    		break;
+    	case 5://WaitToSeeBlackOnLeftSide
+    		if (RobotComponents.inst().getColorSensor().sample()[0] <= param_colorThresh)
+    		{
+    			state = 0;
     		}
     		break;
     	}
     	
-		gui.writeLine(String.valueOf(RobotComponents.inst().getGyroSensor().sample()[0]));
+		gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[0]));
     	
         if (Util.isPressed(Button.ID_UP))
         {

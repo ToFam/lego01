@@ -81,4 +81,28 @@ public final class Util {
 		
 		return sum / weight;
 	}
+	
+	private static float howMuchOnLine_RMin = 0.1f;
+	private static float howMuchOnLine_RMax = 0.29f;
+	private static float howMuchOnLine_GMin = 0.1f;
+	private static float howMuchOnLine_GMax = 0.29f;
+	private static float howMuchOnLine_BMin = 0.1f;
+	private static float howMuchOnLine_BMax = 0.29f;
+	/**
+	 * 
+	 * @param rgbValues
+	 * @return A value between 0 and 1. Where 0 is black and 1 is line
+	 */
+	public static float howMuchOnLine(float[] rgbValues)
+	{
+		float facR = (1.0f / (howMuchOnLine_RMax - howMuchOnLine_RMin)) * (rgbValues[0] - howMuchOnLine_RMin);
+		float facG = (1.0f / (howMuchOnLine_GMax - howMuchOnLine_GMin)) * (rgbValues[1] - howMuchOnLine_GMin);
+		float facB = (1.0f / (howMuchOnLine_BMax - howMuchOnLine_BMin)) * (rgbValues[2] - howMuchOnLine_BMin);
+		
+		float midVal = (facR + facG + facB) / 3.0f;
+		
+		midVal = midVal < 0f ? 0f : (midVal > 1f ? 1f : midVal);
+		
+		return midVal;
+	}
 }
