@@ -13,4 +13,9 @@ public class LCDGui
 	{
 		LCD.drawString(line, 0, 0);
 	}
+	
+	public void logData(float x, float y)
+	{
+		
+	}
 }
