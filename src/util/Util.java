@@ -11,6 +11,7 @@ import lejos.hardware.Button;
  */
 public final class Util {
 	
+	private final static float transmission = 20.f / 12.f;
 	/**
 	 * Default private constructor.
 	 */
@@ -27,6 +28,10 @@ public final class Util {
 	 */
 	public static boolean isPressed(int buttonID) {
 		return (Button.readButtons() & buttonID) != 0;
+	}
+	
+	public static int getEffectiveAngle(float angle) {
+		return (int) (angle * transmission);
 	}
 	
 	/**

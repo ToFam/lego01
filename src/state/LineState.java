@@ -5,6 +5,7 @@ import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import util.FloatTuple;
+import util.Util;
 
 public class LineState implements ParcourState {
 	
@@ -20,7 +21,6 @@ public class LineState implements ParcourState {
      */
     private FloatTuple[] sample;
     private int endIndex;
-    private int counter;
     private boolean left;
     
     public LineState(Robot robot, LCDGui gui) {
@@ -33,7 +33,6 @@ public class LineState implements ParcourState {
         
         this.sample = new FloatTuple[100];
         this.endIndex = 0;
-        this.counter = 0;
         this.left = true;
         
         
@@ -41,7 +40,9 @@ public class LineState implements ParcourState {
 
 	@Override
 	public void init() {
-		
+
+		RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(45), true);
+		this.left = true;
 	}
 
 	@Override
@@ -57,21 +58,21 @@ public class LineState implements ParcourState {
 	
 	private void scan() {
 		
-		this.counter = 0;
+		int counter = 0;
         RobotComponents.inst().getMediumMotor().resetTachoCount();
         
 		if (this.left) {
-			RobotComponents.inst().getMediumMotor().rotate(-90, true);
+			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(-90), true);
 		} else {
-			RobotComponents.inst().getMediumMotor().rotate(90, true);
+			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(90), true);
 		}
 		
 		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) != 90) {
-			this.sample[this.counter] = RobotComponents.inst().getColorSensor().getFloatTuple();
-			this.counter++;
+			this.sample[counter] = RobotComponents.inst().getColorSensor().getFloatTuple();
+			counter++;
 		}
 		
-		this.endIndex = this.counter;
+		this.endIndex = counter;
 		
 	}
 	
