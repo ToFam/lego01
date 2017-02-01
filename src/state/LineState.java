@@ -31,7 +31,7 @@ public class LineState implements ParcourState {
         
         this.threshold = 0.02f;
         
-        this.sample = new FloatTuple[100];
+        this.sample = new FloatTuple[50000];
         this.endIndex = 0;
         this.left = true;
         
@@ -41,7 +41,7 @@ public class LineState implements ParcourState {
 	@Override
 	public void init() {
 
-		RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(45), true);
+		RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(25), true);
 		this.left = true;
 	}
 
@@ -62,17 +62,19 @@ public class LineState implements ParcourState {
         RobotComponents.inst().getMediumMotor().resetTachoCount();
         
 		if (this.left) {
-			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(-90), true);
+			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(-50), true);
 		} else {
-			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(90), true);
+			RobotComponents.inst().getMediumMotor().rotate(Util.getEffectiveAngle(50), true);
 		}
 		
-		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) != 90) {
+		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < Util.getEffectiveAngle(45)) {
 			this.sample[counter] = RobotComponents.inst().getColorSensor().getFloatTuple();
 			counter++;
 		}
 		
 		this.endIndex = counter;
+		
+		gui.writeLine(String.valueOf(this.endIndex));
 		
 	}
 	
