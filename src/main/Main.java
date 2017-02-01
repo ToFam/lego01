@@ -68,7 +68,7 @@ public class Main {
         uvSensorThread = new UVSensorThread(storage);
         
         colorSensorThread.start();
-        colorSensorThread.setRunning(false);
+        colorSensorThread.setRunning(true);
         
         uvSensorThread.start();
         uvSensorThread.setRunning(false);
@@ -82,11 +82,15 @@ public class Main {
         state = new LineState(robot, gui, storage);
         state.init();
         
+        float sample;
+        RobotComponents.inst().getColorSensor().setCurrentMode("Ambient");
+        
         while (true)
         {
             
-            state.update();
+            sample = storage.getColor();
             
+            LCD.drawString(String.valueOf(sample), 0, 0);
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
