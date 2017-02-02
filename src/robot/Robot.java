@@ -37,6 +37,18 @@ public class Robot {
         
         //this.forward();
     }
+    
+    /**
+     * 
+     * @param direction 1 is drive full left, -1 is drive full right. 0 is straight
+     */
+    public void setSpeedInDriveDirection(float direction)
+    {
+    	float left = (-1f * direction) >= 0f? (-1f * direction) : 0f;
+    	float right = (1f * direction) >= 0f? (1f * direction) : 0f;
+    	
+    	setSpeed(left, right);
+    }
 
 
     public void forward() {
