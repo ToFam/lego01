@@ -52,13 +52,13 @@ public class Robot {
 
 
     public void forward() {
-        RobotComponents.inst().getLeftMotor().forward();
-        RobotComponents.inst().getRightMotor().forward();
+        RobotComponents.inst().getLeftMotor().backward();
+        RobotComponents.inst().getRightMotor().backward();
     }
     
     public void backward() {
-        RobotComponents.inst().getLeftMotor().backward();
-        RobotComponents.inst().getRightMotor().backward();
+        RobotComponents.inst().getLeftMotor().forward();
+        RobotComponents.inst().getRightMotor().forward();
     }
 	
 	/**
