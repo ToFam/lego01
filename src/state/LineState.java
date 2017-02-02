@@ -51,6 +51,7 @@ public class LineState implements ParcourState {
 	public void init() {
 
 		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
+//		RobotComponents.inst().getColorSensor().setMedianFilter(10);
 		RobotComponents.inst().getMediumMotor().rotate(this.angle / 2 - 5, false);
 		this.left = true;
 		
@@ -97,8 +98,9 @@ public class LineState implements ParcourState {
 		int r = 0; //right bound == last encounter with line from the left
 		int i = 0;
 		
-		while (this.sample[i].getF1() < threshold && i < this.endIndex) {
+		while (i < this.endIndex && this.sample[i].getF1() < threshold) {
 			i++;
+//			gui.setVarValue(1, "LEFT: " + String.valueOf(i));
 		}
 		
 		if (i >= this.endIndex) {
@@ -112,8 +114,9 @@ public class LineState implements ParcourState {
 		l = i;
 		i = this.endIndex - 1;
 		
-		while (this.sample[i].getF1() < threshold && i >= 0) {
+		while (i >= 0 && this.sample[i].getF1() < threshold) {
 			i--;
+//			gui.setVarValue(1, "RIGHT: " + String.valueOf(i));
 		}
 		
 		r = i;
