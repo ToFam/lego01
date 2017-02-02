@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lcdGui.LCDChooseList;
+import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
@@ -74,6 +75,7 @@ public class Main {
             
             state = mainMenu.getCurrentSelected();
             states.get(state).init();
+            LCDGui.clearLCD();
         
             while (!Util.isPressed(Button.ENTER.getId()))
             {

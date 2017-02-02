@@ -17,7 +17,7 @@ public class LCDGui
         LCD.clear();
         
         for (int i = 0; i < LCDGui.LCDAmountOfRows; i++) {
-            LCD.drawString("                                          ", 0, i);
+            LCD.clear(i);
         }
     }
 	
