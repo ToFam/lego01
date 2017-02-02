@@ -21,6 +21,7 @@ public class TestDriveLTWall implements ParcourState {
     public void init() {
         robot.setSpeed(1f);
         RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUV().setMedianFilter(1000);
         
         gui = new LCDGui(4, 2);
     }
@@ -31,6 +32,7 @@ public class TestDriveLTWall implements ParcourState {
     	
     	
     	gui.setVarValue(0, RobotComponents.inst().getUV().sample()[0]);
+    	gui.setVarValue(1, RobotComponents.inst().getUV().instSample()[0]);
     	
     	
     }
