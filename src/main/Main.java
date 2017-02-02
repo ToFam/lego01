@@ -73,6 +73,7 @@ public class Main {
             }
             
             state = mainMenu.getCurrentSelected();
+            states.get(state).init();
         
             while (!Util.isPressed(Button.ENTER.getId()))
             {
@@ -84,6 +85,8 @@ public class Main {
                     e.printStackTrace();
                 }
             }
+            
+            states.get(state).reset();
         }
     }
     
