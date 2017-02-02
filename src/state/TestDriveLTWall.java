@@ -22,7 +22,7 @@ public class TestDriveLTWall implements ParcourState {
     }
 
     public void reset() {
-        
+        robot.stop();
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TestDriveLTWall implements ParcourState {
     }
     
     private float oldDistance = 0.0f;
-    private float turnFactor = 10.0f;
+    private float turnFactor = 5.0f;
 
     @Override
     public void update(int elapsedTime) {
