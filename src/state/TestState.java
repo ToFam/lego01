@@ -27,7 +27,7 @@ public class TestState implements ParcourState {
     }
 
     @Override
-    public void update() {
+    public void update(int elapsedTime) {
 
     	if (RobotComponents.inst().getColorSensor().sampleSize() >= 3)
     	{

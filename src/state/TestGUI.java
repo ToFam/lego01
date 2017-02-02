@@ -26,7 +26,7 @@ public class TestGUI implements ParcourState {
     }
 
     @Override
-    public void update() {
+    public void update(int elapsedTime) {
 
         if (Util.isPressed(Button.ID_DOWN))
         {

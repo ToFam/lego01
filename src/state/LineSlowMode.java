@@ -32,7 +32,7 @@ public class LineSlowMode implements ParcourState {
     int state = 0;
     
     @Override
-    public void update() {
+    public void update(int elapsedTime) {
 
     	switch (state)
     	{

@@ -26,7 +26,7 @@ public class LabyrinthState implements ParcourState {
     }
 
     @Override
-    public void update() {
+    public void update(int elapsedTime) {
         if (retreat > 0) {
             retreat--;
             

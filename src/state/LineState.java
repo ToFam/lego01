@@ -47,7 +47,7 @@ public class LineState implements ParcourState {
 	}
 
 	@Override
-	public void update() {
+	public void update(int elapsedTime) {
 		
 		this.scan();
 		this.evaluate();

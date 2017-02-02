@@ -26,7 +26,7 @@ public class TestDriveLTWall implements ParcourState {
     }
 
     @Override
-    public void update() {
+    public void update(int elapsedTime) {
 
     	
     	

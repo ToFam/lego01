@@ -9,6 +9,7 @@ import state.LineState;
 import state.ParcourState;
 import state.TestGUI;
 import state.TestState;
+import util.Util;
 /**
  * 
  * @author	Team AndreasBot: Simon,
@@ -40,10 +41,9 @@ public class Main {
 
         gui.writeLine("Started!");
         
-        while (true)
+        while (!Util.isPressed(Button.ENTER.getId()))
         {
-            
-            state.update();
+            state.update(50);
             
             try {
                 Thread.sleep(50);
