@@ -22,7 +22,7 @@ public class TestGUI implements ParcourState {
     
     @Override
     public void init() {
-    	chooseList = new LCDChooseList(new String[] {"Number 1", "Second", "Dr3i", "Vier"});
+    	chooseList = new LCDChooseList(new String[] {"Number 1", "Second", "Dr3i", "Vier", "5", "6", "7", "8", "9"});
     }
 
     @Override

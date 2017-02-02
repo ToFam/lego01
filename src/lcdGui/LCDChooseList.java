@@ -49,7 +49,8 @@ public class LCDChooseList {
 		
 		if (oldOffset != currentOffset || oldSelected != currentSelected)
 		{
-			LCD.clear(0, oldSelected - oldOffset, 1);
+			//LCD.clear(0, oldSelected - oldOffset, 1);
+			LCD.drawString(" ", 0, oldSelected - oldOffset);
 		}
 		
 		LCD.drawString(">", 0, currentSelected - currentOffset);

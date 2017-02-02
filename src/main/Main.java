@@ -7,6 +7,7 @@ import lejos.hardware.KeyListener;
 import robot.Robot;
 import state.LineState;
 import state.ParcourState;
+import state.TestGUI;
 import state.TestState;
 /**
  * 
@@ -33,7 +34,8 @@ public class Main {
         
         //state = new LineState(robot, gui);
         //state = new LineState(robot, gui);
-        state = new TestState(robot, gui);
+        //state = new TestState(robot, gui);
+        state = new TestGUI(robot, gui);
         state.init();
 
         gui.writeLine("Started!");
