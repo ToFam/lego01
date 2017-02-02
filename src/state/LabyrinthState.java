@@ -3,10 +3,13 @@ package state;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.GyroSensorMode;
+import sensor.modes.UVSensorMode;
 
 public class LabyrinthState implements ParcourState 
 {
     private static final int TIME_UNTIL_FREE = 1000;
+    private static final float DISTANCE_SHOULD = 0.05f;
+    private static final float TURN_FACTOR = 5.f;
 
     private int free = 0;
     private Robot robot;
@@ -34,14 +37,19 @@ public class LabyrinthState implements ParcourState
     public void init() 
     {
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getTouchSensorB().setMode(0);
+        RobotComponents.inst().getTouchSensorB();
+        RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUV().setMedianFilter(1000);
         robot.setSpeed(1.f);
+        
+        robot.rotateMiddle(-(Robot.SENSOR_ANGLE / 2 - 5));
         robot.forward();
     }
     
     public void reset() 
     {
-        
+        robot.stop();
+        robot.rotateMiddle((Robot.SENSOR_ANGLE / 2 - 5));
     }
 
     @Override
@@ -72,6 +80,9 @@ public class LabyrinthState implements ParcourState
         else
         {
             free++;
+            
+            float turn = (RobotComponents.inst().getUV().sample()[0] - DISTANCE_SHOULD) * TURN_FACTOR;
+            robot.steer(turn);
         }
         
         if (free > TIME_UNTIL_FREE) 

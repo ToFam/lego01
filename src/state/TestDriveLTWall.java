@@ -47,7 +47,7 @@ public class TestDriveLTWall implements ParcourState {
     	
     	diff *= turnFactor;
     	
-    	robot.setSpeedInDriveDirection(diff);
+    	robot.steer(diff);
     	robot.forward();
     	
     	

@@ -1,8 +1,5 @@
 package robot;
 
-import lcdGui.LCDGui;
-import lejos.hardware.lcd.LCD;
-import lejos.robotics.RegulatedMotor;
 import sensor.modes.ColorSensorMode;
 
 /**
@@ -16,8 +13,9 @@ import sensor.modes.ColorSensorMode;
  * @author	Team AndreasBot: Adrian
  *
  */
-public class Robot {
-
+public class Robot 
+{
+    public static final int SENSOR_ANGLE = 130;
 	
 	/**
 	 * 
@@ -44,10 +42,13 @@ public class Robot {
      * 
      * @param direction 1 is drive full left, -1 is drive full right. 0 is straight
      */
-    public void setSpeedInDriveDirection(float direction)
+    public void steer(float direction)
     {
-    	float left = (-1f * direction) >= 0f? (-1f * direction) : 0f;
-    	float right = (1f * direction) >= 0f? (1f * direction) : 0f;
+        float lMax = RobotComponents.inst().getLeftMotor().getSpeed();
+        float rMax = RobotComponents.inst().getRightMotor().getSpeed();
+        
+    	float left = Math.min(lMax, lMax * (direction + 1));
+    	float right = Math.min(rMax, rMax * (direction - 1) * (-1));
     	
     	setSpeed(left, right);
     }

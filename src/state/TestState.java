@@ -28,12 +28,17 @@ public class TestState implements ParcourState {
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
         RobotComponents.inst().getUV().setMode(0);
+        robot.forward();
     }
 
     public void reset() {
         
     }
 
+    
+    int timer = 0;
+    boolean mode = false;
+    
     @Override
     public void update(int elapsedTime) {
 
@@ -49,6 +54,18 @@ public class TestState implements ParcourState {
     	gui.setVarValue(1, RobotComponents.inst().getUV().sample()[0]);
     	gui.setVarValue(2, RobotComponents.inst().getGyroSensor().sample()[0]);
     	
+    	timer += elapsedTime;
+    	if (timer >= 5000)
+    	{
+    	    timer = 0;
+    	    if (mode)
+    	        robot.stop();
+    	    else
+    	    {
+    	        mode = true;
+    	        robot.backward();
+    	    }
+    	}
     	
         if (Util.isPressed(Button.ID_UP))
         {
