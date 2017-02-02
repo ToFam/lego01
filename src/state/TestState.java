@@ -13,9 +13,13 @@ public class TestState implements ParcourState {
     private Robot robot;
     private LCDGui gui;
     
-    public TestState(Robot robot, LCDGui gui) {
+    public TestState(Robot robot) {
         this.robot = robot;
-        this.gui = gui;
+        this.gui = new LCDGui(4,2);
+    }
+    
+    public String getName() {
+        return "Test";
     }
 
     @Override
@@ -24,6 +28,10 @@ public class TestState implements ParcourState {
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
         RobotComponents.inst().getUV().setMode(0);
+    }
+
+    public void reset() {
+        
     }
 
     @Override

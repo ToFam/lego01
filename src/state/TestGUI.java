@@ -13,16 +13,24 @@ public class TestGUI implements ParcourState {
 	private Robot robot;
     private LCDGui gui;
     
-    public TestGUI(Robot robot, LCDGui gui) {
+    public TestGUI(Robot robot) {
         this.robot = robot;
-        this.gui = gui;
+        this.gui = new LCDGui(4,2);
     }
     
     private LCDChooseList chooseList;
+
+    public String getName() {
+        return "GUITest";
+    }
     
     @Override
     public void init() {
     	chooseList = new LCDChooseList(new String[] {"Number 1", "Second", "Dr3i", "Vier", "5", "6", "7", "8", "9"});
+    }
+
+    public void reset() {
+        
     }
 
     @Override

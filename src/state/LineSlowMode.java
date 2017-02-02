@@ -13,9 +13,9 @@ public class LineSlowMode implements ParcourState {
     private Robot robot;
     private LCDGui gui;
     
-    public LineSlowMode(Robot robot, LCDGui gui) {
+    public LineSlowMode(Robot robot) {
         this.robot = robot;
-        this.gui = gui;
+        this.gui = new LCDGui(4,2);
     }
 
     @Override
@@ -30,6 +30,14 @@ public class LineSlowMode implements ParcourState {
     
     boolean isLeftToLine = true;
     int state = 0;
+    
+    public String getName() {
+        return "LineSlow";
+    }
+    
+    public void reset() {
+        
+    }
     
     @Override
     public void update(int elapsedTime) {

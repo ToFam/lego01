@@ -23,10 +23,26 @@ public class LCDChooseList {
 		currentSelected = 0;
 		currentOffset = 0;
 		this.elements = elements;
-		
-		LCD.clear();
-		
-		drawLCD();
+
+        repaint();
+	}
+	
+	public void repaint() {
+	    clearLCD();
+
+        for (int i = 0; i < LCDGui.LCDAmountOfRows; i++)
+        {
+            if (i + currentOffset < elements.length)
+            {
+                LCD.drawString(elements[i + currentOffset], 1, i);
+            }
+            else
+            {
+                LCD.clear(i);
+            }
+        }
+
+        LCD.drawString(">", 0, currentSelected - currentOffset);
 	}
 	
 	private void drawLCD()
@@ -95,7 +111,7 @@ public class LCDChooseList {
 		return elements[currentSelected];
 	}
 	
-	public void ClearLCD()
+	public void clearLCD()
 	{
 		LCD.clear();
 	}

@@ -24,9 +24,9 @@ public class LineState implements ParcourState {
     private int endIndex;
     private boolean left;
     
-    public LineState(Robot robot, LCDGui gui) {
+    public LineState(Robot robot) {
         this.robot = robot;
-        this.gui = gui;
+        this.gui = new LCDGui(4,2);
         this.leftScale = 0.f;
         this.rightScale = 0.f;
         
@@ -36,6 +36,14 @@ public class LineState implements ParcourState {
         this.endIndex = 0;
         this.left = true;
         
+        
+    }
+    
+    public String getName() {
+        return "Line";
+    }
+
+    public void reset() {
         
     }
 

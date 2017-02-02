@@ -12,9 +12,17 @@ public class TestDriveLTWall implements ParcourState {
     private Robot robot;
     private LCDGui gui;
     
-    public TestDriveLTWall(Robot robot, LCDGui gui) {
+    public TestDriveLTWall(Robot robot) {
         this.robot = robot;
-        this.gui = gui;
+        this.gui = new LCDGui(4,2);
+    }
+
+    public String getName() {
+        return "TestDriveLTWall";
+    }
+
+    public void reset() {
+        
     }
 
     @Override

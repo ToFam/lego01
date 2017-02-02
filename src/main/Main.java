@@ -1,12 +1,17 @@
 package main;
 
-import lcdGui.LCDGui;
+import java.util.List;
+
+import lcdGui.LCDChooseList;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
 import robot.Robot;
+import state.LabyrinthState;
+import state.LineSlowMode;
 import state.LineState;
 import state.ParcourState;
+import state.TestDriveLTWall;
 import state.TestGUI;
 import state.TestState;
 import util.Util;
@@ -18,39 +23,50 @@ import util.Util;
  *
  */
 public class Main {
-
     private Robot robot;
-    private ParcourState state;
+    private LCDChooseList mainMenu;
     
-    static boolean ultraLooksDown = false;
+    private List<ParcourState> states;
+    private int state;
+    
+    public Main() {
+        robot = new Robot();
+        String elements[] = new String[9];
+        states.add(new LineState(robot));
+        states.add(new LineSlowMode(robot));
+        states.add(new LabyrinthState(robot));
+        states.add(new TestDriveLTWall(robot));
+        states.add(new TestGUI(robot));
+        states.add(new TestState(robot));
+        mainMenu = new LCDChooseList(elements);
+    }
     
     public void run()
     {
-        robot = new Robot();
-        
-        LCDGui gui = new LCDGui(4, 2);
-        
-        gui.writeLine("Starting State...");
-        
-        
-        //state = new LineState(robot, gui);
-        //state = new LineState(robot, gui);
-        //state = new TestState(robot, gui);
-        state = new TestGUI(robot, gui);
-        state.init();
-
-        gui.writeLine("Started!");
-        
-        while (!Util.isPressed(Button.ENTER.getId()))
-        {
-            state.update(50);
+        while (true) {
+            mainMenu.repaint();
             
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            while(!Util.isPressed(Button.RIGHT.getId())) {
+                if (Util.isPressed(Button.UP.getId())) {
+                    mainMenu.moveOneDown();
+                }
+                else if (Util.isPressed(Button.DOWN.getId())) {
+                    mainMenu.moveOneDown();
+                }
             }
             
+            state = mainMenu.getCurrentSelected();
+        
+            while (!Util.isPressed(Button.ENTER.getId()))
+            {
+                states.get(state).update(50);
+                
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     
@@ -59,8 +75,6 @@ public class Main {
 		Button.ESCAPE.addKeyListener(new KeyListener() {
 			@Override
 			public void keyReleased(Key k) {
-				// TODO Auto-generated method stub
-				
 			}
 			@Override
 			public void keyPressed(Key k) {

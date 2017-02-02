@@ -20,9 +20,17 @@ public class LabyrinthState implements ParcourState {
     public LabyrinthState(Robot robo) {
         robot = robo;
     }
+    
+    public String getName() {
+        return "Labyrinth";
+    }
 
     @Override
     public void init() {
+    }
+    
+    public void reset() {
+        
     }
 
     @Override
