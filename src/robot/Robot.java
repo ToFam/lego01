@@ -47,8 +47,8 @@ public class Robot
         float lMax = RobotComponents.inst().getLeftMotor().getSpeed();
         float rMax = RobotComponents.inst().getRightMotor().getSpeed();
         
-    	float left = Math.min(lMax, lMax * (direction + 1));
-    	float right = Math.min(rMax, rMax * (direction - 1) * (-1));
+    	float left = Math.min(lMax, lMax * (direction - 1) * (-1));
+    	float right = Math.min(rMax, rMax * (direction + 1));
     	
     	setSpeed(left, right);
     }

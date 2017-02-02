@@ -9,7 +9,7 @@ public class LabyrinthState implements ParcourState
 {
     private static final int TIME_UNTIL_FREE = 1000;
     private static final float DISTANCE_SHOULD = 0.05f;
-    private static final float TURN_FACTOR = 5.f;
+    private static final float TURN_FACTOR = 10.f;
 
     private int free = 0;
     private Robot robot;
@@ -58,16 +58,12 @@ public class LabyrinthState implements ParcourState
         if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) 
         {
             robot.stop();
-            robot.move(540);
+            robot.move(360);
             free = 0;
             
             switch (choice) {
             case STRAIGHT:
-                robot.turnOnSpot(90);
-                choice = Path.LEFT;
-                break;
-            case LEFT:
-                robot.turnOnSpot(180);
+                robot.turnOnSpot(-90);
                 choice = Path.RIGHT;
                 break;
             case RIGHT:
