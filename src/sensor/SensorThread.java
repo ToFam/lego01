@@ -8,6 +8,10 @@ public abstract class SensorThread extends Thread {
 	protected BaseSensor sensor;
 	protected float[] sample;
 	/**
+	 * This is, what was sample before. It contains the most current measured value
+	 */
+	protected float[] instSample;
+	/**
 	 * Sets the amount of samples, where the median is beeing calculated, before the sample is provided to other classes
 	 */
 	protected int medianAmount = 1;
@@ -22,6 +26,7 @@ public abstract class SensorThread extends Thread {
 	protected SensorThread(BaseSensor sensor) {
 	    this.sensor = sensor;
 	    sample = new float[sampleSize()];
+	    instSample = new float[sampleSize()];
 	    medianSample = new float[sampleSize()];
 	    calculationTempValues = new float[sampleSize()];
 	    running = true;
@@ -30,6 +35,7 @@ public abstract class SensorThread extends Thread {
     public synchronized void setMode(int mode) {
         sensor.setCurrentMode(mode);
         sample = new float[sensor.sampleSize()];
+	    instSample = new float[sampleSize()];
 	    medianSample = new float[sampleSize() * medianAmount];
 	    calculationTempValues = new float[sampleSize()];
     }
@@ -50,11 +56,19 @@ public abstract class SensorThread extends Thread {
 	}
 	
 	/**
-	 * The latest fetched sensor data
+	 * The median fetched sensor data
 	 * @return an array of sensor data
 	 */
 	public float[] sample() {
 	    return sample;
+	}
+	
+	/**
+	 * The latest fetched sensor data
+	 * @return an array of sensor data
+	 */
+	public float[] instSample() {
+	    return instSample;
 	}
 	
 	/**
@@ -83,6 +97,7 @@ public abstract class SensorThread extends Thread {
 	{
 		this.medianAmount = medianAmount >= 1 ? medianAmount : 1;
 		sample = new float[sensor.sampleSize()];
+	    instSample = new float[sampleSize()];
 	    medianSample = new float[sampleSize() * medianAmount];
 	    calculationTempValues = new float[sampleSize()];
 	}

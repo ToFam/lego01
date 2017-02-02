@@ -21,9 +21,14 @@ public class ColorSensor extends SensorThread {
                     e.printStackTrace();
                 }
             }
+            
             if (medianCounter < medianAmount)
             {
                 sensor.fetchSample(medianSample, medianCounter * sample.length);
+                for (int i = 0; i < instSample.length; i++)
+                {
+                    instSample[i] = medianSample[medianCounter * sample.length + i];
+                }
                 medianCounter++;
             }
             
