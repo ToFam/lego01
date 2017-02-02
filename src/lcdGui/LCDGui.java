@@ -11,6 +11,15 @@ public class LCDGui
 	private int rowToDrawSeperator = 0;
 	private int[] colPoss;
 	private Object[] vars;
+    
+    public static void clearLCD()
+    {
+        LCD.clear();
+        
+        for (int i = 0; i < LCDGui.LCDAmountOfRows; i++) {
+            LCD.drawString("                                          ", 0, i);
+        }
+    }
 	
 	public LCDGui(int amountOfVariables, int amountOfColumns)
 	{
@@ -37,7 +46,7 @@ public class LCDGui
 		}
 		vars = new Object[varsAmount];
 		
-		LCD.clear();
+		clearLCD();
 	}
 	
 	private void drawLCD()

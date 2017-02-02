@@ -28,7 +28,7 @@ public class LCDChooseList {
 	}
 	
 	public void repaint() {
-	    clearLCD();
+	    LCDGui.clearLCD();
 
         for (int i = 0; i < LCDGui.LCDAmountOfRows; i++)
         {
@@ -109,10 +109,5 @@ public class LCDChooseList {
 	public String getCurrentElement()
 	{
 		return elements[currentSelected];
-	}
-	
-	public void clearLCD()
-	{
-		LCD.clear();
 	}
 }
