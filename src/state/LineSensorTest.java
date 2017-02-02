@@ -6,6 +6,7 @@ import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
+import util.MediumMotorTuple;
 import util.Util;
 
 public class LineSensorTest implements ParcourState {
@@ -18,21 +19,21 @@ public class LineSensorTest implements ParcourState {
         this.gui = new LCDGui(4,2);
     }
 
-    private int param_mediumMotorOpenRangeAngleToOneDirection = 50;
+    private int param_mediumMotorOpenRangeAngleToOneDirection = 60;
     private float param_colorThresh = 0.17f;
     private int param_bufferSize = 100000;
     
     @Override
     public void init() {
     	maxAngl = param_mediumMotorOpenRangeAngleToOneDirection;
-    	buffer = new float[param_bufferSize];
+    	buffer = new MediumMotorTuple[param_bufferSize];
 
-        gui = new LCDGui(4, 2);
+        gui = new LCDGui(4, 1);
     	
         robot.setSpeed(0.5f);
         RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.6f);
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
-        RobotComponents.inst().getColorSensor().setMedianFilter(5);
+        RobotComponents.inst().getColorSensor().setMedianFilter(2);
         RobotComponents.inst().getMediumMotor().resetTachoCount();
     }
 
@@ -40,8 +41,11 @@ public class LineSensorTest implements ParcourState {
     private int maxAngl = 0;
     
     boolean armMovingLeft = true;
-    float[] buffer;
+    //float[] buffer;
+    MediumMotorTuple[] buffer;
     int bufPos = 0;
+    float firstVal = 0f;
+    float secondVal = 0f;
     boolean isLeftToLine = true;
     int state = 0;
     
@@ -59,10 +63,26 @@ public class LineSensorTest implements ParcourState {
     	// Rotation des Arms
     	if (RobotComponents.inst().getMediumMotor().isMoving() == false)
     	{
-    		gui.setVarValue(0,  bufPos);
+    		//gui.setVarValue(1,  bufPos);
     		
-    		float errorAngle = evaluateBuffer(armMovingLeft);
+    		float[] errorAngles = evaluateBuffer(armMovingLeft);
+
+    		float error = (errorAngles[0] + errorAngles[1]);
     		
+    		if (armMovingLeft)
+    		{
+    			firstVal = error;
+    		}
+    		else
+    		{
+    			secondVal = error;
+    			
+    			float between = (firstVal + secondVal) * 0.5f;
+    			
+        		gui.setVarValue(0,  between);
+    		}
+    		
+    		//gui.setVarValue(1,  errorAngles[1]);
     		
     		
     		if (RobotComponents.inst().getMediumMotor().getTachoCount() > 0)
@@ -81,12 +101,12 @@ public class LineSensorTest implements ParcourState {
     	
     	float currentLineVal = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample());
     	
-    	buffer[bufPos] = currentLineVal;
+    	buffer[bufPos] = new MediumMotorTuple(currentLineVal, RobotComponents.inst().getMediumMotor().getTachoCount());
     	bufPos++;
     	
     	
     	
-		//gui.setVarValue(2,  currentLineVal);
+		//gui.setVarValue(0,  currentLineVal);
     	
         if (Util.isPressed(Button.ID_UP))
         {
@@ -115,9 +135,49 @@ public class LineSensorTest implements ParcourState {
         
     }
     
-    private float evaluateBuffer(boolean movingToLeft)
+    /**
+     * Attention: 5000 and -5000 is a error value
+     * @param movingToLeft
+     * @return
+     */
+    private float[] evaluateBuffer(boolean movingToLeft)
     {
-    	int arrayC = movingToLeft ? 0 : bufPos - 1;
-    	return 0f;
+    	//int arrayC = movingToLeft ? 0 : bufPos - 1;
+    	
+    	float medianWhite = 0f;
+    	float medianBlack = 0f;
+    	int amountAddedWhite = 0;
+    	int amountAddedBlack = 0;
+    	
+    	for (int i = 0; i < bufPos; i++)
+    	{
+    		if (buffer[i].getF1() >= param_colorThresh)
+    		{
+    			medianWhite += buffer[i].getF2();
+    			amountAddedWhite++;
+    		}
+    		else
+    		{
+    			medianBlack += buffer[i].getF2();
+    			amountAddedBlack++;
+    		}
+    	}
+    	
+    	if (amountAddedWhite == 0)
+    	{
+    		return new float[] {0, 5000};
+    	}
+    	if (amountAddedBlack == 0)
+    	{
+    		return new float[] {-5000, 0};
+    	}
+    	
+    	medianWhite = medianWhite / amountAddedWhite;
+    	//medianWhite = movingToLeft ? medianWhite : -medianWhite;
+
+    	medianBlack = medianBlack / amountAddedBlack;
+    	//medianBlack = movingToLeft ? medianBlack : -medianBlack;
+    	
+    	return new float[] {medianWhite, medianBlack};
     }
 }
