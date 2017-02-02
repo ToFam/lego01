@@ -22,6 +22,7 @@ public class LineSensorTest implements ParcourState {
     private int param_mediumMotorOpenRangeAngleToOneDirection = 60;
     private float param_colorThresh = 0.17f;
     private int param_bufferSize = 100000;
+    private float kp = 1.0f / 60f;
     
     @Override
     public void init() {
@@ -80,6 +81,8 @@ public class LineSensorTest implements ParcourState {
     			float between = (firstVal + secondVal) * 0.5f;
     			
         		gui.setVarValue(0,  between);
+        		
+        		robot.steer(error * kp);
     		}
     		
     		//gui.setVarValue(1,  errorAngles[1]);
