@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lcdGui.LCDChooseList;
@@ -30,15 +31,25 @@ public class Main {
     private int state;
     
     public Main() {
+        states = new ArrayList<ParcourState>();
         robot = new Robot();
-        String elements[] = new String[9];
+        
+        String elements[] = new String[6];
         states.add(new LineState(robot));
+        elements[0] = states.get(0).getName();
         states.add(new LineSlowMode(robot));
+        elements[1] = states.get(1).getName();
         states.add(new LabyrinthState(robot));
+        elements[2] = states.get(2).getName();
         states.add(new TestDriveLTWall(robot));
+        elements[3] = states.get(3).getName();
         states.add(new TestGUI(robot));
+        elements[4] = states.get(4).getName();
         states.add(new TestState(robot));
+        elements[5] = states.get(5).getName();
         mainMenu = new LCDChooseList(elements);
+        
+        state = 0;
     }
     
     public void run()
@@ -48,10 +59,16 @@ public class Main {
             
             while(!Util.isPressed(Button.RIGHT.getId())) {
                 if (Util.isPressed(Button.UP.getId())) {
-                    mainMenu.moveOneDown();
+                    mainMenu.moveOneUp();
                 }
                 else if (Util.isPressed(Button.DOWN.getId())) {
                     mainMenu.moveOneDown();
+                }
+                
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
             
