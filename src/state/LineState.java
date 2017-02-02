@@ -149,10 +149,10 @@ public class LineState implements ParcourState {
 		gui.writeLine(" +++ " + linterpol + " +++ ");
 		
 		if (linterpol > 0) {
-			robot.setSpeed((1.f - 2.f * linterpol) / 3.f, 1.f);
+			robot.setSpeed(1.f - linterpol, 1.f);
 			robot.forward();
 		} else {
-			robot.setSpeed(1.f, (1.f + 2 * linterpol) / 3.f);
+			robot.setSpeed(1.f, 1.f + linterpol);
 			robot.forward();
 		}
 		
