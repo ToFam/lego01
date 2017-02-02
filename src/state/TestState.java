@@ -47,6 +47,7 @@ public class TestState implements ParcourState {
     	}
     	
     	gui.setVarValue(1, RobotComponents.inst().getUV().sample()[0]);
+    	gui.setVarValue(2, RobotComponents.inst().getGyroSensor().sample()[0]);
     	
     	
         if (Util.isPressed(Button.ID_UP))

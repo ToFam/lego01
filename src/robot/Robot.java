@@ -1,7 +1,9 @@
 package robot;
 
+import lcdGui.LCDGui;
+import lejos.hardware.lcd.LCD;
+import lejos.robotics.RegulatedMotor;
 import sensor.modes.ColorSensorMode;
-import sensor.modes.GyroSensorMode;
 
 /**
  * 
@@ -49,7 +51,24 @@ public class Robot {
     	
     	setSpeed(left, right);
     }
+    
+    public void rotateMiddle(int deg) {
+        RobotComponents.inst().getMediumMotor().rotate(deg);
+    }
+    
+    public void move(int deg) 
+    {
+        //RobotComponents.inst().getLeftMotor().synchronizeWith(new RegulatedMotor[]{RobotComponents.inst().getRightMotor()});
+        //RobotComponents.inst().getLeftMotor().startSynchronization();
+        RobotComponents.inst().getLeftMotor().rotate(deg, true);
+        RobotComponents.inst().getRightMotor().rotate(deg, true);
+        //RobotComponents.inst().getLeftMotor().endSynchronization();
 
+        //RobotComponents.inst().getLeftMotor().startSynchronization();
+        RobotComponents.inst().getLeftMotor().waitComplete();
+        RobotComponents.inst().getRightMotor().waitComplete();
+        //RobotComponents.inst().getLeftMotor().endSynchronization();*/
+    }
 
     public void forward() {
         RobotComponents.inst().getLeftMotor().backward();
@@ -65,8 +84,10 @@ public class Robot {
 	 * The Robot stops in place.
 	 */
 	public void stop() {
-		RobotComponents.inst().getLeftMotor().stop();
-		RobotComponents.inst().getRightMotor().stop();
+		RobotComponents.inst().getLeftMotor().stop(true);
+		RobotComponents.inst().getRightMotor().stop(true);
+        RobotComponents.inst().getLeftMotor().waitComplete();
+        RobotComponents.inst().getRightMotor().waitComplete();
 	}
 
 	/**
@@ -82,6 +103,20 @@ public class Robot {
 	 */
 	public void curveRight() {
 	}
+	
+	public void startTurnOnSpot(boolean left) 
+	{
+	    if (left) 
+	    {
+            RobotComponents.inst().getLeftMotor().backward();
+            RobotComponents.inst().getRightMotor().forward();
+	    }
+	    else
+	    {
+            RobotComponents.inst().getLeftMotor().forward();
+            RobotComponents.inst().getRightMotor().backward();
+	    }
+	}
 
 	
 	private float turnOnSpot_angleToSlowDown = 50f;
@@ -94,9 +129,12 @@ public class Robot {
 	 */
 	public void turnOnSpot(float degree)
 	{
+	    // DEBUG
+	    // RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+	    // LCDGui.clearLCD();
+	    
 		float oldSpeedL = RobotComponents.inst().getLeftMotor().getSpeed();
 		float oldSpeedR = RobotComponents.inst().getRightMotor().getSpeed();
-		//RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
 		float gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
 		float goalValue = gyroValue + degree;
 		boolean mustBeGreater = gyroValue < goalValue;
@@ -104,40 +142,41 @@ public class Robot {
 		float addition = mustBeGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
 		goalValue += addition;
 		
-		
 		if (mustBeGreater)
 		{
-	        RobotComponents.inst().getLeftMotor().forward();
-			RobotComponents.inst().getRightMotor().backward();
+		    startTurnOnSpot(true);
 		}
 		else
 		{
-	        RobotComponents.inst().getLeftMotor().backward();
-			RobotComponents.inst().getRightMotor().forward();
+            startTurnOnSpot(false);
 		}
 
 		boolean setSpeed = false;
-		while (RobotComponents.inst().getGyroSensor().sample()[0] < goalValue == mustBeGreater)
+		while (gyroValue < goalValue == mustBeGreater)
 		{
-			if (setSpeed == false && Math.abs(RobotComponents.inst().getGyroSensor().sample()[0] - goalValue) < turnOnSpot_angleToSlowDown)
+		    // DEBUG
+		    // LCD.drawString(String.valueOf(gyroValue), 4, 2);
+		    // LCD.drawString(String.valueOf(goalValue), 4, 7);
+		    
+			if (setSpeed == false && Math.abs(gyroValue - goalValue) < turnOnSpot_angleToSlowDown)
 			{
 				setSpeed = true;
 		        RobotComponents.inst().getLeftMotor().stop(true);
 				RobotComponents.inst().getRightMotor().stop(true);
 				RobotComponents.inst().getLeftMotor().setSpeed(oldSpeedL * turnOnSpot_slowDownSpeedFactor);
 				RobotComponents.inst().getRightMotor().setSpeed(oldSpeedR * turnOnSpot_slowDownSpeedFactor);
-				
-				if (mustBeGreater)
-				{
-			        RobotComponents.inst().getLeftMotor().forward();
-					RobotComponents.inst().getRightMotor().backward();
-				}
-				else
-				{
-			        RobotComponents.inst().getLeftMotor().backward();
-					RobotComponents.inst().getRightMotor().forward();
-				}
+
+		        if (mustBeGreater)
+		        {
+		            startTurnOnSpot(true);
+		        }
+		        else
+		        {
+		            startTurnOnSpot(false);
+		        }
 			}
+			
+			gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
 		}
 		
         RobotComponents.inst().getLeftMotor().stop(true);
