@@ -7,6 +7,13 @@ public abstract class SensorThread extends Thread {
 	protected boolean running;
 	protected BaseSensor sensor;
 	protected float[] sample;
+	/**
+	 * Sets the amount of samples, where the median is beeing calculated, before the sample is provided to other classes
+	 */
+	protected int medianAmount = 1;
+	protected int medianCounter = 0;
+	protected float[] medianSample;
+	protected float[] calculationTempValues;
 	
 	/**
 	 * Create a threaded sensor
@@ -15,12 +22,16 @@ public abstract class SensorThread extends Thread {
 	protected SensorThread(BaseSensor sensor) {
 	    this.sensor = sensor;
 	    sample = new float[sampleSize()];
+	    medianSample = new float[sampleSize()];
+	    calculationTempValues = new float[sampleSize()];
 	    running = true;
 	}
 	
     public synchronized void setMode(int mode) {
         sensor.setCurrentMode(mode);
         sample = new float[sensor.sampleSize()];
+	    medianSample = new float[sampleSize() * medianAmount];
+	    calculationTempValues = new float[sampleSize()];
     }
 	
 	/**
@@ -62,6 +73,18 @@ public abstract class SensorThread extends Thread {
 		this.running = running;
 		if (running)
 		    notifyAll();
+	}
+	
+	/**
+	 * Sets the amount of samples, over which the median is beeing calculated before the values can be accessed
+	 * @param medianAmount The amount greater than 0
+	 */
+	public void setMedianFilter(int medianAmount)
+	{
+		this.medianAmount = medianAmount >= 1 ? medianAmount : 1;
+		sample = new float[sensor.sampleSize()];
+	    medianSample = new float[sampleSize() * medianAmount];
+	    calculationTempValues = new float[sampleSize()];
 	}
 
 }
