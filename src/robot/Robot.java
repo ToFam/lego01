@@ -16,6 +16,9 @@ import sensor.modes.ColorSensorMode;
 public class Robot 
 {
     public static final int SENSOR_ANGLE = 130;
+    
+    private float speedLeft = 0.f;
+    private float speedRight = 0.f;
 	
 	/**
 	 * 
@@ -32,10 +35,10 @@ public class Robot
 	
     public void setSpeed(float speedLeft, float speedRight) {
         float max = Math.min(RobotComponents.inst().getLeftMotor().getMaxSpeed(), RobotComponents.inst().getRightMotor().getMaxSpeed());
-        RobotComponents.inst().getLeftMotor().setSpeed(max * speedLeft);
-        RobotComponents.inst().getRightMotor().setSpeed(max * speedRight);
-        
-        //this.forward();
+        this.speedLeft = max * speedLeft;
+        this.speedRight = max * speedRight;
+        RobotComponents.inst().getLeftMotor().setSpeed(this.speedLeft);
+        RobotComponents.inst().getRightMotor().setSpeed(this.speedRight);
     }
     
     /**
@@ -43,12 +46,9 @@ public class Robot
      * @param direction 1 is drive full left, -1 is drive full right. 0 is straight
      */
     public void steer(float direction)
-    {
-        float lMax = RobotComponents.inst().getLeftMotor().getSpeed();
-        float rMax = RobotComponents.inst().getRightMotor().getSpeed();
-        
-    	float left = Math.min(lMax, lMax * (direction - 1) * (-1));
-    	float right = Math.min(rMax, rMax * (direction + 1));
+    {   
+    	float left = Math.min(speedLeft, speedLeft * (direction - 1) * (-1));
+    	float right = Math.min(speedRight, speedRight * (direction + 1));
     	
     	setSpeed(left, right);
     }

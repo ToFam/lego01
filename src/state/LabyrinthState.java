@@ -1,5 +1,6 @@
 package state;
 
+import lcdGui.LCDGui;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.GyroSensorMode;
@@ -13,6 +14,7 @@ public class LabyrinthState implements ParcourState
 
     private int free = 0;
     private Robot robot;
+    private LCDGui gui;
     
     private enum Path
     {
@@ -39,11 +41,12 @@ public class LabyrinthState implements ParcourState
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getTouchSensorB();
         RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
-        RobotComponents.inst().getUV().setMedianFilter(1000);
-        robot.setSpeed(1.f);
+        RobotComponents.inst().getUV().setMedianFilter(100);
+        robot.setSpeed(0.5f);
         
         robot.rotateMiddle(-(Robot.SENSOR_ANGLE / 2 - 5));
         robot.forward();
+        gui = new LCDGui(1, 1);
     }
     
     public void reset() 
@@ -79,6 +82,9 @@ public class LabyrinthState implements ParcourState
             
             float turn = (RobotComponents.inst().getUV().sample()[0] - DISTANCE_SHOULD) * TURN_FACTOR;
             robot.steer(turn);
+            robot.forward();
+            
+            gui.setVarValue(0, turn);
         }
         
         if (free > TIME_UNTIL_FREE) 
