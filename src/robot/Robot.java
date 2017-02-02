@@ -53,6 +53,18 @@ public class Robot
     	setSpeed(left, right);
     }
     
+    /**
+     * Additional factor to make the whole thing slower
+     * @param direction 1 is drive full left, -1 is drive full right. 0 is straight
+     */
+    public void steerFacSimonTest(float direction, float speed)
+    {
+    	float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
+    	float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
+    	
+    	setSpeed(left * speed, right* speed);
+    }
+    
     public void rotateMiddle(int deg) {
         RobotComponents.inst().getMediumMotor().rotate(deg);
     }

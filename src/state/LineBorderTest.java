@@ -5,16 +5,15 @@ import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
-import sensor.modes.GyroSensorMode;
 import util.MediumMotorTuple;
 import util.Util;
 
-public class LineSensorTest implements ParcourState {
+public class LineBorderTest implements ParcourState {
 
     private Robot robot;
     private LCDGui gui;
     
-    public LineSensorTest(Robot robot) {
+    public LineBorderTest(Robot robot) {
         this.robot = robot;
         this.gui = new LCDGui(4,2);
     }
@@ -23,7 +22,9 @@ public class LineSensorTest implements ParcourState {
     private float param_mediumMotorSpeed = 0.7f;
     private float param_colorThresh = 0.17f;
     private int param_bufferSize = 100000;
-    private float param_kp = 1.0f / 30f;
+    private float param_kp = 1.0f;
+    
+    private int param_TicksUntilFullSteer = 25;
     
     @Override
     public void init() {
@@ -52,77 +53,62 @@ public class LineSensorTest implements ParcourState {
     boolean isLeftToLine = true;
     int state = 0;
     
+    int timeCounter = 1;
+    boolean currOnBlack = true;
+    
     public String getName() {
-        return "Line SensTest";
+        return "Line Simon";
     }
     
     public void reset() {
         RobotComponents.inst().getMediumMotor().rotateTo(0, true);
+        robot.stop();
     }
     
     @Override
-    public void update(int elapsedTime) {
-
-    	// Rotation des Arms
-    	if (RobotComponents.inst().getMediumMotor().isMoving() == false)
+    public void update(int elapsedTime)
+    {
+    	float curr = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample());
+    	if (curr < param_colorThresh)
     	{
-    		//gui.setVarValue(1,  bufPos);
-    		
-    		float[] errorAngles = evaluateBuffer(armMovingLeft);
-
-    		float error = (errorAngles[0] + errorAngles[1]);
-    		
-    		if (armMovingLeft)
+    		curr = 0.0f;
+    		if (currOnBlack == false)
     		{
-    			firstVal = error;
+        		timeCounter = 1;
     		}
-    		else
+    		currOnBlack = true;
+    	}
+    	else
+    	{
+    		curr = 1.0f;
+    		if (currOnBlack)
     		{
-    			secondVal = error;
-    			
-    			float between = (firstVal + secondVal) * 0.5f;
-    			
-        		gui.setVarValue(0,  between);
-        		
-        		robot.steerFacSimonTest(between * param_kp, 0.2f);
-        		
-        		robot.forward();
+        		timeCounter = 1;
     		}
-    		
-    		//gui.setVarValue(1,  errorAngles[1]);
-    		
-    		
-    		if (RobotComponents.inst().getMediumMotor().getTachoCount() > 0)
-    		{
-    			armMovingLeft = false;
-    		}
-    		else
-    		{
-    			armMovingLeft = true;
-    		}
-
-        	RobotComponents.inst().getMediumMotor().rotateTo(armMovingLeft ? maxAngl : -maxAngl, true);
-
-        	bufPos = 0;
+    		currOnBlack = false;
     	}
     	
-    	float currentLineVal = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample());
+    	float err = ((curr * 2 - 1f) * timeCounter) / ((float)param_TicksUntilFullSteer);
     	
-    	buffer[bufPos] = new MediumMotorTuple(currentLineVal, RobotComponents.inst().getMediumMotor().getTachoCount());
-    	bufPos++;
+    	float steerY = err * param_kp;
+    	robot.steerFacSimonTest(steerY, 0.4f);
+    	steerY = steerY > 1f ? 1f : (steerY < -1f ? -1f : steerY);
     	
     	
+    	robot.forward();
     	
-		//gui.setVarValue(0,  currentLineVal);
+
+		gui.setVarValue(0,  curr);
+		gui.setVarValue(1,  steerY);
+		
+    	timeCounter++;
+    	timeCounter = timeCounter > param_TicksUntilFullSteer ? param_TicksUntilFullSteer : timeCounter;
+    	
+    	
     	
         if (Util.isPressed(Button.ID_UP))
         {
             robot.forward();
-        }
-        
-        if (Util.isPressed(Button.ID_ENTER))
-        {
-            robot.stop();
         }
         
         if (Util.isPressed(Button.ID_LEFT))
