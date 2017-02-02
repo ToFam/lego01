@@ -5,34 +5,34 @@ import lejos.hardware.lcd.LCD;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
-import util.FloatTuple;
+import util.MediumMotorTuple;
 import util.Util;
 
 public class LineState implements ParcourState {
 	
+	private final int angle;
+	
     private Robot robot;
     private LCDGui gui;
-    private float leftScale;
-    private float rightScale;
     
     private final float threshold;
     
     /*
      * valid from [0, endIndex)
      */
-    private FloatTuple[] sample;
+    private MediumMotorTuple[] sample;
     private int endIndex;
     private boolean left;
     
     public LineState(Robot robot) {
+    	this.angle = 130;
+    	
         this.robot = robot;
         this.gui = new LCDGui(4,2);
-        this.leftScale = 0.f;
-        this.rightScale = 0.f;
         
         this.threshold = 0.5f;
         
-        this.sample = new FloatTuple[50000];
+        this.sample = new MediumMotorTuple[50000];
         this.endIndex = 0;
         this.left = true;
         
@@ -50,15 +50,16 @@ public class LineState implements ParcourState {
 	@Override
 	public void init() {
 
-		RobotComponents.inst().getMediumMotor().rotate(70, true);
+		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
+		RobotComponents.inst().getMediumMotor().rotate(this.angle / 2 - 5, false);
 		this.left = true;
+		
 	}
 
 	@Override
 	public void update(int elapsedTime) {
 		
 		this.scan();
-		this.evaluate();
 		this.adapt();
 		
 		left = !left;
@@ -71,23 +72,26 @@ public class LineState implements ParcourState {
         RobotComponents.inst().getMediumMotor().resetTachoCount();
         
 		if (this.left) {
-			RobotComponents.inst().getMediumMotor().rotate(-130, true);
+			RobotComponents.inst().getMediumMotor().rotate(-this.angle, true);
 		} else {
-			RobotComponents.inst().getMediumMotor().rotate(130, true);
+			RobotComponents.inst().getMediumMotor().rotate(this.angle, true);
 		}
 		
-		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < 125) {
-			this.sample[counter] = RobotComponents.inst().getColorSensor().getFloatTuple();
+		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < angle - 5) {
+			this.sample[counter] = new MediumMotorTuple(
+					Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample()),
+					RobotComponents.inst().getMediumMotor().getTachoCount()
+					);
 			counter++;
 		}
 		
 		this.endIndex = counter;
 		
-		gui.writeLine(String.valueOf(this.endIndex));
+		gui.setVarValue(0, String.valueOf(this.endIndex));
 		
 	}
 	
-	private void evaluate() {
+	private void adapt() {
 		
 		int l = 0; //left bound == first encounter with line from the left
 		int r = 0; //right bound == last encounter with line from the left
@@ -112,57 +116,18 @@ public class LineState implements ParcourState {
 			i--;
 		}
 		
-		r = this.endIndex - i - 1;
+		r = i;
 		
-		if (l == 0 && r != 0) {
-			if (left) {
-				//turn left
-				this.leftScale = .8f;
-				this.rightScale = 1.f;
-			} else {
-				//turn right
-				this.leftScale = 1.f;
-				this.rightScale = .8f;
-			}
-		} else if (l != 0 && r == 0) {
-			if (left) {
-				//turn right
-				this.leftScale = 1.f;
-				this.rightScale = .8f;
-			} else {
-				//turn left
-				this.leftScale = .8f;
-				this.rightScale = 1.f;
-			}
+		float mid = (r - l) / 2;
+		float linterpol = (1 - mid) * 1 + mid * -1;
+		
+		if (linterpol > 0) {
+			robot.setSpeed(1.f - linterpol, 1.f);
+			robot.forward();
 		} else {
-			
-			/*
-			float direction;
-			
-			if (left) {
-				direction = (r - l) / this.sample.length;
-			} else {
-				direction = (l - r) / this.sample.length;
-			}
-			
-			if (direction < 0) {
-				//turn right
-			} else if (direction > 0) {
-				//turn left
-			} else {
-				//go straight
-			}
-			*/
-			
-			this.leftScale = 1.f;
-			this.rightScale = 1.f;
+			robot.setSpeed(1.f, 1.f + linterpol);
+			robot.forward();
 		}
 		
 	}
-	
-	private void adapt() {
-		robot.setSpeed(this.leftScale, this.rightScale);
-		robot.forward();
-	}
-
 }

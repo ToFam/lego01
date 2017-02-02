@@ -2,7 +2,7 @@ package sensor;
 
 import lejos.hardware.sensor.EV3ColorSensor;
 import robot.RobotComponents;
-import util.FloatTuple;
+import util.MediumMotorTuple;
 
 public class ColorSensor extends SensorThread {
 	
@@ -68,7 +68,7 @@ public class ColorSensor extends SensorThread {
         }
     }
     
-    public FloatTuple getFloatTuple() {
-    	return new FloatTuple(sample[0], RobotComponents.inst().getMediumMotor().getTachoCount());
-    }
+//    public FloatTuple getFloatTuple() {
+//    	return new FloatTuple(sample[0], RobotComponents.inst().getMediumMotor().getTachoCount());
+//    }
 }
