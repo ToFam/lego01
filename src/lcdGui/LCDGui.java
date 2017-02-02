@@ -58,7 +58,7 @@ public class LCDGui
 	{
 		for (int i = 0; i < vars.length; i++)
 		{
-			LCD.drawString(String.valueOf(vars[i]), colPoss[i % colPoss.length], i / 3);
+			LCD.drawString(String.valueOf(vars[i]), colPoss[i % colPoss.length], i / amountOfCols);
 		}
 	}
 	
@@ -67,7 +67,7 @@ public class LCDGui
 		if (index >= 0 && index < vars.length)
 		{
 			vars[index] = var;
-			LCD.drawString(String.valueOf(vars[index]), colPoss[index % colPoss.length], index / 3);
+			LCD.drawString(String.valueOf(vars[index]), colPoss[index % colPoss.length], index / amountOfCols);
 		}
 	}
 	
