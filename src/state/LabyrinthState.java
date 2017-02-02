@@ -3,13 +3,15 @@ package state;
 import robot.Robot;
 import robot.RobotComponents;
 
-public class LabyrinthState implements ParcourState {
+public class LabyrinthState implements ParcourState 
+{
     private Robot robot;
     
     private int retreat = 0;
     private int free = 0;
     
-    private enum Path {
+    private enum Path 
+    {
         STRAIGHT,
         LEFT,
         RIGHT
@@ -17,25 +19,32 @@ public class LabyrinthState implements ParcourState {
     
     private Path choice = Path.STRAIGHT;
     
-    public LabyrinthState(Robot robo) {
+    public LabyrinthState(Robot robo) 
+    {
         robot = robo;
     }
     
-    public String getName() {
+    public String getName() 
+    {
         return "Labyrinth";
     }
 
     @Override
-    public void init() {
+    public void init() 
+    {
+        
     }
     
-    public void reset() {
+    public void reset() 
+    {
         
     }
 
     @Override
-    public void update(int elapsedTime) {
-        if (retreat > 0) {
+    public void update(int elapsedTime) 
+    {
+        if (retreat > 0) 
+        {
             retreat--;
             
             if (retreat == 0)
@@ -57,8 +66,10 @@ public class LabyrinthState implements ParcourState {
                 robot.forward();
             }
         }
-        else {
-            if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
+        else 
+        {
+            if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) 
+            {
                 robot.stop();
                 retreat = 10;
                 free = 0;
@@ -68,7 +79,8 @@ public class LabyrinthState implements ParcourState {
                 free++;
             }
             
-            if (free > retreat * 1.5) {
+            if (free > retreat * 1.5) 
+            {
                 // we made it out (hopefully)
                 robot.forward();
                 choice = Path.STRAIGHT;

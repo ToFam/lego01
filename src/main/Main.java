@@ -58,7 +58,10 @@ public class Main {
         while (true) {
             mainMenu.repaint();
             
-            while(!Util.isPressed(Button.RIGHT.getId())) {
+            int btn;
+            do {
+                btn = Button.waitForAnyPress();
+                
                 if (Util.isPressed(Button.UP.getId())) {
                     mainMenu.moveOneUp();
                 }
@@ -66,16 +69,11 @@ public class Main {
                     mainMenu.moveOneDown();
                 }
                 
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            
+            } while (btn != Button.RIGHT.getId());
+
+            LCDGui.clearLCD();
             state = mainMenu.getCurrentSelected();
             states.get(state).init();
-            LCDGui.clearLCD();
         
             while (!Util.isPressed(Button.ENTER.getId()))
             {
