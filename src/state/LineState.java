@@ -1,16 +1,15 @@
 package state;
 
 import lcdGui.LCDGui;
-import lejos.hardware.lcd.LCD;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
-import util.MediumMotorTuple;
 import util.Util;
 
 public class LineState implements ParcourState {
 	
 	private final int angle;
+	private final int noError;
 	
     private Robot robot;
     private LCDGui gui;
@@ -20,7 +19,7 @@ public class LineState implements ParcourState {
     /*
      * valid from [0, endIndex)
      */
-    private MediumMotorTuple[] sample;
+    private float[] sample;
     private int endIndex;
     private boolean left;
     
@@ -30,9 +29,10 @@ public class LineState implements ParcourState {
         this.robot = robot;
         this.gui = new LCDGui(4,2);
         
-        this.threshold = 0.5f;
+        this.threshold = 0.2f;
+        this.noError = 10;
         
-        this.sample = new MediumMotorTuple[50000];
+        this.sample = new float[50000];
         this.endIndex = 0;
         this.left = true;
         
@@ -44,7 +44,11 @@ public class LineState implements ParcourState {
     }
 
     public void reset() {
-        
+        if (left) {
+    		RobotComponents.inst().getMediumMotor().rotate(-this.angle / 2 - 5, false);
+        } else {
+    		RobotComponents.inst().getMediumMotor().rotate(this.angle / 2 - 5, false);
+        }
     }
 
 	@Override
@@ -78,17 +82,12 @@ public class LineState implements ParcourState {
 			RobotComponents.inst().getMediumMotor().rotate(this.angle, true);
 		}
 		
-		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < angle - 5) {
-			this.sample[counter] = new MediumMotorTuple(
-					Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample()),
-					RobotComponents.inst().getMediumMotor().getTachoCount()
-					);
+		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < angle - 2) {
+			this.sample[counter] = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample());
 			counter++;
 		}
 		
 		this.endIndex = counter;
-		
-		gui.setVarValue(0, String.valueOf(this.endIndex));
 		
 	}
 	
@@ -97,38 +96,63 @@ public class LineState implements ParcourState {
 		int l = 0; //left bound == first encounter with line from the left
 		int r = 0; //right bound == last encounter with line from the left
 		int i = 0;
+		int errorPreventionCount = 0;
 		
-		while (i < this.endIndex && this.sample[i].getF1() < threshold) {
+		while (i < this.endIndex) {
+			if (this.sample[i] >= this.threshold) {
+				if (errorPreventionCount < noError) {
+					errorPreventionCount++;
+				} else {
+					//found left limit
+					break;
+				}
+			} else {
+				errorPreventionCount = 0;
+			}
 			i++;
 //			gui.setVarValue(1, "LEFT: " + String.valueOf(i));
 		}
 		
-		if (i >= this.endIndex) {
-			
-			/*
-			 * NO LINE FOUND!
-			 */
-			
+		if (i == this.endIndex) {
+			robot.stop();
+			return;
 		}
-		
+
 		l = i;
 		i = this.endIndex - 1;
+		errorPreventionCount = 0;
 		
-		while (i >= 0 && this.sample[i].getF1() < threshold) {
+		while (i >= 0) {
+			if (this.sample[i] >= this.threshold) {
+				if (errorPreventionCount < noError) {
+					errorPreventionCount++;
+				} else {
+					//found right limit
+					break;
+				}
+			} else {
+				errorPreventionCount = 0;
+			}
 			i--;
 //			gui.setVarValue(1, "RIGHT: " + String.valueOf(i));
 		}
-		
+
 		r = i;
 		
-		float mid = (r - l) / 2;
+		gui.clearLCD();
+		gui.writeLine("l: " + String.valueOf(l));
+		gui.writeLine("r: " + String.valueOf(r));
+		
+		float mid = ((float) Math.abs(r + l) / 2.f / this.endIndex);
 		float linterpol = (1 - mid) * 1 + mid * -1;
+		gui.writeLine(" - " + this.endIndex + " - ");
+		gui.writeLine(" +++ " + linterpol + " +++ ");
 		
 		if (linterpol > 0) {
-			robot.setSpeed(1.f - linterpol, 1.f);
+			robot.setSpeed((1.f - 2.f * linterpol) / 3.f, 1.f);
 			robot.forward();
 		} else {
-			robot.setSpeed(1.f, 1.f + linterpol);
+			robot.setSpeed(1.f, (1.f + 2 * linterpol) / 3.f);
 			robot.forward();
 		}
 		

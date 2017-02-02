@@ -15,7 +15,6 @@ import sensor.GyroSensor;
 import sensor.TouchSensorAThread;
 import sensor.TouchSensorBThread;
 import sensor.UVSensor;
-import sensor.modes.ColorSensorMode;
 
 /**
  * 

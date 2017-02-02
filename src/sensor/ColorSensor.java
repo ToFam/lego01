@@ -1,8 +1,6 @@
 package sensor;
 
 import lejos.hardware.sensor.EV3ColorSensor;
-import robot.RobotComponents;
-import util.MediumMotorTuple;
 
 public class ColorSensor extends SensorThread {
 	
