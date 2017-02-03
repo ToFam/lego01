@@ -59,7 +59,7 @@ public class LineMovingIIt1  implements ParcourState {
     private ColorSensor colorSensor;
     private GyroSensor gyroSensor;
     
-    private LMState curStat = LMState.STRAIGHT_LEFT;
+    private LMState curStat = LMState.SEARCH_LEFT;
     private float lostAngle = 0f;
     private int searchIteration = 0;
     private boolean startTurnLeft = true;
@@ -101,9 +101,16 @@ public class LineMovingIIt1  implements ParcourState {
     	{
     		float colorNow = colorSensor.sample()[0];
     		
-    		if (colorNow < param_redThreshhold)
+    		if (colorNow > param_redThreshhold)
     		{
     			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_LEFT : LMState.STRAIGHT_RIGHT);
+    			
+
+    			gui.writeLine("Found line");
+    			gui.writeLine("Wait for DOWN");
+    			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			
+    			robot.forward();
     		}
     		else
     		{
@@ -120,6 +127,7 @@ public class LineMovingIIt1  implements ParcourState {
     			
     			
 
+    			gui.writeLine("Gonna turn");
     			gui.writeLine("Wait for DOWN");
     			while(Util.isPressed(Button.ID_DOWN) == false) {}
     			
@@ -147,7 +155,8 @@ public class LineMovingIIt1  implements ParcourState {
     	
     	
     	
-		gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 5);
+		gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 4);
+		gui.setVarValue(1,  RobotComponents.inst().getGyroSensor().sample()[0], 5);
     	
         if (Util.isPressed(Button.ID_UP))
         {
