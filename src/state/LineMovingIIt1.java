@@ -132,10 +132,13 @@ public class LineMovingIIt1  implements ParcourState {
     			estimatedDiff *= 0.002f;
     			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
 
+    			preLastAngle = lastAngle;
+    			
     	    	System.out.println("FoundLine. EstDiff=" + String.valueOf(estimatedDiff));
     	    	
     	        //robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	        //robot.setSpeed(1f, 1f);
+
     	        robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
     			robot.forward();
     		}
