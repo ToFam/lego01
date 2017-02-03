@@ -247,8 +247,8 @@ public class LineMovingIIt1  implements ParcourState {
     	
     	
     	
-		gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 5);
-		gui.setVarValue(1,  RobotComponents.inst().getGyroSensor().sample()[0], 5);
+		//gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 5);
+		//gui.setVarValue(1,  RobotComponents.inst().getGyroSensor().sample()[0], 5);
     	
         if (Util.isPressed(Button.ID_UP))
         {

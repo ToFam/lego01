@@ -25,14 +25,17 @@ public class TestState implements ParcourState {
     @Override
     public void init() {
         robot.setSpeed(1f);
+        
+        RobotComponents.inst().getMediumMotor().resetTachoCount();
+        RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed());
         //RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         //RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
         //RobotComponents.inst().getUV().setMode(0);
-        robot.forward();
+        //robot.forward();
     }
 
     public void reset() {
-        
+        RobotComponents.inst().getMediumMotor().rotateTo(0);
     }
 
     
@@ -80,13 +83,16 @@ public class TestState implements ParcourState {
         if (Util.isPressed(Button.ID_LEFT))
         {
             //robot.turnOnSpot(90);
-        	turnRobotDegrees(180);
+        	//turnRobotDegrees(180);
+        	RobotComponents.inst().getMediumMotor().rotateTo(0);
         }
         
         if (Util.isPressed(Button.ID_RIGHT))
         {
             //robot.turnOnSpot(-90);
-        	turnRobotDegrees(-180);
+        	//turnRobotDegrees(-180);
+        	
+        	RobotComponents.inst().getMediumMotor().rotateTo(210);
         }
         
         if (Util.isPressed(Button.ID_DOWN))
