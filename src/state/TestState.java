@@ -79,12 +79,14 @@ public class TestState implements ParcourState {
         
         if (Util.isPressed(Button.ID_LEFT))
         {
-            robot.turnOnSpot(90);
+            //robot.turnOnSpot(90);
+        	turnRobotDegrees(180);
         }
         
         if (Util.isPressed(Button.ID_RIGHT))
         {
-            robot.turnOnSpot(-90);
+            //robot.turnOnSpot(-90);
+        	turnRobotDegrees(-180);
         }
         
         if (Util.isPressed(Button.ID_DOWN))
@@ -92,5 +94,14 @@ public class TestState implements ParcourState {
             robot.stop();
         }
         
+    }
+    
+    private float degreeFac = 360f / 45f;
+    private void turnRobotDegrees(float degrees)
+    {
+    	float turnSpeed = 1f;
+    	robot.setSpeed(turnSpeed, turnSpeed);
+    	RobotComponents.inst().getLeftMotor().rotate((int) (degrees * degreeFac), true);
+    	RobotComponents.inst().getRightMotor().rotate((int) (-degrees * degreeFac), true);
     }
 }

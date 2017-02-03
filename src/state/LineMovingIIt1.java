@@ -68,16 +68,21 @@ public class LineMovingIIt1  implements ParcourState {
     private float lostAngle = 0f;
     private int searchIteration = 0;
     private boolean startTurnLeft = true;
+    private float preLastAngle = 0f;
+    private float lastAngle = 0f;
     
     @Override
     public void update(int elapsedTime) {
 
+    	//System.out.println("Color=" + String.valueOf(RobotComponents.inst().getColorSensor().sample()[0]));
+    	
     	if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
     	{
     		float colorVal = RobotComponents.inst().getColorSensor().sample()[0];
     		
     		if (colorVal < param_redThreshhold)
     		{
+    	    	System.out.println("LostLine");
     			gui.writeLine("Lost line");
     			robot.stop();
     			
@@ -122,7 +127,16 @@ public class LineMovingIIt1  implements ParcourState {
         			while(Util.isPressed(Button.ID_DOWN) == false) {}
     			}
 
-    	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+    			lastAngle = gyroSensor.sample()[0];
+    			float estimatedDiff = lastAngle - preLastAngle;
+    			estimatedDiff *= 0.002f;
+    			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
+
+    	    	System.out.println("FoundLine. EstDiff=" + String.valueOf(estimatedDiff));
+    	    	
+    	        //robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+    	        //robot.setSpeed(1f, 1f);
+    	        robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
     			robot.forward();
     		}
     		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
@@ -208,6 +222,8 @@ public class LineMovingIIt1  implements ParcourState {
     	float turnSpeed = degrees / param_angleWhenToTurnWithMaxSpeed;
     	
     	turnSpeed = (turnSpeed < param_minTurnSpeed ? param_minTurnSpeed : (turnSpeed > param_maxTurnSpeed ? param_maxTurnSpeed : turnSpeed));
+    	
+    	turnSpeed = 1f;
     	
     	robot.setSpeed(turnSpeed, turnSpeed);
     	RobotComponents.inst().getLeftMotor().rotate((int) (degrees * degreeFac), true);

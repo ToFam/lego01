@@ -82,7 +82,11 @@ public class Robot
         float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
         float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
         
-        setSpeed(left * speedLeft, right * speedRight);
+        //System.out.println("Right=" + String.valueOf(right) + " Left=" + String.valueOf(left) + " Direction=" + String.valueOf(direction));
+        
+        
+        //setSpeed(left * speedLeft, right * speedRight);
+        setSpeed(left, right);
     }
     
     public void steerFacSimonSpot(float direction, float speed)
