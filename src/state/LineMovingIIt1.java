@@ -15,6 +15,8 @@ public class LineMovingIIt1  implements ParcourState {
     
     
     private float param_robotMaxSpeed = 0.4f;
+    private int param_colorFilterSize = 1;
+    private float param_redThreshhold = 0.5f;
     
     public LineMovingIIt1(Robot robot) {
         this.robot = robot;
@@ -28,7 +30,7 @@ public class LineMovingIIt1  implements ParcourState {
         RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 1f);
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
-        RobotComponents.inst().getColorSensor().setMedianFilter(1);
+        RobotComponents.inst().getColorSensor().setMedianFilter(param_colorFilterSize);
         RobotComponents.inst().getMediumMotor().resetTachoCount();
     }
 
@@ -40,6 +42,8 @@ public class LineMovingIIt1  implements ParcourState {
     public void reset() {
         RobotComponents.inst().getMediumMotor().rotateTo(0, true);
     }
+    
+    private LMState curStat = LMState.STRAIGHT_LEFT;
     
     @Override
     public void update(int elapsedTime) {
