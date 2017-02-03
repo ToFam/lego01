@@ -78,7 +78,7 @@ public class LCDGui
 			vars[index] = var;
 			String str = String.valueOf(vars[index]);
 			if (str.length() > strLength)
-				str = str.substring(0, strLength);
+			str = str.substring(0, strLength);
 			LCD.drawString(str, colPoss[index % colPoss.length], index / amountOfCols);
 		}
 	}

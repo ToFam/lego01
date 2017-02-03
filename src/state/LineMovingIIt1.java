@@ -17,11 +17,12 @@ public class LineMovingIIt1  implements ParcourState {
     private LCDGui gui;
     
     
-    private float param_robotMaxSpeed = 0.4f;
+    private float param_robotMaxSpeed = 0.7f;
     private int param_colorFilterSize = 4;
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.5f;
-    private float[] param_searchAngles = new float[] {8f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
+    private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
+    private boolean param_debugWaits = false;
     
     public LineMovingIIt1(Robot robot) {
         this.robot = robot;
@@ -93,9 +94,11 @@ public class LineMovingIIt1  implements ParcourState {
         			turnRobotDegrees(-param_searchAngles[searchIteration]);
     			}
     			
-    			
-    			gui.writeLine("Wait for DOWN");
-    			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			if (param_debugWaits)
+    			{
+        			gui.writeLine("Wait for DOWN");
+        			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			}
     		}
     	}
     	
@@ -105,12 +108,15 @@ public class LineMovingIIt1  implements ParcourState {
     		
     		if (colorNow > param_redThreshhold)
     		{
-    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_LEFT : LMState.STRAIGHT_RIGHT);
+    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_RIGHT : LMState.STRAIGHT_LEFT);
     			
 
     			gui.writeLine("Found line");
-    			gui.writeLine("Wait for DOWN");
-    			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			if (param_debugWaits)
+    			{
+        			gui.writeLine("Wait for DOWN");
+        			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			}
     			
     			robot.forward();
     		}
@@ -130,8 +136,11 @@ public class LineMovingIIt1  implements ParcourState {
     			
 
     			gui.writeLine("Gonna turn");
-    			gui.writeLine("Wait for DOWN");
-    			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			if (param_debugWaits)
+    			{
+        			gui.writeLine("Wait for DOWN");
+        			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			}
     			
     			if (curStat == LMState.SEARCH_LEFT)
     			{
