@@ -17,12 +17,12 @@ public class LineMovingIIt1  implements ParcourState {
     private LCDGui gui;
     
     
-    private float param_robotMaxSpeed = 0.8f;
+    private float param_robotMaxSpeed = 1f;
     private int param_colorFilterSize = 4;
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.5f;
     //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
-    private float[] param_searchAngles = new float[] {6f, 16f, 100f, 140f};
+    private float[] param_searchAngles = new float[] {8f, 18f, 40f, 100f, 120f};
     private float param_angleWhenToTurnWithMaxSpeed = 50f;
     private float param_minTurnSpeed = 0.5f;
     private float param_maxTurnSpeed = 1f;
