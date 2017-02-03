@@ -25,9 +25,9 @@ public class TestState implements ParcourState {
     @Override
     public void init() {
         robot.setSpeed(1f);
-        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
-        RobotComponents.inst().getUV().setMode(0);
+        //RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+        //RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
+        //RobotComponents.inst().getUV().setMode(0);
         robot.forward();
     }
 
@@ -42,7 +42,7 @@ public class TestState implements ParcourState {
     @Override
     public void update(int elapsedTime) {
 
-    	if (RobotComponents.inst().getColorSensor().sampleSize() >= 3)
+    	/*if (RobotComponents.inst().getColorSensor().sampleSize() >= 3)
     	{
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[0]), 0);
     		//gui.writeLine(String.valueOf(RobotComponents.inst().getColorSensor().sample()[1]), 1);
@@ -65,7 +65,7 @@ public class TestState implements ParcourState {
     	        mode = true;
     	        robot.backward();
     	    }
-    	}
+    	}*/
     	
         if (Util.isPressed(Button.ID_UP))
         {
@@ -74,7 +74,7 @@ public class TestState implements ParcourState {
         
         if (Util.isPressed(Button.ID_ENTER))
         {
-            robot.stop();
+            //robot.stop();
         }
         
         if (Util.isPressed(Button.ID_LEFT))
@@ -89,7 +89,7 @@ public class TestState implements ParcourState {
         
         if (Util.isPressed(Button.ID_DOWN))
         {
-            robot.backward();
+            robot.stop();
         }
         
     }
