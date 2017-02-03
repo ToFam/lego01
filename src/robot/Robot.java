@@ -69,6 +69,33 @@ public class Robot
     	setSpeed(left * speed, right* speed);
     }
     
+    private float turnVal = 0.8f;
+    
+    public void steerFacSimonSpot(float direction, float speed)
+    {
+    	float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
+    	float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
+    	
+    	setSpeed((left >= 0f ? left : -left) * speed, (right >= 0f ? right : -right) * speed);
+    	
+    	if (right >= 0f)
+    	{
+            RobotComponents.inst().getRightMotor().backward();
+    	}
+    	else
+    	{
+            RobotComponents.inst().getRightMotor().forward();
+    	}
+    	if (left >= 0f)
+    	{
+            RobotComponents.inst().getLeftMotor().backward();
+    	}
+    	else
+    	{
+            RobotComponents.inst().getLeftMotor().forward();
+    	}
+    }
+    
     public void rotateMiddle(int deg) {
         RobotComponents.inst().getMediumMotor().rotate(deg);
     }

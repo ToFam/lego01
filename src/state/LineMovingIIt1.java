@@ -8,12 +8,12 @@ import sensor.modes.ColorSensorMode;
 import util.MediumMotorTuple;
 import util.Util;
 
-public class LineBorderTest implements ParcourState {
+public class LineMovingIIt1  implements ParcourState {
 
     private Robot robot;
     private LCDGui gui;
     
-    public LineBorderTest(Robot robot) {
+    public LineMovingIIt1(Robot robot) {
         this.robot = robot;
         this.gui = new LCDGui(4,2);
     }
@@ -22,9 +22,6 @@ public class LineBorderTest implements ParcourState {
     private float param_mediumMotorSpeed = 0.7f;
     private float param_colorThresh = 0.17f;
     private int param_bufferSize = 100000;
-    private float param_kp = 1.2f;
-    
-    private int param_TicksUntilFullSteer = 15;
     
     @Override
     public void init() {
@@ -37,7 +34,7 @@ public class LineBorderTest implements ParcourState {
         RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.5f);
         robot.setSpeed(0.4f, 0.4f);
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
-        RobotComponents.inst().getColorSensor().setMedianFilter(2);
+        RobotComponents.inst().getColorSensor().setMedianFilter(1);
         RobotComponents.inst().getMediumMotor().resetTachoCount();
     }
 
@@ -48,77 +45,61 @@ public class LineBorderTest implements ParcourState {
     //float[] buffer;
     MediumMotorTuple[] buffer;
     int bufPos = 0;
-    float firstVal = 0f;
-    float secondVal = 0f;
     boolean isLeftToLine = true;
-    int state = 0;
-    
-    int timeCounter = 1;
-    boolean currOnBlack = true;
     
     public String getName() {
-        return "Line Simon";
+        return "Line SensTest";
     }
     
     public void reset() {
         RobotComponents.inst().getMediumMotor().rotateTo(0, true);
-        robot.stop();
     }
     
     @Override
-    public void update(int elapsedTime)
-    {
-    	float curr = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().instSample());
-    	if (curr < param_colorThresh)
-    	{
-    		curr = 0.0f;
-    		if (currOnBlack == false)
-    		{
-        		//timeCounter = 1;
-    		}
-    		currOnBlack = true;
-    	}
-    	else
-    	{
-    		curr = 1.0f;
-    		if (currOnBlack)
-    		{
-        		//timeCounter = 1;
-    		}
-    		currOnBlack = false;
-    	}
-    	
-    	//float err = ((curr * 2 - 1f) * (timeCounter) >= 0 ? timeCounter : -timeCounter) / ((float)param_TicksUntilFullSteer);
-    	float err = (curr * 2 - 1f);
-    	
-    	float steerY = err * param_kp;
-		gui.setVarValue(0,  curr);
-		gui.setVarValue(1,  steerY);
-    	robot.steerFacSimonSpot(steerY, 0.5f);
-    	
-    	//steerY = steerY > 1f ? 1f : (steerY < -1f ? -1f : steerY);
-    	
-    	
-    	//robot.forward();
-    	
+    public void update(int elapsedTime) {
 
-		
-		if (currOnBlack)
-		{
-	    	timeCounter++;
-	    	timeCounter = timeCounter > param_TicksUntilFullSteer ? param_TicksUntilFullSteer : timeCounter;
-		}
-		else
-		{
-			timeCounter--;
-	    	timeCounter = timeCounter < -param_TicksUntilFullSteer ? -param_TicksUntilFullSteer : timeCounter;
-		}
+    	// Rotation des Arms
+    	if (RobotComponents.inst().getMediumMotor().isMoving() == false)
+    	{
+    		//gui.setVarValue(1,  bufPos);
+    		
+    		//float[] errorAngles = evaluateBuffer(armMovingLeft);
+
+    		//float error = (errorAngles[0] + errorAngles[1]);
+    		
+    		
+    		
+    		if (RobotComponents.inst().getMediumMotor().getTachoCount() > 0)
+    		{
+    			armMovingLeft = false;
+    		}
+    		else
+    		{
+    			armMovingLeft = true;
+    		}
+
+        	RobotComponents.inst().getMediumMotor().rotateTo(armMovingLeft ? maxAngl : -maxAngl, true);
+
+        	bufPos = 0;
+    	}
+    	
+    	float currentLineVal = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample());
+    	
+    	buffer[bufPos] = new MediumMotorTuple(currentLineVal, RobotComponents.inst().getMediumMotor().getTachoCount());
+    	bufPos++;
     	
     	
+    	
+		//gui.setVarValue(0,  currentLineVal);
     	
         if (Util.isPressed(Button.ID_UP))
         {
             robot.forward();
+        }
+        
+        if (Util.isPressed(Button.ID_ENTER))
+        {
+            robot.stop();
         }
         
         if (Util.isPressed(Button.ID_LEFT))
@@ -143,7 +124,7 @@ public class LineBorderTest implements ParcourState {
      * @param movingToLeft
      * @return
      */
-    private float[] evaluateBuffer(boolean movingToLeft)
+    private float evaluateBuffer(boolean movingToLeft)
     {
     	//int arrayC = movingToLeft ? 0 : bufPos - 1;
     	
@@ -168,11 +149,11 @@ public class LineBorderTest implements ParcourState {
     	
     	if (amountAddedWhite == 0)
     	{
-    		return new float[] {0, 5000};
+    		return 0;
     	}
     	if (amountAddedBlack == 0)
     	{
-    		return new float[] {-5000, 0};
+    		return 0;
     	}
     	
     	medianWhite = medianWhite / amountAddedWhite;
@@ -181,6 +162,6 @@ public class LineBorderTest implements ParcourState {
     	medianBlack = medianBlack / amountAddedBlack;
     	//medianBlack = movingToLeft ? medianBlack : -medianBlack;
     	
-    	return new float[] {medianWhite, medianBlack};
+    	return medianWhite - medianBlack;
     }
 }

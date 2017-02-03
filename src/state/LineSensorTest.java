@@ -22,6 +22,8 @@ public class LineSensorTest implements ParcourState {
     private int param_mediumMotorOpenRangeAngleToOneDirection = 60;
     private float param_mediumMotorSpeed = 0.7f;
     private float param_colorThresh = 0.17f;
+    private float param_leftOffset = -15f;
+    private float param_rightOffset = 15f;
     private int param_bufferSize = 100000;
     private float param_kp = 1.0f / 30f;
     
@@ -36,7 +38,7 @@ public class LineSensorTest implements ParcourState {
         RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.5f);
         robot.setSpeed(0.4f, 0.4f);
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RGB.getIdf());
-        RobotComponents.inst().getColorSensor().setMedianFilter(2);
+        RobotComponents.inst().getColorSensor().setMedianFilter(1);
         RobotComponents.inst().getMediumMotor().resetTachoCount();
     }
 
@@ -75,19 +77,27 @@ public class LineSensorTest implements ParcourState {
     		if (armMovingLeft)
     		{
     			firstVal = error;
+    			error += param_leftOffset;
     		}
     		else
     		{
     			secondVal = error;
+    			error += param_rightOffset;
     			
-    			float between = (firstVal + secondVal) * 0.5f;
+    			/*float between = (firstVal + secondVal) * 0.5f;
     			
         		gui.setVarValue(0,  between);
         		
         		robot.steerFacSimonTest(between * param_kp, 0.2f);
         		
-        		robot.forward();
+        		robot.forward();*/
     		}
+    		
+    		gui.setVarValue(0,  error * param_kp);
+    		
+    		//robot.steerFacSimonTest(error * param_kp, 0.3f);
+    		
+    		//robot.forward();
     		
     		//gui.setVarValue(1,  errorAngles[1]);
     		
