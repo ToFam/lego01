@@ -29,31 +29,29 @@ public class Main {
     private Robot robot;
     private LCDChooseList mainMenu;
     
-    private List<ParcourState> states;
+    private final ParcourState[] states = {
+    		new LabyrinthState(robot),
+    		new TestDriveLTWall(robot),
+    		new HumpbackBridgeState(robot),
+    		new LineState(robot),
+    		new LineSlowMode(robot),
+    		new TestGUI(robot),
+    		new TestState(robot),
+    };
+    private final String[] elements;
     private int state;
     
     public Main() {
-        states = new ArrayList<ParcourState>();
-        robot = new Robot();
+        this.robot = new Robot();
         
-        String elements[] = new String[7];
-        states.add(new LineState(robot));
-        elements[0] = states.get(0).getName();
-        states.add(new LineSlowMode(robot));
-        elements[1] = states.get(1).getName();
-        states.add(new LabyrinthState(robot));
-        elements[2] = states.get(2).getName();
-        states.add(new TestDriveLTWall(robot));
-        elements[3] = states.get(3).getName();
-        states.add(new TestGUI(robot));
-        elements[4] = states.get(4).getName();
-        states.add(new TestState(robot));
-        elements[5] = states.get(5).getName();
-        mainMenu = new LCDChooseList(elements);
-        states.add(new HumpbackBridgeState(robot));
-        elements[6] = states.get(6).getName();
+        this.elements = new String[states.length];
+        for (int i = 0; i < elements.length; i++) {
+        	this.elements[i] = states[i].getName();
+        }
         
-        state = 0;
+        this.mainMenu = new LCDChooseList(elements);
+        this.state = 0;
+        
     }
     
     public void run()
@@ -76,11 +74,11 @@ public class Main {
 
             LCDGui.clearLCD();
             state = mainMenu.getCurrentSelected();
-            states.get(state).init();
+            states[state].init();
         
             while (!Util.isPressed(Button.ENTER.getId()))
             {
-                states.get(state).update(50);
+                states[state].update(50);
                 
                 try {
                     Thread.sleep(50);
@@ -89,7 +87,7 @@ public class Main {
                 }
             }
             
-            states.get(state).reset();
+            states[state].reset();
         }
     }
     
