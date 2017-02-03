@@ -1,6 +1,8 @@
 package robot.action;
 
+import lejos.hardware.lcd.LCD;
 import robot.RobotComponents;
+import util.lcdGui.LCDGui;
 
 public class TurnOnSpot implements RobotAction {
     
@@ -67,7 +69,7 @@ public class TurnOnSpot implements RobotAction {
     {
         // DEBUG
         // RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        // LCDGui.clearLCD();
+        LCDGui.clearLCD();
         
         if (finished)
             return;
@@ -75,8 +77,8 @@ public class TurnOnSpot implements RobotAction {
         if ((goalGreater && gyroValue < goalValue) || (!goalGreater && gyroValue > goalValue))
         {
             // DEBUG
-            // LCD.drawString(String.valueOf(gyroValue), 4, 2);
-            // LCD.drawString(String.valueOf(goalValue), 4, 4);
+            LCD.drawString(String.valueOf(gyroValue), 4, 2);
+            LCD.drawString(String.valueOf(goalValue), 4, 4);
             
             if (slowMode == false && Math.abs(gyroValue - goalValue) < turnOnSpot_angleToSlowDown)
             {
