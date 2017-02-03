@@ -79,8 +79,8 @@ public class HumpbackBridgeState implements ParcourState {
 
 	@Override
 	public void update(int elapsedTime) {
-		this.heights.add(RobotComponents.inst().getUV().sample()[0]);
 		gui.writeLine(this.bridgeSegment.toString());
+		this.heights.add(RobotComponents.inst().getUV().sample()[0]);
 		
 		switch (this.bridgeSegment) {
 		case RAMP_UP:
