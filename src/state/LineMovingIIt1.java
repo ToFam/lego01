@@ -21,7 +21,7 @@ public class LineMovingIIt1  implements ParcourState {
     private int param_colorFilterSize = 4;
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.5f;
-    private float[] param_searchAngles = new float[] {20f, 40f, 60f, 100f, 150f, 180f};
+    private float[] param_searchAngles = new float[] {8f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
     
     public LineMovingIIt1(Robot robot) {
         this.robot = robot;
