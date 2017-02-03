@@ -33,8 +33,8 @@ public class HumpbackBridgeState implements ParcourState {
 		this.SPEED_MAX = 1.f;
 		this.SPEED_LEFT = this.SPEED_MAX;
 		this.SPEED_RIGHT = this.SPEED_MAX;
-		this.THRESHOLD = 0.08f;
-		this.PAST = 99;
+		this.THRESHOLD = 0.1f;
+		this.PAST = 1;
 		this.SEGMENT_COUNT = 0;
 		
 		this.bridgeSegment = BridgeSegment.RAMP_UP;
@@ -61,8 +61,16 @@ public class HumpbackBridgeState implements ParcourState {
 
 	@Override
 	public void update(int elapsedTime) {
+		this.robot.stop();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.robot.forward();
 		this.heights[this.current] = RobotComponents.inst().getUV().sample()[0];
-		gui.writeLine(this.bridgeSegment.toString() + " " + this.heights[this.current]);
+		gui.writeLine(this.bridgeSegment.toString() + ": " + this.heights[this.current]);
 		this.current++;
 		
 		switch (this.bridgeSegment) {
@@ -123,7 +131,7 @@ public class HumpbackBridgeState implements ParcourState {
 			
 			} else {
 				
-				this.slowDownRightMotor();
+				this.slowDownLeftMotor();
 				
 			}
 			
@@ -163,7 +171,7 @@ public class HumpbackBridgeState implements ParcourState {
 
 	@Override
 	public void reset() {
-		
+		this.robot.stop();
 	}
 	
 	private void speedUpLeftMotor() {
