@@ -29,14 +29,14 @@ public class LineState implements ParcourState {
     
     public LineState(Robot robot) {
     	this.ANGLE = 130;
-    	this.COMFORT_ZONE = 1.3f;
+    	this.COMFORT_ZONE = 1.f;
     	
         this.robot = robot;
         this.gui = new LCDGui(4,2);
         
-        this.THRESHOLD = 0.2f;
-        this.NO_ERROR = 10;
-        this.SPEED = 0.5f;
+        this.THRESHOLD = 0.4f;
+        this.NO_ERROR = 5;
+        this.SPEED = .5f;
         
         this.sample = new float[50000];
         this.endIndex = 0;
@@ -57,8 +57,8 @@ public class LineState implements ParcourState {
         } else {
     		RobotComponents.inst().getMediumMotor().rotate(this.ANGLE / 2 - 5, false);
         }
-        robot.setSpeed(1.f);
-        robot.forward();
+//        robot.setSpeed(1.f);
+//        robot.forward();
     }
 
 	@Override
@@ -69,8 +69,8 @@ public class LineState implements ParcourState {
 		RobotComponents.inst().getMediumMotor().rotate(this.ANGLE / 2 - 5, false);
 		this.left = true;
 		
-		robot.setSpeed(this.SPEED);
-		robot.forward();
+//		robot.setSpeed(this.SPEED);
+//		robot.forward();
 	}
 
 	@Override
@@ -94,7 +94,8 @@ public class LineState implements ParcourState {
 			RobotComponents.inst().getMediumMotor().rotate(this.ANGLE, true);
 		}
 		
-		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < ANGLE - 2) {
+		while (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < ANGLE - 1) {
+			if (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) > 1)
 			this.sample[counter] = Util.howMuchOnLine(RobotComponents.inst().getColorSensor().sample());
 			counter++;
 		}
@@ -144,7 +145,7 @@ public class LineState implements ParcourState {
 //			}
 		}
 
-		l = i;
+		l = i - this.NO_ERROR;
 		i = this.endIndex - 1;
 		errorPreventionCount = 0;
 		
@@ -163,32 +164,34 @@ public class LineState implements ParcourState {
 //			gui.setVarValue(1, "RIGHT: " + String.valueOf(i));
 		}
 
-		r = i;
+		r = i + this.NO_ERROR;
 		
 		gui.clearLCD();
 		gui.writeLine("l: " + String.valueOf(l));
 		gui.writeLine("r: " + String.valueOf(r));
 		
-		this.mid = ((float) Math.abs(r + l) / 2.f / this.endIndex);
+		this.mid = (((float) (r + l) / 2.f) / this.endIndex);
+		
+//		if (!left) {
+//			this.mid = 1.f - this.mid;
+//		}
 		this.linterpol = (1 - mid) * 1 + mid * -1;
 		this.linterpol *= /*1.f / this.linterpol / this.linterpol **/ this.SPEED;
-		
-		if (!left) {
-			this.linterpol *= -1.f;
-		}
 		
 		gui.writeLine(" - " + this.endIndex + " - ");
 		gui.writeLine(" +++ " + this.linterpol + " +++ ");
 		
 		if (this.linterpol > 0) {
-			robot.setSpeed(Math.min(this.SPEED - this.COMFORT_ZONE * this.linterpol, 0.f), this.SPEED);
+			gui.writeLine(String.valueOf(Math.max(this.SPEED - this.COMFORT_ZONE * this.linterpol, 0.f)));
+			robot.setSpeed(Math.max(this.SPEED - this.COMFORT_ZONE * this.linterpol, 0.f), this.SPEED);
 		} else {
-			robot.setSpeed(this.SPEED, Math.min(this.SPEED + this.COMFORT_ZONE * this.linterpol, 0.f));
+			gui.writeLine(String.valueOf(Math.max(this.SPEED + this.COMFORT_ZONE * this.linterpol, 0.f)));
+			robot.setSpeed(this.SPEED, Math.max(this.SPEED + this.COMFORT_ZONE * this.linterpol, 0.f));
 		}
 //		if (linterpol > 0) {
-//			robot.setSpeed(Math.min(this.SPEED - this.linterpol, 0.f), this.SPEED);
+//			robot.setSpeed(Math.max(this.SPEED - this.linterpol, 0.f), this.SPEED);
 //		} else {
-//			robot.setSpeed(this.SPEED, Math.min(this.SPEED - this.linterpol, 0.f));
+//			robot.setSpeed(this.SPEED, Math.max(this.SPEED - this.linterpol, 0.f));
 //		}
 
 		robot.forward();
