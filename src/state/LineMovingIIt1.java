@@ -21,8 +21,8 @@ public class LineMovingIIt1  implements ParcourState {
     private int param_colorFilterSize = 4;
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.5f;
-    private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
-    //private float[] param_searchAngles = new float[] {30f, 60f, 100f, 140f};
+    //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
+    private float[] param_searchAngles = new float[] {6f, 16f, 100f, 140f, 150f, 160f};
     private float param_angleWhenToTurnWithMaxSpeed = 50f;
     private float param_minTurnSpeed = 0.5f;
     private float param_maxTurnSpeed = 1f;
@@ -74,7 +74,6 @@ public class LineMovingIIt1  implements ParcourState {
     @Override
     public void update(int elapsedTime) {
 
-    	//System.out.println("Color=" + String.valueOf(RobotComponents.inst().getColorSensor().sample()[0]));
     	
     	if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
     	{
@@ -82,7 +81,6 @@ public class LineMovingIIt1  implements ParcourState {
     		
     		if (colorVal < param_redThreshhold)
     		{
-    	    	System.out.println("LostLine");
     			gui.writeLine("Lost line");
     			robot.stop();
     			
@@ -94,13 +92,13 @@ public class LineMovingIIt1  implements ParcourState {
     			{
     				startTurnLeft = true;
         			//robot.turnOnSpot(param_searchAngles[searchIteration]);
-        			turnRobotDegrees(param_searchAngles[searchIteration]);
+    				turnRobotDegreesGyro(param_searchAngles[searchIteration]);
     			}
     			else 
     			{
     				startTurnLeft = false;
         			//robot.turnOnSpot(-param_searchAngles[searchIteration]);
-        			turnRobotDegrees(-param_searchAngles[searchIteration]);
+        			turnRobotDegreesGyro(-param_searchAngles[searchIteration]);
     			}
     			
     			if (param_debugWaits)
@@ -134,12 +132,10 @@ public class LineMovingIIt1  implements ParcourState {
 
     			preLastAngle = lastAngle;
     			
-    	    	System.out.println("FoundLine. EstDiff=" + String.valueOf(estimatedDiff));
-    	    	
-    	        //robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+    	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	        //robot.setSpeed(1f, 1f);
 
-    	        robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
+    	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
     			robot.forward();
     		}
     		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
@@ -152,36 +148,59 @@ public class LineMovingIIt1  implements ParcourState {
     				searchIteration++;
     			}
     			
-    			float curGyro = gyroSensor.sample()[0];
-    			float turnDegree = param_searchAngles[searchIteration];
-    			
-    			
-
-    			gui.writeLine("Gonna turn");
-    			if (param_debugWaits)
+    			if (searchIteration >= param_searchAngles.length)
     			{
-        			gui.writeLine("Wait for DOWN");
-        			while(Util.isPressed(Button.ID_DOWN) == false) {}
-    			}
-    			
-    			if (curStat == LMState.SEARCH_LEFT)
-    			{
-    				turnDegree = lostAngle - curGyro + param_searchAngles[searchIteration];
+    				curStat = LMState.SEARCH_LINE_END;
     			}
     			else
     			{
-    				turnDegree = lostAngle - curGyro - param_searchAngles[searchIteration];
-    			}
+    				float curGyro = gyroSensor.sample()[0];
+        			float turnDegree = param_searchAngles[searchIteration];
+        			
+        			
 
-    			//robot.turnOnSpot(turnDegree);
-    			turnRobotDegrees(turnDegree);
-    			
+        			gui.writeLine("Gonna turn");
+        			if (param_debugWaits)
+        			{
+            			gui.writeLine("Wait for DOWN");
+            			while(Util.isPressed(Button.ID_DOWN) == false) {}
+        			}
+        			
+        			if (curStat == LMState.SEARCH_LEFT)
+        			{
+        				turnDegree = lostAngle - curGyro + param_searchAngles[searchIteration];
+        			}
+        			else
+        			{
+        				turnDegree = lostAngle - curGyro - param_searchAngles[searchIteration];
+        			}
+
+        			//robot.turnOnSpot(turnDegree);
+        			//turnRobotDegrees(turnDegree);
+        			turnRobotDegreesGyro(turnDegree);
+    			}
     		}
     	}
     	
     	
     	
+    	if (curStat == LMState.SEARCH_LINE_END)
+    	{
+    		gui.writeLine("TurnToLost");
+			if (param_debugWaits)
+			{
+    			while(Util.isPressed(Button.ID_DOWN) == false) {}
+			}
+			
+			curStat = LMState.SEARCH_LINE_END_TURNTOLOST;
+			
+    		turnRobotDegreesGyro(lostAngle);
+    	}
     	
+    	if (curStat == LMState.SEARCH_LINE_END_TURNTOLOST)
+    	{
+    		
+    	}
     	
     	
     	
@@ -231,5 +250,10 @@ public class LineMovingIIt1  implements ParcourState {
     	robot.setSpeed(turnSpeed, turnSpeed);
     	RobotComponents.inst().getLeftMotor().rotate((int) (degrees * degreeFac), true);
     	RobotComponents.inst().getRightMotor().rotate((int) (-degrees * degreeFac), true);
+    }
+    
+    private void turnRobotDegreesGyro(float degrees)
+    {
+    	robot.turnOnSpot(degrees);
     }
 }
