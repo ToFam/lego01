@@ -61,15 +61,13 @@ public class Robot
      * Additional factor to make the whole thing slower
      * @param direction 1 is drive full left, -1 is drive full right. 0 is straight
      */
-    public void steerFacSimonTest(float direction, float speed)
+    public void steerFacSimonTest(float direction)
     {
     	float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
     	float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
     	
-    	setSpeed(left * speed, right* speed);
+    	setSpeed(left * speedLeft, right * speedRight);
     }
-    
-    private float turnVal = 0.8f;
     
     public void steerFacSimonSpot(float direction, float speed)
     {

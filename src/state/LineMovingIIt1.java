@@ -4,7 +4,10 @@ import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.ColorSensor;
+import sensor.GyroSensor;
 import sensor.modes.ColorSensorMode;
+import sensor.modes.GyroSensorMode;
 import util.MediumMotorTuple;
 import util.Util;
 
@@ -15,8 +18,10 @@ public class LineMovingIIt1  implements ParcourState {
     
     
     private float param_robotMaxSpeed = 0.4f;
-    private int param_colorFilterSize = 1;
+    private int param_colorFilterSize = 4;
+    private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.5f;
+    private float[] param_searchAngles = new float[] {20f, 40f, 60f, 100f, 150f, 180f};
     
     public LineMovingIIt1(Robot robot) {
         this.robot = robot;
@@ -26,12 +31,20 @@ public class LineMovingIIt1  implements ParcourState {
     @Override
     public void init() {
         gui = new LCDGui(4, 1);
+        
+        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	
         RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 1f);
-        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+        RobotComponents.inst().getMediumMotor().resetTachoCount();
+        
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
         RobotComponents.inst().getColorSensor().setMedianFilter(param_colorFilterSize);
-        RobotComponents.inst().getMediumMotor().resetTachoCount();
+        
+        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+        RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
+        
+        colorSensor = RobotComponents.inst().getColorSensor();
+        gyroSensor = RobotComponents.inst().getGyroSensor();
     }
 
     
@@ -43,11 +56,71 @@ public class LineMovingIIt1  implements ParcourState {
         RobotComponents.inst().getMediumMotor().rotateTo(0, true);
     }
     
+    private ColorSensor colorSensor;
+    private GyroSensor gyroSensor;
+    
     private LMState curStat = LMState.STRAIGHT_LEFT;
+    private float lostAngle = 0f;
+    private int searchIteration = 0;
     
     @Override
     public void update(int elapsedTime) {
 
+    	if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
+    	{
+    		float colorVal = RobotComponents.inst().getColorSensor().sample()[0];
+    		
+    		if (colorVal < param_redThreshhold)
+    		{
+    			robot.stop();
+    			
+    			lostAngle = gyroSensor.sample()[0];
+    			searchIteration = 0;
+    			curStat = (curStat == LMState.STRAIGHT_LEFT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
+    			
+    			if (curStat == LMState.SEARCH_LEFT)
+    			{
+        			robot.turnOnSpot(param_searchAngles[searchIteration]);
+    			}
+    			else 
+    			{
+        			robot.turnOnSpot(-param_searchAngles[searchIteration]);
+    			}
+    			
+    		}
+    	}
+    	
+    	if (curStat == LMState.SEARCH_LEFT || curStat == LMState.SEARCH_RIGHT)
+    	{
+    		float colorNow = colorSensor.sample()[0];
+    		
+    		if (colorNow < param_redThreshhold)
+    		{
+    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_LEFT : LMState.STRAIGHT_RIGHT);
+    		}
+    		else
+    		{
+    			searchIteration++;
+    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
+    			
+    			if (curStat == LMState.SEARCH_LEFT)
+    			{
+        			robot.turnOnSpot(param_searchAngles[searchIteration]);
+    			}
+    			else 
+    			{
+        			robot.turnOnSpot(-param_searchAngles[searchIteration]);
+    			}
+    		}
+    	}
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
     	
     	
 		gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 5);
