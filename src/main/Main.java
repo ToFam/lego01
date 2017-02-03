@@ -9,6 +9,7 @@ import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
 import robot.Robot;
+import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineSlowMode;
 import state.LineState;
@@ -35,7 +36,7 @@ public class Main {
         states = new ArrayList<ParcourState>();
         robot = new Robot();
         
-        String elements[] = new String[6];
+        String elements[] = new String[7];
         states.add(new LineState(robot));
         elements[0] = states.get(0).getName();
         states.add(new LineSlowMode(robot));
@@ -49,6 +50,8 @@ public class Main {
         states.add(new TestState(robot));
         elements[5] = states.get(5).getName();
         mainMenu = new LCDChooseList(elements);
+        states.add(new HumpbackBridgeState(robot));
+        elements[6] = states.get(6).getName();
         
         state = 0;
     }

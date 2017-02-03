@@ -1,9 +1,15 @@
 package state;
 
+import robot.Robot;
 import robot.RobotComponents;
 
 public class HumpbackBridgeState implements ParcourState {
 
+	private Robot robot;
+	
+	public HumpbackBridgeState(Robot robot) {
+		this.robot = robot;
+	}
 	@Override
 	public String getName() {
 		return "HumpbackBridge";
