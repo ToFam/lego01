@@ -36,6 +36,7 @@ public class Robot
 	    stop = new Stop();
 	    action = stop;
 	    action.start();
+	    RobotComponents.inst().getMediumMotor().resetTachoCount();
 	}
 	
 	public boolean finished() 
@@ -46,6 +47,26 @@ public class Robot
 	public void update()
 	{
 	    action.update();
+	}
+	
+	public void raiseUV() {
+		if (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < 2) {
+			RobotComponents.inst().getMediumMotor().rotate(-210, true);
+		}
+	}
+	
+	public boolean UVisUp() {
+		return Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < 2;
+	}
+	
+	public void lowerUV() {
+		if (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) > 208) {
+			RobotComponents.inst().getMediumMotor().rotate(210, true);
+		}
+	}
+	
+	public boolean UVisDown() {
+		return Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) > 208;
 	}
 	
 	public void setSpeed(float speed) {
