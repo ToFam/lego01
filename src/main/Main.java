@@ -11,6 +11,7 @@ import lejos.hardware.KeyListener;
 import robot.Robot;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
+import state.LineMovingIIt1;
 import state.LineSlowMode;
 import state.LineState;
 import state.ParcourState;
@@ -29,20 +30,22 @@ public class Main {
     private Robot robot;
     private LCDChooseList mainMenu;
     
-    private final ParcourState[] states = {
-    		new LabyrinthState(robot),
-    		new TestDriveLTWall(robot),
-    		new HumpbackBridgeState(robot),
-    		new LineState(robot),
-    		new LineSlowMode(robot),
-    		new TestGUI(robot),
-    		new TestState(robot),
-    };
+    private final ParcourState[] states;
     private final String[] elements;
     private int state;
     
     public Main() {
         this.robot = new Robot();
+        
+        this.states = new ParcourState[] {
+    		new LabyrinthState(robot),
+    		new TestDriveLTWall(robot),
+    		new HumpbackBridgeState(robot),
+    		new LineState(robot),
+    		new LineMovingIIt1(robot),
+    		new TestGUI(robot),
+    		new TestState(robot),
+        };
         
         this.elements = new String[states.length];
         for (int i = 0; i < elements.length; i++) {

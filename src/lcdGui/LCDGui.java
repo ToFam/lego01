@@ -71,6 +71,18 @@ public class LCDGui
 		}
 	}
 	
+	public void setVarValue(int index, Object var, int strLength)
+	{
+		if (index >= 0 && index < vars.length)
+		{
+			vars[index] = var;
+			String str = String.valueOf(vars[index]);
+			if (str.length() > strLength)
+				str = str.substring(0, strLength);
+			LCD.drawString(str, colPoss[index % colPoss.length], index / amountOfCols);
+		}
+	}
+	
 	public void writeLine(String line)
 	{
 		LCD.scroll();
