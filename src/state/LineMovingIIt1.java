@@ -37,6 +37,8 @@ public class LineMovingIIt1  implements ParcourState {
     public void init() {
         gui = new LCDGui(2, 2);
         
+        curStat = LMState.SEARCH_LEFT;
+        
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	
         RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 1f);
@@ -196,7 +198,9 @@ public class LineMovingIIt1  implements ParcourState {
 			
 			curStat = LMState.SEARCH_LINE_END_TURNTOLOST;
 			
-    		turnRobotDegreesGyro(lostAngle);
+			float currAngle = gyroSensor.sample()[0];
+			
+    		turnRobotDegreesGyro(lostAngle - currAngle);
     	}
     	
     	if (curStat == LMState.SEARCH_LINE_END_TURNTOLOST)
@@ -206,6 +210,7 @@ public class LineMovingIIt1  implements ParcourState {
     			curStat = LMState.SEARCH_360_LINESCOUNT;
     			search360Count = 0;
     			search360onWhite = false;
+        		System.out.println("Start turning for 360");
         		turnRobotDegreesGyro(lostAngle + 360);
     		}
     	}
@@ -215,6 +220,8 @@ public class LineMovingIIt1  implements ParcourState {
     		if (robot.finished() == false)
     		{
         		float colorNow = colorSensor.sample()[0];
+        		
+        		System.out.println("CurCol=" + String.valueOf(colorNow));
         		
         		if (colorNow > param_redThreshhold && search360onWhite == false)
         		{
