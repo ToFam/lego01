@@ -1,10 +1,10 @@
 package state;
 
-import lcdGui.LCDGui;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import util.Util;
+import util.lcdGui.LCDGui;
 
 public class LineState implements ParcourState {
 	

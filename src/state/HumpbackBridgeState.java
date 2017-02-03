@@ -1,9 +1,9 @@
 package state;
 
-import lcdGui.LCDGui;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.UVSensorMode;
+import util.lcdGui.LCDGui;
 
 public class HumpbackBridgeState implements ParcourState {
 

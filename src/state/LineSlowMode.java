@@ -1,12 +1,12 @@
 package state;
 
-import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import util.Util;
+import util.lcdGui.LCDGui;
 
 public class LineSlowMode implements ParcourState {
 

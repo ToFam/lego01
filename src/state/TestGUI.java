@@ -1,13 +1,13 @@
 package state;
 
-import lcdGui.LCDChooseList;
-import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import util.Util;
+import util.lcdGui.LCDChooseList;
+import util.lcdGui.LCDGui;
 
 public class TestGUI implements ParcourState {
 	private Robot robot;

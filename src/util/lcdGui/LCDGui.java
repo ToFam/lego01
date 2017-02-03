@@ -1,4 +1,4 @@
-package lcdGui;
+package util.lcdGui;
 
 import lejos.hardware.lcd.LCD;
 

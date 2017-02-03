@@ -3,8 +3,6 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-import lcdGui.LCDChooseList;
-import lcdGui.LCDGui;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
@@ -19,6 +17,8 @@ import state.TestDriveLTWall;
 import state.TestGUI;
 import state.TestState;
 import util.Util;
+import util.lcdGui.LCDChooseList;
+import util.lcdGui.LCDGui;
 /**
  * 
  * @author	Team AndreasBot: Simon,
@@ -81,6 +81,7 @@ public class Main {
         
             while (!Util.isPressed(Button.ENTER.getId()))
             {
+                robot.update();
                 states[state].update(50);
                 
                 try {

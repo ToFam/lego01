@@ -1,9 +1,12 @@
 package robot;
 
-import lcdGui.LCDGui;
-import lejos.hardware.lcd.LCD;
+import robot.action.Backward;
+import robot.action.Forward;
+import robot.action.Move;
+import robot.action.RobotAction;
+import robot.action.Stop;
+import robot.action.TurnOnSpot;
 import sensor.modes.ColorSensorMode;
-import sensor.modes.GyroSensorMode;
 
 /**
  * 
@@ -22,14 +25,27 @@ public class Robot
     
     private float speedLeft = 0.f;
     private float speedRight = 0.f;
+    
+    private RobotAction action;
+    
+    private RobotAction forw, backw, stop;
 	
-	/**
-	 * 
-	 * Constructor directly assigns the value.
-	 * 
-	 * @param behavior
-	 */
 	public Robot() {
+	    forw = new Forward();
+	    backw = new Backward();
+	    stop = new Stop();
+	    action = stop;
+	    action.start();
+	}
+	
+	public boolean finished() 
+	{
+	    return action.finished();
+	}
+	
+	public void update()
+	{
+	    action.update();
 	}
 	
 	public void setSpeed(float speed) {
@@ -63,35 +79,35 @@ public class Robot
      */
     public void steerFacSimonTest(float direction)
     {
-    	float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
-    	float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
-    	
-    	setSpeed(left * speedLeft, right * speedRight);
+        float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
+        float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
+        
+        setSpeed(left * speedLeft, right * speedRight);
     }
     
     public void steerFacSimonSpot(float direction, float speed)
     {
-    	float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
-    	float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
-    	
-    	setSpeed((left >= 0f ? left : -left) * speed, (right >= 0f ? right : -right) * speed);
-    	
-    	if (right >= 0f)
-    	{
+        float right = (direction * -1 + 1f) > 1f ? 1f : (direction * -1 + 1f);
+        float left = (direction + 1f) > 1f ? 1f : (direction + 1f);
+        
+        setSpeed((left >= 0f ? left : -left) * speed, (right >= 0f ? right : -right) * speed);
+        
+        if (right >= 0f)
+        {
             RobotComponents.inst().getRightMotor().backward();
-    	}
-    	else
-    	{
+        }
+        else
+        {
             RobotComponents.inst().getRightMotor().forward();
-    	}
-    	if (left >= 0f)
-    	{
+        }
+        if (left >= 0f)
+        {
             RobotComponents.inst().getLeftMotor().backward();
-    	}
-    	else
-    	{
+        }
+        else
+        {
             RobotComponents.inst().getLeftMotor().forward();
-    	}
+        }
     }
     
     public void rotateMiddle(int deg) {
@@ -100,68 +116,30 @@ public class Robot
     
     public void move(int deg) 
     {
-        //RobotComponents.inst().getLeftMotor().synchronizeWith(new RegulatedMotor[]{RobotComponents.inst().getRightMotor()});
-        //RobotComponents.inst().getLeftMotor().startSynchronization();
-        RobotComponents.inst().getLeftMotor().rotate(deg, true);
-        RobotComponents.inst().getRightMotor().rotate(deg, true);
-        //RobotComponents.inst().getLeftMotor().endSynchronization();
-
-        //RobotComponents.inst().getLeftMotor().startSynchronization();
-        RobotComponents.inst().getLeftMotor().waitComplete();
-        RobotComponents.inst().getRightMotor().waitComplete();
-        //RobotComponents.inst().getLeftMotor().endSynchronization();*/
+        action = new Move(deg);
+        action.start();
     }
 
-    public void forward() {
-        RobotComponents.inst().getLeftMotor().backward();
-        RobotComponents.inst().getRightMotor().backward();
+    public void forward() 
+    {
+        action = forw;
+        action.start();
     }
     
-    public void backward() {
-        RobotComponents.inst().getLeftMotor().forward();
-        RobotComponents.inst().getRightMotor().forward();
+    public void backward() 
+    {
+        action = backw;
+        action.start();
     }
 	
-	/**
-	 * The Robot stops in place.
-	 */
-	public void stop() {
-		RobotComponents.inst().getLeftMotor().stop(true);
-		RobotComponents.inst().getRightMotor().stop(true);
-	}
-
-	/**
-	 * The Robot moves in a curved line.
-	 * @param direction Direction of the curve. 
-	 */
-	public void curveLeft() {
-	}
-
-	/**
-	 * The Robot moves in a curved line.
-	 * @param direction Direction of the curve. 
-	 */
-	public void curveRight() {
-	}
-	
-	public void startTurnOnSpot(boolean left) 
+	public void stop() 
 	{
-	    if (!left) 
-	    {
-            RobotComponents.inst().getLeftMotor().backward();
-            RobotComponents.inst().getRightMotor().forward();
-	    }
-	    else
-	    {
-            RobotComponents.inst().getLeftMotor().forward();
-            RobotComponents.inst().getRightMotor().backward();
-	    }
+	    action = stop;
+        action.start();
 	}
+	
 
 	
-	private float turnOnSpot_angleToSlowDown = 50f;
-	private float turnOnSpot_slowDownSpeedFactor = 0.4f;
-	private float turnOnSpot_stopBeforeAngle = 4f;
 	/**
 	 * Turn the Robot around its axis.
 	 * 
@@ -169,62 +147,8 @@ public class Robot
 	 */
 	public void turnOnSpot(float degree)
 	{
-	    // DEBUG
-	    // RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-	    // LCDGui.clearLCD();
-	    
-        RobotComponents.inst().getLeftMotor().setSpeed(speedLeft);
-        RobotComponents.inst().getRightMotor().setSpeed(speedRight);
-		float gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
-		float goalValue = gyroValue + degree;
-		boolean goalGreater = gyroValue < goalValue;
-		
-		float addition = goalGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
-		goalValue += addition;
-		
-		if (goalGreater)
-		{
-		    startTurnOnSpot(true);
-		}
-		else
-		{
-            startTurnOnSpot(false);
-		}
-
-		boolean setSpeed = false;
-		while ((goalGreater && gyroValue < goalValue) || (!goalGreater && gyroValue > goalValue))
-		{
-		    // DEBUG
-		    // LCD.drawString(String.valueOf(gyroValue), 4, 2);
-		    // LCD.drawString(String.valueOf(goalValue), 4, 4);
-		    
-			if (setSpeed == false && Math.abs(gyroValue - goalValue) < turnOnSpot_angleToSlowDown)
-			{
-				setSpeed = true;
-		        RobotComponents.inst().getLeftMotor().stop(true);
-				RobotComponents.inst().getRightMotor().stop(true);
-				RobotComponents.inst().getLeftMotor().setSpeed(speedLeft * turnOnSpot_slowDownSpeedFactor);
-				RobotComponents.inst().getRightMotor().setSpeed(speedRight * turnOnSpot_slowDownSpeedFactor);
-
-		        if (goalGreater)
-		        {
-		            startTurnOnSpot(true);
-		        }
-		        else
-		        {
-		            startTurnOnSpot(false);
-		        }
-			}
-			
-			gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
-		}
-		
-        RobotComponents.inst().getLeftMotor().stop(true);
-		RobotComponents.inst().getRightMotor().stop(true);
-
-		RobotComponents.inst().getLeftMotor().setSpeed(speedLeft);
-		RobotComponents.inst().getRightMotor().setSpeed(speedRight);
-		
+		action = new TurnOnSpot(degree, speedLeft, speedRight);
+        action.start();
 	}
 	
 	
