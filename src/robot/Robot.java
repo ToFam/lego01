@@ -50,7 +50,7 @@ public class Robot
 	}
 	
 	public void raiseUV() {
-		if (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < 2) {
+		if (!this.UVisUp()) {
 			RobotComponents.inst().getMediumMotor().rotate(-210, true);
 		}
 	}
@@ -60,7 +60,7 @@ public class Robot
 	}
 	
 	public void lowerUV() {
-		if (Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) > 208) {
+		if (!this.UVisDown()) {
 			RobotComponents.inst().getMediumMotor().rotate(210, true);
 		}
 	}
