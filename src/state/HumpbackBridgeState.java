@@ -12,6 +12,7 @@ public class HumpbackBridgeState implements ParcourState {
 	private final float SPEED_MAX;
 	private float SPEED_LEFT;
 	private float SPEED_RIGHT;
+	private final float DELTA;
 	private final float THRESHOLD;
 	private final int PAST;
 	private int SEGMENT_COUNT;
@@ -30,17 +31,18 @@ public class HumpbackBridgeState implements ParcourState {
 	
 	public HumpbackBridgeState(Robot robot) {
 		this.robot = robot;
-		this.gui = new LCDGui(1, 1);
-		this.SPEED_MAX = 1.f;
+		this.gui = new LCDGui(2, 1);
+		this.SPEED_MAX = .5f;
 		this.SPEED_LEFT = this.SPEED_MAX;
 		this.SPEED_RIGHT = this.SPEED_MAX;
-		this.THRESHOLD = 0.038f;
+		this.DELTA = 0.1f;
+		this.THRESHOLD = 0.04f;
 		this.PAST = 10;
 		this.SEGMENT_COUNT = 0;
 		
 		this.bridgeSegment = BridgeSegment.RAMP_UP;
 		
-		this.heights = new float[10000];
+		this.heights = new float[1000];
 	}
 	@Override
 	public String getName() {
@@ -63,9 +65,11 @@ public class HumpbackBridgeState implements ParcourState {
 	@Override
 	public void update(int elapsedTime) {
 		this.heights[this.current] = RobotComponents.inst().getUV().sample()[0];
-		gui.writeLine(String.valueOf(this.heights[this.current]));
-		gui.setVarValue(0, this.bridgeSegment.toString());;
-		this.current++;
+		this.current = (this.current + 1) % this.heights.length;
+//		this.current++;
+		gui.setVarValue(0, this.bridgeSegment.toString());
+//		gui.setVarValue(0, String.valueOf(current));
+		gui.setVarValue(1, String.valueOf(this.heights[this.current]), 5);
 		
 		switch (this.bridgeSegment) {
 		case FIND_LEFT_CLIFF:
@@ -76,15 +80,12 @@ public class HumpbackBridgeState implements ParcourState {
 			
 		case RAMP_UP:
 			
-			if (this.heights[(this.current - this.PAST) % this.heights.length] == this.heights[0]) {
+			if (this.heights[(this.current + this.heights.length - this.PAST) % this.heights.length] == this.heights[0]) {
 				
-				if (this.SEGMENT_COUNT == 3 ) {
+				if (this.SEGMENT_COUNT == 10) {
 					
 					this.bridgeSegment = BridgeSegment.PLANK;
 					this.SEGMENT_COUNT = 0;
-					this.SPEED_RIGHT = this.SPEED_MAX;
-					this.robot.setSpeed(this.SPEED_MAX);
-					this.robot.forward();
 					
 				} else {
 					
@@ -96,13 +97,15 @@ public class HumpbackBridgeState implements ParcourState {
 				this.SEGMENT_COUNT = 0;
 			}
 			
-			if (this.heights[0] > this.THRESHOLD) {
+			if (this.heights[this.current] > this.THRESHOLD) {
 				
+				this.SPEED_LEFT = this.SPEED_MAX;
 				this.slowDownRightMotor();
 			
 			} else {
 				
-				this.speedUpRightMotor();
+				this.SPEED_RIGHT = this.SPEED_MAX;
+				this.slowDownLeftMotor();
 				
 			}
 		
@@ -110,15 +113,12 @@ public class HumpbackBridgeState implements ParcourState {
 			
 		case PLANK:
 			
-			if (this.heights[0] < this.heights[(this.current - this.PAST) % this.heights.length]) {
+			if (this.heights[this.current] < this.heights[(this.current +this.heights.length - this.PAST) % this.heights.length]) {
 				
-				if (this.SEGMENT_COUNT == 3) {
+				if (this.SEGMENT_COUNT == 10) {
 					
 					this.bridgeSegment = BridgeSegment.RAMP_DOWN;
 					this.SEGMENT_COUNT = 0;
-					this.SPEED_LEFT = this.SPEED_MAX;
-					this.robot.setSpeed(this.SPEED_MAX);
-					this.robot.forward();
 					
 				} else {
 					
@@ -129,7 +129,7 @@ public class HumpbackBridgeState implements ParcourState {
 				this.SEGMENT_COUNT = 0;
 			}
 			
-			if (this.heights[0] > this.THRESHOLD) {
+			if (this.heights[this.current] > this.THRESHOLD) {
 					
 				this.speedUpLeftMotor();
 			
@@ -143,9 +143,9 @@ public class HumpbackBridgeState implements ParcourState {
 			break;
 		case RAMP_DOWN:
 			
-			if (this.heights[(this.current - this.PAST) % this.heights.length] == this.heights[0]) {
+			if (this.heights[(this.current + this.heights.length - this.PAST) % this.heights.length] == this.heights[0]) {
 				
-				if (this.SEGMENT_COUNT == 3 ) {
+				if (this.SEGMENT_COUNT == 10) {
 					
 					this.SPEED_RIGHT = this.SPEED_MAX;
 					this.robot.setSpeed(this.SPEED_MAX);
@@ -159,13 +159,15 @@ public class HumpbackBridgeState implements ParcourState {
 				
 			}
 			
-			if (this.heights[0] > this.THRESHOLD) {
+			if (this.heights[this.current] > this.THRESHOLD) {
 				
+				this.SPEED_LEFT = this.SPEED_MAX;
 				this.slowDownRightMotor();
 			
 			} else {
 				
-				this.speedUpRightMotor();
+				this.SPEED_RIGHT = this.SPEED_MAX;
+				this.slowDownLeftMotor();
 				
 			}
 		
@@ -179,25 +181,25 @@ public class HumpbackBridgeState implements ParcourState {
 	}
 	
 	private void speedUpLeftMotor() {
-		this.SPEED_LEFT = Math.min(this.SPEED_LEFT + 1, this.SPEED_MAX);
+		this.SPEED_LEFT = Math.min(this.SPEED_LEFT + this.DELTA, this.SPEED_MAX);
 		robot.setSpeed(this.SPEED_LEFT, this.SPEED_RIGHT);
 		robot.forward();
 	}
 	
 	private void speedUpRightMotor() {
-		this.SPEED_RIGHT = Math.min(this.SPEED_RIGHT + 1, this.SPEED_MAX);
+		this.SPEED_RIGHT = Math.min(this.SPEED_RIGHT + this.DELTA, this.SPEED_MAX);
 		robot.setSpeed(this.SPEED_LEFT, this.SPEED_RIGHT);
 		robot.forward();
 	}
 	
 	private void slowDownLeftMotor() {
-		this.SPEED_LEFT = Math.max(this.SPEED_LEFT - 1, this.SPEED_LEFT / 2.f);
+		this.SPEED_LEFT = Math.max(this.SPEED_LEFT - this.DELTA, this.SPEED_MAX / 2.f);
 		robot.setSpeed(this.SPEED_LEFT, this.SPEED_RIGHT);
 		robot.forward();
 	}
 	
 	private void slowDownRightMotor() {
-		this.SPEED_RIGHT = Math.max(this.SPEED_RIGHT - 1, this.SPEED_RIGHT / 2.f);
+		this.SPEED_RIGHT = Math.max(this.SPEED_RIGHT - this.DELTA, this.SPEED_MAX / 2.f);
 		robot.setSpeed(this.SPEED_LEFT, this.SPEED_RIGHT);
 		robot.forward();
 	}
