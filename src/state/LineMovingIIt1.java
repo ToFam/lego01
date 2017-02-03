@@ -83,12 +83,14 @@ public class LineMovingIIt1  implements ParcourState {
     			if (curStat == LMState.SEARCH_LEFT)
     			{
     				startTurnLeft = true;
-        			robot.turnOnSpot(param_searchAngles[searchIteration]);
+        			//robot.turnOnSpot(param_searchAngles[searchIteration]);
+        			turnRobotDegrees(param_searchAngles[searchIteration]);
     			}
     			else 
     			{
     				startTurnLeft = false;
-        			robot.turnOnSpot(-param_searchAngles[searchIteration]);
+        			//robot.turnOnSpot(-param_searchAngles[searchIteration]);
+        			turnRobotDegrees(-param_searchAngles[searchIteration]);
     			}
     			
     			
@@ -112,7 +114,7 @@ public class LineMovingIIt1  implements ParcourState {
     			
     			robot.forward();
     		}
-    		else
+    		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
     		{
     			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
     			
@@ -140,8 +142,8 @@ public class LineMovingIIt1  implements ParcourState {
     				turnDegree = lostAngle - curGyro - param_searchAngles[searchIteration];
     			}
 
-    			robot.turnOnSpot(turnDegree);
-    			
+    			//robot.turnOnSpot(turnDegree);
+    			turnRobotDegrees(turnDegree);
     			
     		}
     	}
@@ -183,5 +185,13 @@ public class LineMovingIIt1  implements ParcourState {
             //robot.backward();
         }
         
+    }
+    
+    
+    private float degreeFac = 360f / 45f;
+    private void turnRobotDegrees(float degrees)
+    {
+    	RobotComponents.inst().getLeftMotor().rotate((int) (degrees * degreeFac), true);
+    	RobotComponents.inst().getRightMotor().rotate((int) (-degrees * degreeFac), true);
     }
 }
