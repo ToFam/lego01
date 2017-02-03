@@ -18,32 +18,13 @@ public class HumpbackBridgeState implements ParcourState {
 	
 	private BridgeSegment bridgeSegment;
 	
-	private PositionCyclArray heights;
+	private float[] heights;
+	private int current;
 	
 	private enum BridgeSegment {
 		RAMP_UP,
 		PLANK,
 		RAMP_DOWN,
-	}
-	
-	private class PositionCyclArray {
-		
-		private float[] heights;
-		private int current;
-		
-		private PositionCyclArray(int size) {
-			this.heights = new float[size];
-			this.current = -1;
-		}
-		
-		private void add(float height) {
-			this.current++;
-			this.heights[current] = height;
-		}
-		
-		private float getHeight(int previousIndex) {
-			return this.heights[(current + previousIndex + this.heights.length) % this.heights.length];
-		}
 	}
 	
 	public HumpbackBridgeState(Robot robot) {
@@ -58,7 +39,7 @@ public class HumpbackBridgeState implements ParcourState {
 		
 		this.bridgeSegment = BridgeSegment.RAMP_UP;
 		
-		this.heights = new PositionCyclArray(10000);
+		this.heights = new float[10000];
 	}
 	@Override
 	public String getName() {
@@ -71,21 +52,23 @@ public class HumpbackBridgeState implements ParcourState {
 		RobotComponents.inst().getUV().setMedianFilter(1);
 		
 		for (int i = 0; i < this.PAST + 1; i++) {
-			this.heights.add(RobotComponents.inst().getUV().sample()[0]);
+			this.heights[0] = RobotComponents.inst().getUV().sample()[0];
 		}
 		
+		this.current = this.PAST;
 		this.bridgeSegment = BridgeSegment.RAMP_UP;
 	}
 
 	@Override
 	public void update(int elapsedTime) {
-		gui.writeLine(this.bridgeSegment.toString());
-		this.heights.add(RobotComponents.inst().getUV().sample()[0]);
+		this.heights[this.current] = RobotComponents.inst().getUV().sample()[0];
+		gui.writeLine(this.bridgeSegment.toString() + " " + this.heights[this.current]);
+		this.current++;
 		
 		switch (this.bridgeSegment) {
 		case RAMP_UP:
 			
-			if (this.heights.getHeight(-this.PAST) == this.heights.getHeight(0)) {
+			if (this.heights[(this.current - this.PAST) % this.heights.length] == this.heights[0]) {
 				
 				if (this.SEGMENT_COUNT == 3 ) {
 					
@@ -103,7 +86,7 @@ public class HumpbackBridgeState implements ParcourState {
 				
 			}
 			
-			if (this.heights.getHeight(0) > this.THRESHOLD) {
+			if (this.heights[0] > this.THRESHOLD) {
 				
 				this.slowDownRightMotor();
 			
@@ -117,7 +100,7 @@ public class HumpbackBridgeState implements ParcourState {
 			
 		case PLANK:
 			
-			if (this.heights.getHeight(0) < this.heights.getHeight(-this.PAST)) {
+			if (this.heights[0] < this.heights[(this.current - this.PAST) % this.heights.length]) {
 				
 				if (this.SEGMENT_COUNT == 3) {
 					
@@ -134,7 +117,7 @@ public class HumpbackBridgeState implements ParcourState {
 				
 			}
 			
-			if (this.heights.getHeight(0) > this.THRESHOLD) {
+			if (this.heights[0] > this.THRESHOLD) {
 					
 				this.speedUpLeftMotor();
 			
@@ -148,7 +131,7 @@ public class HumpbackBridgeState implements ParcourState {
 			break;
 		case RAMP_DOWN:
 			
-			if (this.heights.getHeight(-this.PAST) == this.heights.getHeight(0)) {
+			if (this.heights[(this.current - this.PAST) % this.heights.length] == this.heights[0]) {
 				
 				if (this.SEGMENT_COUNT == 3 ) {
 					
@@ -164,7 +147,7 @@ public class HumpbackBridgeState implements ParcourState {
 				
 			}
 			
-			if (this.heights.getHeight(0) > this.THRESHOLD) {
+			if (this.heights[0] > this.THRESHOLD) {
 				
 				this.slowDownRightMotor();
 			
