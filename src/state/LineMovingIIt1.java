@@ -22,7 +22,7 @@ public class LineMovingIIt1  implements ParcourState {
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.5f;
     //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
-    private float[] param_searchAngles = new float[] {6f, 16f, 100f, 140f, 150f, 160f};
+    private float[] param_searchAngles = new float[] {6f, 16f, 100f, 140f};
     private float param_angleWhenToTurnWithMaxSpeed = 50f;
     private float param_minTurnSpeed = 0.5f;
     private float param_maxTurnSpeed = 1f;
@@ -30,12 +30,12 @@ public class LineMovingIIt1  implements ParcourState {
     
     public LineMovingIIt1(Robot robot) {
         this.robot = robot;
-        this.gui = new LCDGui(4,2);
+        this.gui = new LCDGui(2,2);
     }
     
     @Override
     public void init() {
-        gui = new LCDGui(4, 1);
+        gui = new LCDGui(2, 2);
         
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	
@@ -70,6 +70,8 @@ public class LineMovingIIt1  implements ParcourState {
     private boolean startTurnLeft = true;
     private float preLastAngle = 0f;
     private float lastAngle = 0f;
+    private boolean search360onWhite = false;
+    private int search360Count = 0;
     
     @Override
     public void update(int elapsedTime) {
@@ -199,7 +201,38 @@ public class LineMovingIIt1  implements ParcourState {
     	
     	if (curStat == LMState.SEARCH_LINE_END_TURNTOLOST)
     	{
-    		
+    		if (robot.finished())
+    		{
+    			curStat = LMState.SEARCH_360_LINESCOUNT;
+    			search360Count = 0;
+    			search360onWhite = false;
+        		turnRobotDegreesGyro(lostAngle + 360);
+    		}
+    	}
+    	
+    	if (curStat == LMState.SEARCH_360_LINESCOUNT)
+    	{
+    		if (robot.finished() == false)
+    		{
+        		float colorNow = colorSensor.sample()[0];
+        		
+        		if (colorNow > param_redThreshhold && search360onWhite == false)
+        		{
+        			search360onWhite = true;
+        			search360Count++;
+        		}
+        		else
+        		{
+        			search360onWhite = false;
+        		}
+    		}
+    		else
+    		{
+    			robot.stop();
+    			gui.writeLine("Lines: " + search360Count);
+    			
+    			curStat = LMState.STOP;
+    		}
     	}
     	
     	
@@ -207,7 +240,7 @@ public class LineMovingIIt1  implements ParcourState {
     	
     	
     	
-		gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 4);
+		gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 5);
 		gui.setVarValue(1,  RobotComponents.inst().getGyroSensor().sample()[0], 5);
     	
         if (Util.isPressed(Button.ID_UP))
