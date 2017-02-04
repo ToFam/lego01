@@ -47,6 +47,12 @@ public class LineState implements ParcourState {
         
     }
     
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
+    
     public String getName() {
         return "Line";
     }

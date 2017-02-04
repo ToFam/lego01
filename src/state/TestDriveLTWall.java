@@ -34,6 +34,12 @@ public class TestDriveLTWall implements ParcourState {
         gui = new LCDGui(4, 2);
     }
     
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
+    
     private float oldDistance = 0.0f;
     private float turnFactor = 5.0f;
 

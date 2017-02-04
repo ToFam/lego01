@@ -30,6 +30,12 @@ public class LabyrinthState implements ParcourState
         robot = robo;
     }
     
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
+    
     public String getName() 
     {
         return "Labyrinth";

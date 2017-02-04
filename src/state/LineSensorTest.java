@@ -41,6 +41,12 @@ public class LineSensorTest implements ParcourState {
         RobotComponents.inst().getColorSensor().setMedianFilter(1);
         RobotComponents.inst().getMediumMotor().resetTachoCount();
     }
+    
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
 
     
     private int maxAngl = 0;

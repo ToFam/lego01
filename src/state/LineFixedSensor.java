@@ -25,6 +25,12 @@ public class LineFixedSensor implements ParcourState {
     public String getName() {
         return "LineFixedSensor";
     }
+    
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
 
     @Override
     public void init() {

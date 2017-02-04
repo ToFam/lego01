@@ -28,10 +28,18 @@ public class LineMovingIIt1  implements ParcourState {
     private float param_maxTurnSpeed = 1f;
     private boolean param_debugWaits = false;
     
+    private boolean end_of_line = false;
+    
     public LineMovingIIt1(Robot robot) {
         this.robot = robot;
         this.gui = new LCDGui(2,2);
     }
+    
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return end_of_line;
+	}
     
     @Override
     public void init() {

@@ -35,6 +35,12 @@ public class LineSlowMode implements ParcourState {
         return "LineSlow";
     }
     
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
+    
     public void reset() {
         
     }

@@ -53,6 +53,12 @@ public class HumpbackBridgeState implements ParcourState {
 		this.heights = new float[1000];
 	}
 	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
+	
+	@Override
 	public String getName() {
 		return "HumpbackBridge";
 	}

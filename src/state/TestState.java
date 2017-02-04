@@ -37,6 +37,12 @@ public class TestState implements ParcourState {
     public void reset() {
         RobotComponents.inst().getMediumMotor().rotateTo(0);
     }
+    
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
 
     
     int timer = 0;

@@ -33,6 +33,12 @@ public class TestGUI implements ParcourState {
     	RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
     	RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
     }
+    
+	@Override
+	public boolean changeOnBarcode()
+	{
+		return true;
+	}
 
     public void reset() {
         

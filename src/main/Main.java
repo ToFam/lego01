@@ -7,6 +7,7 @@ import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
 import robot.Robot;
+import robot.RobotComponents;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
@@ -34,15 +35,25 @@ public class Main {
     private final String[] elements;
     private int state;
     
+    private float sample_old;
+    
     public Main() {
         this.robot = new Robot();
         
         this.states = new ParcourState[] {
-    		new LabyrinthState(robot),
+    		new LabyrinthState(robot),			// Start und Labyrinth
+    		new LineMovingIIt1(robot),			// Linie nach Labyrinth
+    		new HumpbackBridgeState(robot),		// Große Brücke
+    		new LineMovingIIt1(robot),			// Linie nach Brücke
+    		// new Seesaw(robot),				// Wippe
+    		// new LineMovingIIt1(robot),		// Linie nach Wippe
+    		// new Swamp(robot),				// Sumpf
+    		new LabyrinthState(robot),			// Wand nach Sumpf
+    		// new SuspensionBridge(robot),		// Hängebrücke
+    		// new BossFight(robot),			// Da Endboss
+    		
     		new TestDriveLTWall(robot),
-    		new HumpbackBridgeState(robot),
     		new LineState(robot),
-    		new LineMovingIIt1(robot),
     		new TestGUI(robot),
     		new TestState(robot),
         };
@@ -54,15 +65,33 @@ public class Main {
         
         this.mainMenu = new LCDChooseList(elements);
         this.state = 0;
-        
+        this.sample_old = 0.f;
+    }
+    
+    /**
+     * Detect barcode
+     * @return true iff line was detected
+     */
+    public boolean barcode()
+    {
+    	// TODO: Set values accordingly
+    	if (sample_old == 0 && (sample_old = RobotComponents.inst().getColorSensor().sample()[0]) > 5.f)
+    	{
+    		return true;
+    	}
+    	
+    	return false;
     }
     
     public void run()
     {
+    	boolean backToMenu = false;
+    	int btn;
+    	
+    	// Main Menu Loop
         while (true) {
             mainMenu.repaint();
             
-            int btn;
             do {
                 btn = Button.waitForAnyPress();
                 
@@ -77,21 +106,48 @@ public class Main {
 
             LCDGui.clearLCD();
             state = mainMenu.getCurrentSelected();
-            states[state].init();
-        
-            while (!Util.isPressed(Button.ENTER.getId()))
+            
+            // Normal sequential parcour operation
+            while (!backToMenu)
             {
-                robot.update();
-                states[state].update(50);
-                
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+	            states[state].init();
+	        
+	            // Main loop with active state
+	            while (true)
+	            {
+	                robot.update();
+	                states[state].update(50);
+	                
+	                if (states[state].changeOnBarcode() && barcode())
+	                {
+	                	// Barcode excepted and detected, change to next state
+	    	            states[state].reset();
+	    	            if (state < states.length - 1)
+	    	            {
+	    	            	state++;
+	    	            	mainMenu.moveOneDown();
+	    	            }
+	    	            else
+	    	            	backToMenu = true;
+	                	break;
+	                }
+	                
+	                if (Util.isPressed(Button.ID_ENTER))
+	                {
+	                	backToMenu = true;
+	    	            states[state].reset();
+	                	break;
+	                }
+	                
+	                try {
+	                    Thread.sleep(50);
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+	            }
             }
             
-            states[state].reset();
+            backToMenu = false;
         }
     }
     
