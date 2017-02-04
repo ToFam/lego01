@@ -82,6 +82,20 @@ public final class Util {
 		return sum / weight;
 	}
 	
+	public static float average(float[] samples, int elementsCount) {
+		float sum = 0.f;
+		int weight = 0;
+		
+		for (int i = 0; i < Math.min(samples.length, elementsCount); i++) {
+			if (samples[i] != Float.NEGATIVE_INFINITY || samples[i] != Float.POSITIVE_INFINITY) {
+				sum += samples[i];
+				weight++;
+			}
+		}
+		
+		return sum / weight;
+	}
+	
 	private static float howMuchOnLine_RMin = 0.1f;
 	private static float howMuchOnLine_RMax = 0.29f;
 	private static float howMuchOnLine_GMin = 0.1f;

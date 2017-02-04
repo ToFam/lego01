@@ -14,6 +14,7 @@ import state.LineMovingIIt1;
 import state.LineSlowMode;
 import state.LineState;
 import state.ParcourState;
+import state.SuspBridgeState;
 import state.TestDriveLTWall;
 import state.TestGUI;
 import state.TestState;
@@ -41,6 +42,7 @@ public class Main {
         this.robot = new Robot();
         
         this.states = new ParcourState[] {
+        		new SuspBridgeState(robot),
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot),			// Linie nach Labyrinth
     		new HumpbackBridgeState(robot),		// Große Brücke

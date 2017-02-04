@@ -1,12 +1,18 @@
 package state;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.internal.ev3.EV3Audio;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.ColorSensor;
 import sensor.GyroSensor;
+import sensor.TouchSensorBThread;
+import sensor.UVSensor;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
+import sensor.modes.UVSensorMode;
+import util.MediumMotorTuple;
 import util.Util;
 import util.lcdGui.LCDGui;
 
@@ -17,17 +23,26 @@ public class SuspBridgeState implements ParcourState {
     
     
     private float param_robotMaxSpeed = 1f;
-    private int param_colorFilterSize = 4;
+    private float param_robotSpeedOnRampUp = 0.6f;
+    private float param_robotSpeedOnBridge = 1f;
+    private float param_robotRetreatSpeed = 0.6f;
+    private float param_goalDistance = 0.087f;
+    private float param_goalDistanceRampUp = 0.058f;
+    private float param_uvReachedTopOfRamp = 0.09f;
+    private float param_kpStraight = 32f * 1.3f;
+    private float param_kpRamp = 32f * 1.3f;
     private int param_gyroFilterSize = 4;
-    private float param_redThreshhold = 0.45f;
-    //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
-    private float[] param_searchAngles = new float[] {8f, 18f, 40f, 100f, 120f};
-    private float param_angleWhenToTurnWithMaxSpeed = 50f;
-    private float param_minTurnSpeed = 0.5f;
-    private float param_maxTurnSpeed = 1f;
-    private int param_timeWhenNextGyroValueIsTaken = 50;
+    private int param_uvFilterSize = 4;
+    private int param_timeGyroMedianOnStraight = 5000;
+    private int param_timeGyroMedianOnRamp = 3000;
+    private int param_minTimeOnBridge = 5000;
+    private int param_minTimeOnRampDown = 3000;
+    private float param_angleStraightToSuspBridge = 20f;
+    private float param_uvCatchRobotAtEndWhenUnder = 0.2f;
+    private float param_percentCutBegin = 0.32f;
+    private float param_percentCutEnd = 0.2f;
     private boolean param_debugWaits = false;
-    
+
     private boolean end_of_line = false;
     
     public SuspBridgeState(Robot robot) {
@@ -43,261 +58,261 @@ public class SuspBridgeState implements ParcourState {
     
     @Override
     public void init() {
-        //gui = new LCDGui(4, 1);
-        
-        curStat = LMState.SEARCH_LEFT;
-        
-        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+    	state = S_SuspBridgeState.BEFORE_DOTS;
     	
-        RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 1f);
-        RobotComponents.inst().getMediumMotor().resetTachoCount();
+        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+
+        RobotComponents.inst().getTouchSensorB().setMode(0);
         
-        RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
-        RobotComponents.inst().getColorSensor().setMedianFilter(param_colorFilterSize);
+        RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUV().setMedianFilter(param_uvFilterSize);
         
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
         
-        colorSensor = RobotComponents.inst().getColorSensor();
         gyroSensor = RobotComponents.inst().getGyroSensor();
+        uvSensor = RobotComponents.inst().getUV();
+        touchSensor = RobotComponents.inst().getTouchSensorB();
+
+		robot.forward();
     }
 
     
     public String getName() {
-        return "Static Line";
+        return "Suspension bridge";
     }
     
     public void reset() {
         RobotComponents.inst().getMediumMotor().rotateTo(0, true);
     }
     
-    private ColorSensor colorSensor;
     private GyroSensor gyroSensor;
+    private UVSensor uvSensor;
+    private TouchSensorBThread touchSensor;
     
-    private LMState curStat = LMState.SEARCH_LEFT;
-    private float lostAngle = 0f;
-    private int searchIteration = 0;
-    private boolean startTurnLeft = true;
-    private float preLastAngle = 0f;
-    private float lastAngle = 0f;
-    private boolean search360onWhite = false;
-    private int search360Count = 0;
-    private float[] lastGyros = new float[10];
-    private int lastGyrosIndex = 0;
-    private int timeCounter = 0;
+    private S_SuspBridgeState state;
+    
+    MediumMotorTuple[] measures = new MediumMotorTuple[10000];
+    MediumMotorTuple[] measures2 = new MediumMotorTuple[10000];
+    
+    float[] straightGyros = new float[10000];
+    int straightGyrosCount = 0;
+    float[] rampGyros = new float[10000];
+    int rampGyrosCount = 0;
+    float straightAngle = Float.MAX_VALUE;
+    float rampAngle = Float.MAX_VALUE;
+    float uvMax = -1f;
+    int c = 0;
+    private float turn = 0;
+    private int timeInfinityCounter = 0;
     
     @Override
     public void update(int elapsedTime) {
 
-    	timeCounter += elapsedTime;
-    	
-    	if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
+    	switch (state)
     	{
-    		float colorVal = RobotComponents.inst().getColorSensor().sample()[0];
-    		
-    		if (colorVal < param_redThreshhold)
+    	case BEFORE_DOTS:
+    		if (touchSensor.sample()[0] == 1)
     		{
-    			//gui.writeLine("Lost line");
-    			robot.stop();
-    			
-    			lostAngle = gyroSensor.sample()[0];
-    			searchIteration = 0;
-    			curStat = (curStat == LMState.STRAIGHT_LEFT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
-    			
-    			if (curStat == LMState.SEARCH_LEFT)
-    			{
-    				startTurnLeft = true;
-        			//robot.turnOnSpot(param_searchAngles[searchIteration]);
-    				turnRobotDegreesGyro(param_searchAngles[searchIteration]);
-    			}
-    			else 
-    			{
-    				startTurnLeft = false;
-        			//robot.turnOnSpot(-param_searchAngles[searchIteration]);
-        			turnRobotDegreesGyro(-param_searchAngles[searchIteration]);
-    			}
-    			
-    			if (param_debugWaits)
-    			{
-        			//gui.writeLine("Wait for DOWN");
-        			while(Util.isPressed(Button.ID_DOWN) == false) {}
-    			}
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(230);
+                state = S_SuspBridgeState.RETREAT;
     		}
-    		else if (false)
-    		{
-    			//Fährt schön geradeaus
-    			
-    			if (timeCounter >= param_timeWhenNextGyroValueIsTaken)
-    			{
-    				lastGyros[lastGyrosIndex] = gyroSensor.sample()[0];
-    				lastGyrosIndex++;
-    				if (lastGyrosIndex >= lastGyros.length)
-    				{
-    					lastGyrosIndex = 0;
-    				}
-    				
-    				float relTurn = 0f;
-    				
-    				float fac = 1f;
-    				
-    				for (int i = lastGyrosIndex + lastGyros.length; i > lastGyrosIndex; i--)
-    				{
-    					float first = lastGyros[(i) % lastGyros.length];
-    					float second = lastGyros[(i - 1) % lastGyros.length];
-    					relTurn += (first - second) * fac;
-
-    					fac *= 0.5f;
-    				}
-    				
-    				gui.setVarValue(0, relTurn);
-
-					//robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
-
-	    			//robot.forward();
-    			}
-    		}
-    	}
-    	
-    	if (curStat == LMState.SEARCH_LEFT || curStat == LMState.SEARCH_RIGHT)
-    	{
-    		float colorNow = colorSensor.sample()[0];
-    		
-    		if (colorNow > param_redThreshhold)
-    		{
-    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_RIGHT : LMState.STRAIGHT_LEFT);
-    			
-
-    			//gui.writeLine("Found line");
-    			if (param_debugWaits)
-    			{
-        			//gui.writeLine("Wait for DOWN");
-        			while(Util.isPressed(Button.ID_DOWN) == false) {}
-    			}
-
-    			lastAngle = gyroSensor.sample()[0];
-    			float estimatedDiff = lastAngle - preLastAngle;
-    			estimatedDiff *= 0.002f;
-    			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
-
-    			preLastAngle = lastAngle;
-    			
-    	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
-    	        //robot.setSpeed(1f, 1f);
-
-    	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
-    			robot.forward();
-    		}
-    		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
-    		{
-    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
-    			
-    			if (curStat == LMState.SEARCH_RIGHT && startTurnLeft == false
-    				|| curStat == LMState.SEARCH_LEFT && startTurnLeft)
-    			{
-    				searchIteration++;
-    			}
-    			
-    			if (searchIteration >= param_searchAngles.length)
-    			{
-    				curStat = LMState.SEARCH_LINE_END;
-    			}
-    			else
-    			{
-    				float curGyro = gyroSensor.sample()[0];
-        			float turnDegree = param_searchAngles[searchIteration];
-        			
-        			
-
-        			//gui.writeLine("Gonna turn");
-        			if (param_debugWaits)
-        			{
-            			//gui.writeLine("Wait for DOWN");
-            			while(Util.isPressed(Button.ID_DOWN) == false) {}
-        			}
-        			
-        			if (curStat == LMState.SEARCH_LEFT)
-        			{
-        				turnDegree = lostAngle - curGyro + param_searchAngles[searchIteration];
-        			}
-        			else
-        			{
-        				turnDegree = lostAngle - curGyro - param_searchAngles[searchIteration];
-        			}
-
-        			//robot.turnOnSpot(turnDegree);
-        			//turnRobotDegrees(turnDegree);
-        			turnRobotDegreesGyro(turnDegree);
-    			}
-    		}
-    	}
-    	
-    	
-    	
-    	if (curStat == LMState.SEARCH_LINE_END)
-    	{
-    		//gui.writeLine("TurnToLost");
-			if (param_debugWaits)
-			{
-    			while(Util.isPressed(Button.ID_DOWN) == false) {}
-			}
-			
-			curStat = LMState.SEARCH_LINE_END_TURNTOLOST;
-			
-			float currAngle = gyroSensor.sample()[0];
-			
-    		turnRobotDegreesGyro(lostAngle - currAngle);
-    	}
-    	
-    	if (curStat == LMState.SEARCH_LINE_END_TURNTOLOST)
-    	{
+    		break;
+    	case RETREAT:
     		if (robot.finished())
     		{
-    			curStat = LMState.SEARCH_360_LINESCOUNT;
-    			search360Count = 0;
-    			search360onWhite = false;
-        		//System.out.println("Start turning for 360");
-        		turnRobotDegreesGyro(lostAngle + 360);
+                robot.turnOnSpot(-90);
+                state = S_SuspBridgeState.TURNING;
     		}
-    	}
-    	
-    	if (curStat == LMState.SEARCH_360_LINESCOUNT)
-    	{
-    		if (robot.finished() == false)
-    		{
-        		float colorNow = colorSensor.sample()[0];
-        		
-        		//System.out.println("CurCol=" + String.valueOf(colorNow));
-        		
-        		if (colorNow > param_redThreshhold && search360onWhite == false)
-        		{
-        			search360onWhite = true;
-        			search360Count++;
-        		}
-        		else
-        		{
-        			search360onWhite = false;
-        		}
-    		}
-    		else
+    		break;
+    	case TURNING:
+    		if (robot.finished())
     		{
     			robot.stop();
-    			//gui.writeLine("Lines: " + search360Count);
-    			
-    			curStat = LMState.STOP;
+    			robot.forward();
+    			state = S_SuspBridgeState.HOLD_DISTANCE;
     		}
+    		break;
+    	case HOLD_DISTANCE:
+    		robot.setSpeed(param_robotMaxSpeed);
+    		
+    		if (straightGyrosCount * elapsedTime < param_timeGyroMedianOnStraight)
+    		{
+    			straightGyros[straightGyrosCount] = gyroSensor.sample()[0];
+    			straightGyrosCount++;
+    		}
+    		else if (straightAngle == Float.MAX_VALUE)
+    		{
+    			straightAngle = Util.average(straightGyros, straightGyrosCount);
+    			
+    			gui.writeLine("Saved straight");
+    			gui.writeLine("Val is: " + String.valueOf(straightAngle));
+    			
+    		}
+    		else if (Math.abs((gyroSensor.sample()[0] - straightAngle)) >= param_angleStraightToSuspBridge)
+    		{
+    			state = S_SuspBridgeState.ON_SUSP_RAMP_UP;
+    			
+    			gui.writeLine("STATE OnSuspRamp");
+    			
+    		}
+    			
+    		
+    		
+    		
+    		/*measures[c] = new MediumMotorTuple(gyroSensor.sample()[0], c);
+    		
+    		if (uvSensor.sample()[0] > uvMax)
+    		{
+    			uvMax = uvSensor.sample()[0];
+    		}
+    		
+    		measures2[c] = new MediumMotorTuple(uvSensor.sample()[0], c);
+    		c++;
+    		if (c >= measures.length)
+    			c = measures.length - 1;*/
+    		float samp = uvSensor.sample()[0];
+            
+            turn = (samp - param_goalDistance) * param_kpStraight;
+            robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+            robot.forward();
+            
+            //gui.setVarValue(0, samp);
+            //gui.setVarValue(0, turn);
+    		break;
+    	case ON_SUSP_RAMP_UP:
+    		robot.setSpeed(param_robotSpeedOnRampUp);
+    		float samp2 = uvSensor.sample()[0];
+            
+            turn = (samp2 - param_goalDistanceRampUp) * param_kpRamp;
+            robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+            robot.forward();
+            
+            
+            
+    		if (rampGyrosCount * elapsedTime < param_timeGyroMedianOnRamp || uvSensor.sample()[0] < param_uvReachedTopOfRamp)
+    		{
+    			rampGyros[rampGyrosCount] = gyroSensor.sample()[0];
+    			rampGyrosCount++;
+    		}
+    		else if (rampAngle == Float.MAX_VALUE)
+    		{
+    			float[] cutted2 = new float[rampGyrosCount];
+    			int cuttedCounter = 0;
+    			for (int i = 0; i < rampGyrosCount; i++)
+    			{
+    				float curPos = ((float)(i)) / ((float)(rampGyrosCount));
+    				if (curPos >= param_percentCutBegin && curPos <= 1f - param_percentCutEnd)
+    				{
+    					cutted2[cuttedCounter] = rampGyros[i];
+    					cuttedCounter++;
+    				}
+    			}
+    			float[] cutted = new float[cuttedCounter];
+    			for (int i = 0; i < cuttedCounter; i++)
+    			{
+    				cutted[i] = cutted2[i];
+    			}
+    			
+    			rampAngle = Util.average(cutted);
+
+    			gui.writeLine("Saved ramp");
+    			gui.writeLine("Val is: " + String.valueOf(rampAngle));
+    			gui.writeLine("GyrCount: " + String.valueOf(rampGyrosCount));
+    			gui.writeLine("CutCount: " + String.valueOf(cuttedCounter));
+    			if (param_debugWaits)
+    			{
+    				robot.stop();
+        			while(Util.isPressed(Button.ID_DOWN) == false) {}
+        			robot.forward();
+    			}
+    			
+    			robot.stop();
+    			float curAngle = gyroSensor.sample()[0];
+    			
+    			robot.turnOnSpot(rampAngle - curAngle);
+    			
+    			state = S_SuspBridgeState.WAIT_FOR_ADJUSTANCE;
+    		}
+    		
+    		
+    		break;
+    	case WAIT_FOR_ADJUSTANCE:
+    		if (robot.finished())
+    		{
+
+    			gui.writeLine("Adjusted");
+    			
+    			robot.setSpeed(param_robotSpeedOnBridge);
+    			robot.forward();
+    			state = S_SuspBridgeState.DRIVE_TILL_INFINITY;
+    		}
+    		break;
+    	case DRIVE_TILL_INFINITY:
+    		timeInfinityCounter++;
+    		if (uvSensor.sample()[0] > param_uvCatchRobotAtEndWhenUnder + 0.05 && timeInfinityCounter * elapsedTime >= param_minTimeOnBridge)
+    		{
+    			state = S_SuspBridgeState.FULLSPEED;
+    		}
+    		break;
+    	case FULLSPEED:
+    		if (uvSensor.sample()[0] < param_uvCatchRobotAtEndWhenUnder)
+    		{
+    			gui.writeLine("Catched");
+    			
+    			timeInfinityCounter = 0;
+    			robot.stop();
+    			state = S_SuspBridgeState.CATCH_AGAIN;
+    		}
+    		break;
+    	case CATCH_AGAIN:
+    		robot.setSpeed(param_robotSpeedOnBridge);
+    		
+    		float samp3 = uvSensor.sample()[0];
+            
+            turn = (samp3 - param_goalDistance) * param_kpRamp * 0.85f;
+            robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+            robot.forward();
+            
+            if (uvSensor.sample()[0] > param_uvCatchRobotAtEndWhenUnder + 0.1f && timeInfinityCounter * elapsedTime >= param_minTimeOnRampDown)
+            {
+            	state = S_SuspBridgeState.PRE_END;
+            	robot.stop();
+            }
+    		break;
+    	case PRE_END:
+    		Sound.setVolume(100);
+    		Sound.beepSequenceUp();
+    		
+    		state = S_SuspBridgeState.END;
+    		break;
+    	case END:
+    		
+    		break;
     	}
     	
     	
     	
-    	
-    	
-    	
-		//gui.setVarValue(0,  RobotComponents.inst().getColorSensor().sample()[0], 5);
+		gui.setVarValue(0,  uvSensor.sample()[0], 5);
 		//gui.setVarValue(1,  RobotComponents.inst().getGyroSensor().sample()[0], 5);
     	
         if (Util.isPressed(Button.ID_UP))
         {
-            robot.forward();
+        	robot.stop();
+    		for (int i = 0; i < c; i++)
+            {
+            	System.out.println(String.valueOf(measures[i].getF2()) + "=" + String.valueOf(measures[i].getF1()));
+        		
+            }
+        	System.out.println("--------------Measures end-----------------------");
+    		for (int i = 0; i < c; i++)
+            {
+            	System.out.println(String.valueOf(measures2[i].getF2()) + "=" + String.valueOf(measures2[i].getF1()));
+        		
+            }
+        	System.out.println("--------------Measures2 end----------------------");
         }
         
         if (Util.isPressed(Button.ID_ENTER))
@@ -320,25 +335,5 @@ public class SuspBridgeState implements ParcourState {
             //robot.backward();
         }
         
-    }
-    
-    
-    private float degreeFac = 360f / 45f;
-    private void turnRobotDegrees(float degrees)
-    {
-    	float turnSpeed = degrees / param_angleWhenToTurnWithMaxSpeed;
-    	
-    	turnSpeed = (turnSpeed < param_minTurnSpeed ? param_minTurnSpeed : (turnSpeed > param_maxTurnSpeed ? param_maxTurnSpeed : turnSpeed));
-    	
-    	turnSpeed = 1f;
-    	
-    	robot.setSpeed(turnSpeed, turnSpeed);
-    	RobotComponents.inst().getLeftMotor().rotate((int) (degrees * degreeFac), true);
-    	RobotComponents.inst().getRightMotor().rotate((int) (-degrees * degreeFac), true);
-    }
-    
-    private void turnRobotDegreesGyro(float degrees)
-    {
-    	robot.turnOnSpot(degrees);
     }
 }
