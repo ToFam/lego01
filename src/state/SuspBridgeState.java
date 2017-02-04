@@ -7,11 +7,10 @@ import sensor.ColorSensor;
 import sensor.GyroSensor;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
-import util.MediumMotorTuple;
 import util.Util;
 import util.lcdGui.LCDGui;
 
-public class LineMovingIIt1 implements ParcourState {
+public class SuspBridgeState implements ParcourState {
 
     private Robot robot;
     private LCDGui gui;
@@ -31,7 +30,7 @@ public class LineMovingIIt1 implements ParcourState {
     
     private boolean end_of_line = false;
     
-    public LineMovingIIt1(Robot robot) {
+    public SuspBridgeState(Robot robot) {
         this.robot = robot;
         this.gui = new LCDGui(4, 1);
     }

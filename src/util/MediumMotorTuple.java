@@ -13,7 +13,7 @@ public class MediumMotorTuple {
 		return this.sensorData;
 	}
 	
-	public float getF2() {
+	public int getF2() {
 		return this.tachoCount;
 	}
 }
