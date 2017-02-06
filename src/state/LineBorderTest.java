@@ -46,6 +46,12 @@ public class LineBorderTest implements ParcourState {
 	{
 		return true;
 	}
+    
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
 
     
     private int maxAngl = 0;

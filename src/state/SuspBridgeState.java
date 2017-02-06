@@ -57,6 +57,12 @@ public class SuspBridgeState implements ParcourState {
 	}
     
     @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
+    
+    @Override
     public void init() {
     	state = S_SuspBridgeState.BEFORE_DOTS;
     	

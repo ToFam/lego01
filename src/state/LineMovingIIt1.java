@@ -43,6 +43,12 @@ public class LineMovingIIt1 implements ParcourState {
 	}
     
     @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
+    
+    @Override
     public void init() {
         //gui = new LCDGui(4, 1);
         

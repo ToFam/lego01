@@ -31,6 +31,12 @@ public class LineFixedSensor implements ParcourState {
 	{
 		return true;
 	}
+    
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
 
     @Override
     public void init() {

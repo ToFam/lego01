@@ -43,6 +43,12 @@ public class TestGUI implements ParcourState {
 	{
 		return true;
 	}
+    
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
 
     public void reset() {
         

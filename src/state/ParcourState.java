@@ -32,4 +32,12 @@ public interface ParcourState {
      * @return true iff state can be changed when a line is detected
      */
     public boolean changeOnBarcode();
+    
+    /**
+     * This is used when end of state should be determined by the state itself instead of 
+     * barcode detection in main.
+     * 
+     * @return true iff state should be changed immediately. No further call to update() will be issued.
+     */
+    public boolean changeImmediately();
 }

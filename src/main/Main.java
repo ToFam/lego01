@@ -127,7 +127,7 @@ public class Main {
 	                        colorSample = 0.f;
 	                    }
 	                }
-	                else if (states[state].changeOnBarcode() && barcode())
+	                else if (states[state].changeImmediately() || (states[state].changeOnBarcode() && barcode()))
 	                {
 	                	robot.stop();
 	        			while(Util.isPressed(Button.ID_DOWN) == false) {}
