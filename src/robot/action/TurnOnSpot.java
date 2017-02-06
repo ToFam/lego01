@@ -17,13 +17,21 @@ public class TurnOnSpot implements RobotAction {
     private boolean slowMode;
     private boolean finished;
     
-    private static final float turnOnSpot_angleToSlowDown = 50f;
+    private static float turnOnSpot_angleToSlowDown = 50f;
     private static final float turnOnSpot_slowDownSpeedFactor = 0.4f;
     private static final float turnOnSpot_stopBeforeAngle = 4f;
     
     public TurnOnSpot(float degree, float speedLeft, float speedRight)
     {
         deg = degree;
+        this.speedLeft = speedLeft;
+        this.speedRight = speedRight;
+    }
+
+    public TurnOnSpot(float degree, float speedLeft, float speedRight, float slowDownAngle)
+    {
+        deg = degree;
+        turnOnSpot_angleToSlowDown = slowDownAngle;
         this.speedLeft = speedLeft;
         this.speedRight = speedRight;
     }

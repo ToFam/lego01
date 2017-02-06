@@ -23,6 +23,7 @@ public class LineMovingIIt1 implements ParcourState {
     private float param_redThreshhold = 0.45f;
     //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
     private float[] param_searchAngles = new float[] {8f, 18f, 40f, 100f, 120f};
+    //private float[] param_searchAngles = new float[] {5f, 8f, 16f, 40f, 100f, 120f};
     private float param_angleWhenToTurnWithMaxSpeed = 50f;
     private float param_minTurnSpeed = 0.5f;
     private float param_maxTurnSpeed = 1f;
@@ -340,7 +341,7 @@ public class LineMovingIIt1 implements ParcourState {
     
     private void turnRobotDegreesGyro(float degrees)
     {
-    	//robot.turnOnSpot(degrees);
-    	robot.turnOnSpotFastBy(degrees);
+    	robot.turnOnSpot(degrees, 20f);
+    	//robot.turnOnSpotFastBy(degrees);
     }
 }

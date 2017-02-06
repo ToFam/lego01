@@ -178,6 +178,19 @@ public class Robot
         action.start();
 	}
 	
+
+	
+	/**
+	 * Turn the Robot around its axis.
+	 * 
+	 * @param degree Makes the Robot turn by the given amount.
+	 */
+	public void turnOnSpot(float degree, float slowDownAngle)
+	{
+		action = new TurnOnSpot(degree, speedLeft, speedRight, slowDownAngle);
+        action.start();
+	}
+	
 	
 	
 

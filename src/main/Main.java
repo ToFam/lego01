@@ -55,7 +55,6 @@ public class Main {
     		// new BossFight(robot),			// Da Endboss
     		
     		new TestDriveLTWall(robot),
-    		new LineState(robot),
     		new TestGUI(robot),
     		new TestState(robot),
         };

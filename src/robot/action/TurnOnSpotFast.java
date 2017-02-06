@@ -15,7 +15,7 @@ public class TurnOnSpotFast implements RobotAction {
     private boolean goalGreater;
     private boolean finished;
     
-    private static final float turnOnSpot_stopBeforeAngle = 15f;
+    private static final float turnOnSpot_stopBeforeAngle = 0f;
     
     public TurnOnSpotFast(float destinyDegree, float speedLeft, float speedRight, boolean turnBy)
     {
