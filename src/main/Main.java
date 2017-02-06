@@ -43,6 +43,7 @@ public class Main {
         
         this.states = new ParcourState[] {
         		new SuspBridgeState(robot),
+        		new SwampState(robot),
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot),			// Linie nach Labyrinth
     		new HumpbackBridgeState(robot),		// Große Brücke
