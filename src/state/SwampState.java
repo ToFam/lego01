@@ -93,5 +93,10 @@ public class SwampState implements ParcourState {
 	public boolean changeOnBarcode() {
 		return finished;
 	}
+
+	@Override
+	public boolean changeImmediately() {
+		return finished;
+	}
 	
 }
