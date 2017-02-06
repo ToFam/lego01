@@ -35,7 +35,7 @@ public class SwampState implements ParcourState {
 
 	@Override
 	public void init() {
-//		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+
 		this.swampSegment = SwampSegment.PRE_BARCODE;
 		this.time = 0;
 		this.finished = false;

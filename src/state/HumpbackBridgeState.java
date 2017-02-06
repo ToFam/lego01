@@ -34,6 +34,7 @@ public class HumpbackBridgeState implements ParcourState {
 	private float correction;
 
 	private float color;
+	private boolean finished;
 	
 	private enum BridgeSegment {
 		PRE_COLLISION,
@@ -84,11 +85,6 @@ public class HumpbackBridgeState implements ParcourState {
 	@Override
 	public void init() {
 		
-        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-		RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
-		RobotComponents.inst().getUS().setMedianFilter(1);
-		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
-		
 		this.angle_no_cliff = RobotComponents.inst().getGyroSensor().sample()[0];
 		for (int i = 0; i < this.angles.length; i++) {
 			this.angles[i] = this.angle_no_cliff;
@@ -99,6 +95,8 @@ public class HumpbackBridgeState implements ParcourState {
 		this.SPEED_LEFT = this.SPEED_MAX;
 		this.SPEED_RIGHT = this.SPEED_MAX;
 		this.turn_delta = -this.TURN_INCREASE;
+		
+		this.finished = false;
 		
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
 		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
@@ -192,7 +190,7 @@ public class HumpbackBridgeState implements ParcourState {
 			
 			if (this.color > 0.8f) {
 				this.bridgeSegment = BridgeSegment.BRIDGE_TRAVERSED;
-				this.robot.stop();
+				this.finished = false;
 				return;
 			}
 			
