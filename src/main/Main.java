@@ -70,16 +70,25 @@ public class Main {
         this.colorSample = 0.f;
         this.onLine = false;
     }
-    
+
     /**
      * Detect barcode
      * @return true iff line was detected
      */
     public boolean barcode()
     {
-    	colorSample = 4.f / 5.f * colorSample + 1.f / 5.f * RobotComponents.inst().getColorSensor().sample()[0];
-    	
-    	return colorSample > COLOR_THRESHOLD;
+    	//colorSample = 4.f / 5.f * colorSample + 1.f / 5.f * RobotComponents.inst().getColorSensor().sample()[0];
+    	float[][] colorSamps20 = RobotComponents.inst().getColorSensor().lastSamples(20);
+    	float average = 0f;
+    	for (int i = 0; i < colorSamps20.length; i++)
+    	{
+    		average += colorSamps20[i][0];
+    	}
+    	average /= colorSamps20.length;
+    	//System.out.println(String.valueOf(cou) + "=" + String.valueOf(average));
+    	//cou++;
+    	//return false;
+    	return average > COLOR_THRESHOLD;
     }
     
     public void run()

@@ -18,6 +18,9 @@ public abstract class SensorThread extends Thread {
 	protected int medianCounter = 0;
 	protected float[] medianSample;
 	protected float[] calculationTempValues;
+	protected final int lastsAmount = 50;
+	protected int lastSampleIndex = 0;
+	protected float[][] lastSamples;
 	
 	/**
 	 * Create a threaded sensor
@@ -26,6 +29,7 @@ public abstract class SensorThread extends Thread {
 	protected SensorThread(BaseSensor sensor) {
 	    this.sensor = sensor;
 	    sample = new float[sampleSize()];
+	    lastSamples = new float[lastsAmount][sampleSize()];
 	    instSample = new float[sampleSize()];
 	    medianSample = new float[sampleSize()];
 	    calculationTempValues = new float[sampleSize()];
@@ -36,6 +40,7 @@ public abstract class SensorThread extends Thread {
         sensor.setCurrentMode(mode);
         sample = new float[sensor.sampleSize()];
 	    instSample = new float[sampleSize()];
+	    lastSamples = new float[lastsAmount][sampleSize()];
 	    medianSample = new float[sampleSize() * medianAmount];
 	    calculationTempValues = new float[sampleSize()];
     }
@@ -61,6 +66,25 @@ public abstract class SensorThread extends Thread {
 	 */
 	public float[] sample() {
 	    return sample;
+	}
+	
+	/**
+	 * The last amount of sensor data
+	 * @param amount The amount of last sensor data
+	 * @return an array of sensor data
+	 */
+	public float[][] lastSamples(int amount)
+	{
+		amount = amount > lastsAmount ? lastsAmount : amount;
+		
+		float[][] lastRetSamples = new float[amount][sampleSize()];
+		
+		for (int i = 0; i < amount; i++)
+		{
+			lastRetSamples[i] = lastSamples[(lastSampleIndex - i + lastSamples.length) % lastSamples.length];
+		}
+		
+		return lastRetSamples;
 	}
 	
 	/**
@@ -97,6 +121,7 @@ public abstract class SensorThread extends Thread {
 	{
 		this.medianAmount = medianAmount >= 1 ? medianAmount : 1;
 		sample = new float[sensor.sampleSize()];
+	    lastSamples = new float[lastsAmount][sampleSize()];
 	    instSample = new float[sampleSize()];
 	    medianSample = new float[sampleSize() * medianAmount];
 	    calculationTempValues = new float[sampleSize()];
