@@ -16,7 +16,8 @@ public class LineMovingIIt1 implements ParcourState {
 	public enum LMState {
 		STRAIGHT_LEFT, STRAIGHT_RIGHT, LOST_RIGHT, LOST_LEFT, SEARCH_LEFT, SEARCH_RIGHT,
 		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP,
-		FIND_LINE_START, FIND_LINE_SHORT_STRAIGHT, FIND_LINE_TURNLEFT, FIND_LINE_TURNRIGHT, FIND_LINE_STRAIGTRIGHT, FIND_LINE_STRAIGHTLEFT
+		FIND_LINE_START, FIND_LINE_SHORT_STRAIGHT, FIND_LINE_TURNLEFT, FIND_LINE_TURNRIGHT, FIND_LINE_STRAIGTRIGHT, FIND_LINE_STRAIGHTLEFT,
+		END
 	}
 	
     private Robot robot;
@@ -28,7 +29,7 @@ public class LineMovingIIt1 implements ParcourState {
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.45f;
     //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
-    private float[] param_searchAngles = new float[] {8f, 18f, 36f, 104f};
+    private float[] param_searchAngles = new float[] {8f, 18f, 36f, 115f, 145f};
     //private float[] param_searchAngles = new float[] {5f, 8f, 16f, 40f, 100f, 120f};
     private float param_angleWhenToTurnWithMaxSpeed = 50f;
     private float param_minTurnSpeed = 0.5f;
@@ -362,11 +363,14 @@ public class LineMovingIIt1 implements ParcourState {
         	{
         		if (robot.finished())
         		{
-        			curStat = LMState.SEARCH_360_LINESCOUNT;
+        			robot.forward();
+        			curStat = LMState.END;
+        			end_of_line = true;
+        			/*curStat = LMState.SEARCH_360_LINESCOUNT;
         			search360Count = 0;
         			search360onWhite = false;
             		//System.out.println("Start turning for 360");
-            		turnRobotDegreesGyro(lostAngle + 360);
+            		turnRobotDegreesGyro(lostAngle + 360);*/
         		}
         	}
         	
