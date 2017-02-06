@@ -7,6 +7,8 @@ import lejos.hardware.Sound;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
+import sensor.modes.GyroSensorMode;
+import sensor.modes.UVSensorMode;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
@@ -41,6 +43,11 @@ public class Main {
     
     public Main() {
         this.robot = new Robot();
+        
+        RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+        RobotComponents.inst().getTouchSensorB().setMode(0);
+        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
         
         this.states = new ParcourState[] {
     		new LabyrinthState(robot),			// Start und Labyrinth
@@ -96,8 +103,6 @@ public class Main {
     {
     	boolean backToMenu = false;
     	int btn;
-    	
-    	RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
     	
     	// Main Menu Loop
         while (true) {

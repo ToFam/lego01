@@ -1,9 +1,12 @@
 package state;
 
+import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.GyroSensorMode;
 import sensor.modes.UVSensorMode;
+import util.Util;
 import util.lcdGui.LCDGui;
 
 public class LabyrinthState implements ParcourState 
@@ -12,7 +15,7 @@ public class LabyrinthState implements ParcourState
     private static final float TOO_NEAR = 0.04f;
     private static final float TOO_FAR = 0.2f;
     private static final float CRITICAL_JUMP = 0.03f;
-    private static final float TURN_FACTOR = 8.f;
+    private static final float TURN_FACTOR = 15.f;
     private static final float STANDARD_SPEED = 1.f;
     private static final int TIME_STRAIGHT = 100;
 
@@ -81,10 +84,6 @@ public class LabyrinthState implements ParcourState
     @Override
     public void init() 
     {
-        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getTouchSensorB();
-        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
-        RobotComponents.inst().getUS().setMedianFilter(100);
         robot.setSpeed(STANDARD_SPEED);
         
         if (!robot.USisUp())
@@ -96,7 +95,7 @@ public class LabyrinthState implements ParcourState
     
     public void stateChangeDebug() 
     {
-//        LCD.drawString("State Change: " + state.toString(), 0, 2);
+//        LCD.drawString(state.toString(), 0, 2);
 //        while (!Util.isPressed(Button.ID_LEFT))
 //        {
 //            try {
@@ -131,10 +130,6 @@ public class LabyrinthState implements ParcourState
             {
                 float samp = RobotComponents.inst().getUS().sample()[0];
                 
-                float max_turn = 0.8f;
-                
-                
-                
                 if (last_samp < TOO_NEAR)
                 {
                     if (samp > last_samp + CRITICAL_JUMP)
@@ -154,15 +149,15 @@ public class LabyrinthState implements ParcourState
                     robot.stop();
                     state = State.SHARP_TURN;
                     stateChangeDebug();
+                    robot.setSpeed(STANDARD_SPEED);
                     robot.forward();
-                    max_turn = 0.5f;
                     turnAngle = RobotComponents.inst().getGyroSensor().sample()[0];
                     return;
                 }
                 
                 last_samp = samp;
                 turn = (samp - DISTANCE_SHOULD) * TURN_FACTOR;
-                robot.steer(Math.max(-max_turn, Math.min(max_turn, turn)));
+                robot.steer(Math.max(-1.f, Math.min(1.f, turn)));
                 robot.forward();
                 
                 gui.setVarValue(0, samp);
@@ -175,6 +170,7 @@ public class LabyrinthState implements ParcourState
                 state = State.ROTATE;
                 stateChangeDebug();
                 robot.turnOnSpot(-90);
+                robot.setSpeed(STANDARD_SPEED);
             }
             break;
         case RETREAT2:
@@ -183,6 +179,7 @@ public class LabyrinthState implements ParcourState
                 state = State.ROTATE;
                 stateChangeDebug();
                 robot.turnOnSpot(-20);
+                robot.setSpeed(STANDARD_SPEED);
             }
             break;
         case ROTATE:
@@ -190,6 +187,7 @@ public class LabyrinthState implements ParcourState
             {
                 state = State.FOLLOW;
                 stateChangeDebug();
+                robot.setSpeed(STANDARD_SPEED);
                 robot.forward();
             }
             break;
@@ -205,7 +203,19 @@ public class LabyrinthState implements ParcourState
             }
             if (RobotComponents.inst().getGyroSensor().sample()[0] < turnAngle + 90)
             {
-                robot.steer(0.6f);
+                float sample = RobotComponents.inst().getUS().sample()[0];
+                
+                if (sample < TOO_FAR)
+                {
+                    robot.stop();
+                    state = State.FOLLOW;
+                    stateChangeDebug();
+                    robot.setSpeed(STANDARD_SPEED);
+                    robot.forward();
+                    return;
+                }
+                
+                robot.steer(0.7f);
                 robot.forward();
             }
             else
@@ -217,6 +227,15 @@ public class LabyrinthState implements ParcourState
             }
             break;
         case STRAIGHT:
+            if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) 
+            {
+                robot.stop();
+                state = State.RETREAT;
+                stateChangeDebug();
+                robot.setSpeed(STANDARD_SPEED);
+                robot.move(360);
+                return;
+            }
             elapsedInterval += elapsedTime;
             if (elapsedInterval < TIME_STRAIGHT)
             {
