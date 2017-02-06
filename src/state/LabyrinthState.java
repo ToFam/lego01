@@ -1,12 +1,9 @@
 package state;
 
-import lejos.hardware.Button;
-import lejos.hardware.lcd.LCD;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.GyroSensorMode;
 import sensor.modes.UVSensorMode;
-import util.Util;
 import util.lcdGui.LCDGui;
 
 public class LabyrinthState implements ParcourState 
@@ -14,10 +11,10 @@ public class LabyrinthState implements ParcourState
     private static final float DISTANCE_SHOULD = 0.1f;
     private static final float TOO_NEAR = 0.04f;
     private static final float TOO_FAR = 0.2f;
-    private static final float CRITICAL_JUMP = 0.01f;
+    private static final float CRITICAL_JUMP = 0.03f;
     private static final float TURN_FACTOR = 8.f;
     private static final float STANDARD_SPEED = 1.f;
-    private static final int TIME_STRAIGHT = 2000;
+    private static final int TIME_STRAIGHT = 100;
 
     private Robot robot;
     private LCDGui gui;
@@ -26,6 +23,27 @@ public class LabyrinthState implements ParcourState
     private float last_samp = DISTANCE_SHOULD;
     private float turnAngle = 0.f;
     private int elapsedInterval = 0;
+    
+    // Ignore this for now
+    public abstract class Action 
+    {
+        private String name;
+        private Action next;
+        
+        public Action(String name, Action next)
+        {
+            this.name = name;
+            this.next = next;
+        }
+        public String toString()
+        {
+            return name;
+        }
+        
+        public void enter() {}
+        public void update() {}
+        public Action exit() { return next; }
+    }
     
     public enum State {
         RETREAT,
@@ -78,16 +96,16 @@ public class LabyrinthState implements ParcourState
     
     public void stateChangeDebug() 
     {
-        LCD.drawString("State Change: " + state.toString(), 0, 2);
-        while (!Util.isPressed(Button.ID_LEFT))
-        {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+//        LCD.drawString("State Change: " + state.toString(), 0, 2);
+//        while (!Util.isPressed(Button.ID_LEFT))
+//        {
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
     }
     
     public void reset() 
@@ -176,6 +194,15 @@ public class LabyrinthState implements ParcourState
             }
             break;
         case SHARP_TURN:
+            if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) 
+            {
+                robot.stop();
+                state = State.RETREAT;
+                stateChangeDebug();
+                robot.setSpeed(STANDARD_SPEED);
+                robot.move(360);
+                return;
+            }
             if (RobotComponents.inst().getGyroSensor().sample()[0] < turnAngle + 90)
             {
                 robot.steer(0.6f);
