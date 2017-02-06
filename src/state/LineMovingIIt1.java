@@ -121,16 +121,19 @@ public class LineMovingIIt1 implements ParcourState {
     		curStat = LMState.FIND_LINE_START;
     		break;
     	case FIND_LINE_START:
-    		gyroStartFindValue = gyroSensor.sample()[0];
-    		robot.turnOnSpot(param_find_angle);
-        	gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
-    		
-    		//gui.writeLine("Short straight");
-    		//robot.stop();
-			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
-			
-    		curStat = LMState.FIND_LINE_SHORT_STRAIGHT;
-    		switchStateIfLineFound();
+    		if (robot.finished())
+    		{
+        		gyroStartFindValue = gyroSensor.sample()[0];
+        		robot.turnOnSpot(param_find_angle);
+            	gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
+        		
+        		//gui.writeLine("Short straight");
+        		//robot.stop();
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
+        		curStat = LMState.FIND_LINE_SHORT_STRAIGHT;
+        		switchStateIfLineFound();
+    		}
     		break;
     	case FIND_LINE_SHORT_STRAIGHT:
     		if (robot.finished())
