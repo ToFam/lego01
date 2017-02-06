@@ -41,11 +41,15 @@ public class LineMovingIIt1 implements ParcourState {
     private int param_drive_down_of_barcode_distance = 450;
     private boolean param_debugWaits = false;
     
-    private boolean end_of_line = false;
+    private boolean retImAtEnd = true;
     
-    public LineMovingIIt1(Robot robot) {
+    private boolean end_of_line = false;
+    private boolean change_immediately = false;
+    
+    public LineMovingIIt1(Robot robot, boolean returnImAtEnd) {
         this.robot = robot;
         this.gui = new LCDGui(4, 1);
+        this.retImAtEnd = returnImAtEnd;
     }
     
 	@Override
@@ -57,7 +61,7 @@ public class LineMovingIIt1 implements ParcourState {
     @Override
     public boolean changeImmediately()
     {
-        return false;
+        return change_immediately;
     }
     
     @Override
@@ -208,6 +212,9 @@ public class LineMovingIIt1 implements ParcourState {
         		curStat = LMState.FIND_LINE_TURNRIGHT;
     		}
     		switchStateIfLineFound();
+    		break;
+    	case END:
+    		
     		break;
     	default:
     		if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
@@ -372,9 +379,17 @@ public class LineMovingIIt1 implements ParcourState {
         	{
         		if (robot.finished())
         		{
-        			robot.forward();
-        			curStat = LMState.END;
-        			end_of_line = true;
+        			if (retImAtEnd)
+        			{
+        				curStat = LMState.END;
+        				change_immediately = true;
+        			}
+        			else
+        			{
+            			robot.forward();
+            			curStat = LMState.END;
+            			end_of_line = true;
+        			}
         			/*curStat = LMState.SEARCH_360_LINESCOUNT;
         			search360Count = 0;
         			search360onWhite = false;

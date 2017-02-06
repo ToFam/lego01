@@ -3,6 +3,7 @@ package main;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
+import lejos.hardware.Sound;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
@@ -42,12 +43,12 @@ public class Main {
         this.robot = new Robot();
         
         this.states = new ParcourState[] {
-        		new SuspBridgeState(robot),
-        		new SwampState(robot),
     		new LabyrinthState(robot),			// Start und Labyrinth
-    		new LineMovingIIt1(robot),			// Linie nach Labyrinth
+    		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
     		new HumpbackBridgeState(robot),		// Große Brücke
-    		new LineMovingIIt1(robot),			// Linie nach Brücke
+    		new LineMovingIIt1(robot, true),			// Linie nach Brücke
+    		new LineMovingIIt1(robot, true),			// Linie nach Brücke
+    		new LineMovingIIt1(robot, false),			// Linie nach Brücke
     		// new Seesaw(robot),				// Wippe
     		// new LineMovingIIt1(robot),		// Linie nach Wippe
     		// new Swamp(robot),				// Sumpf
@@ -140,6 +141,9 @@ public class Main {
 	                {
 	                	onLine = true;
 	                	// Barcode excepted and detected, change to next state
+	                	
+	                	Sound.beep();
+	                	
 	    	            states[state].reset();
 	    	            if (state < states.length - 1)
 	    	            {
