@@ -75,6 +75,12 @@ public class HumpbackBridgeState implements ParcourState {
 	}
 	
 	@Override
+	public boolean changeImmediately()
+	{
+	    return false;
+	}
+	
+	@Override
 	public String getName() {
 		return "HumpbackBridge";
 	}

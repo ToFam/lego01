@@ -33,16 +33,22 @@ public class TestGUI implements ParcourState {
     	//RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
     	//RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
     	
-    	RobotComponents.inst().getMediumMotor().resetTachoCount();
-    	RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.7f);
-        RobotComponents.inst().getMediumMotor().forward();
+    	//RobotComponents.inst().getMediumMotor().resetTachoCount();
+    	//RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.7f);
+        //RobotComponents.inst().getMediumMotor().forward();
     }
     
 	@Override
 	public boolean changeOnBarcode()
 	{
-		return true;
+		return false;
 	}
+    
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
 
     public void reset() {
         
@@ -61,8 +67,9 @@ public class TestGUI implements ParcourState {
     	float uv = 0;//RobotComponents.inst().getUV().sample()[0];
     	float touch = 0;//RobotComponents.inst().getTouchSensorB().sample()[0];
     	
+    	gui.setVarValue(0, String.valueOf(color), 5);
     	
-    	tach[cou] = RobotComponents.inst().getMediumMotor().getTachoCount() % 360;
+    	//tach[cou] = RobotComponents.inst().getMediumMotor().getTachoCount() % 360;
     	cols[cou] = color;
     	
     	if (cou < tach.length - 5)
@@ -71,7 +78,7 @@ public class TestGUI implements ParcourState {
     	if (cou == 9000)
     	{
 
-        	System.out.println("9000");
+        	//System.out.println("9000");
     	}
     	
     	switch (sens)
@@ -99,12 +106,12 @@ public class TestGUI implements ParcourState {
         if (Util.isPressed(Button.ID_UP))
         {
             sens = 1;
-            for (int i = 0; i < tach.length; i++)
+            /*for (int i = 0; i < tach.length; i++)
             {
             	System.out.println(String.valueOf(tach[i]) + "=" + String.valueOf(cols[i]));
         		
-            }
-            RobotComponents.inst().getMediumMotor().stop();
+            }*/
+            //RobotComponents.inst().getMediumMotor().stop();
         }
         if (Util.isPressed(Button.ID_LEFT))
         {

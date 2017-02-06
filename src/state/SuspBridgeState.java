@@ -43,7 +43,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_percentCutEnd = 0.2f;
     private boolean param_debugWaits = true;
 
-    private boolean end_of_line = false;
+    private boolean end_of_line = true;
     
     public SuspBridgeState(Robot robot) {
         this.robot = robot;
@@ -55,6 +55,12 @@ public class SuspBridgeState implements ParcourState {
 	{
 		return end_of_line;
 	}
+    
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
     
     @Override
     public void init() {

@@ -27,6 +27,12 @@ public class UVSensor extends SensorThread {
                 {
                     instSample[i] = medianSample[medianCounter * sample.length + i];
                 }
+                lastSamples[lastSampleIndex] = instSample;
+                lastSampleIndex++;
+                if (lastSampleIndex >= lastsAmount)
+                {
+                	lastSampleIndex = 0;
+                }
                 medianCounter++;
             }
             

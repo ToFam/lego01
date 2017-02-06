@@ -40,6 +40,12 @@ public class TestDriveLTWall implements ParcourState {
 		return true;
 	}
     
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
+    
     private float oldDistance = 0.0f;
     private float turnFactor = 5.0f;
 

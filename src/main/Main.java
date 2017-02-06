@@ -1,17 +1,14 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.modes.ColorSensorMode;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
-import state.LineSlowMode;
 import state.LineState;
 import state.ParcourState;
 import state.SuspBridgeState;
@@ -36,13 +33,16 @@ public class Main {
     private final String[] elements;
     private int state;
     
-    private float sample_old;
+    private static final float COLOR_THRESHOLD = 0.9f;
+    private boolean onLine;
+    private float colorSample;
     
     public Main() {
         this.robot = new Robot();
         
         this.states = new ParcourState[] {
         		new SuspBridgeState(robot),
+        		new LineMovingIIt1(robot),			// Linie nach Labyrinth
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot),			// Linie nach Labyrinth
     		new HumpbackBridgeState(robot),		// Große Brücke
@@ -66,28 +66,36 @@ public class Main {
         
         this.mainMenu = new LCDChooseList(elements);
         this.state = 0;
-        this.sample_old = 0.f;
+        this.colorSample = 0.f;
+        this.onLine = false;
     }
-    
+
     /**
      * Detect barcode
      * @return true iff line was detected
      */
     public boolean barcode()
     {
-    	// TODO: Set values accordingly
-    	if (sample_old == 0 && (sample_old = RobotComponents.inst().getColorSensor().sample()[0]) > 5.f)
+    	//colorSample = 4.f / 5.f * colorSample + 1.f / 5.f * RobotComponents.inst().getColorSensor().sample()[0];
+    	float[][] colorSamps20 = RobotComponents.inst().getColorSensor().lastSamples(20);
+    	float average = 0f;
+    	for (int i = 0; i < colorSamps20.length; i++)
     	{
-    		return true;
+    		average += colorSamps20[i][0];
     	}
-    	
-    	return false;
+    	average /= colorSamps20.length;
+    	//System.out.println(String.valueOf(cou) + "=" + String.valueOf(average));
+    	//cou++;
+    	//return false;
+    	return average > COLOR_THRESHOLD;
     }
     
     public void run()
     {
     	boolean backToMenu = false;
     	int btn;
+    	
+    	RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
     	
     	// Main Menu Loop
         while (true) {
@@ -119,8 +127,17 @@ public class Main {
 	                robot.update();
 	                states[state].update(50);
 	                
-	                if (states[state].changeOnBarcode() && barcode())
+	                if (onLine)
 	                {
+	                    if (!barcode())
+	                    {
+	                        onLine = false;
+	                        colorSample = 0.f;
+	                    }
+	                }
+	                else if (states[state].changeImmediately() || (states[state].changeOnBarcode() && barcode()))
+	                {
+	                	onLine = true;
 	                	// Barcode excepted and detected, change to next state
 	    	            states[state].reset();
 	    	            if (state < states.length - 1)
