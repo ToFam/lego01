@@ -10,7 +10,6 @@ import util.lcdGui.LCDGui;
 public class HumpbackBridgeState implements ParcourState {
 
 	private final Robot robot;
-	private final LCDGui gui;
 	private final float SPEED_MAX;
 	private final float SPEED_MIN_LEFT;
 	private final float SPEED_MIN_RIGHT;
@@ -35,7 +34,6 @@ public class HumpbackBridgeState implements ParcourState {
 	private float correction;
 
 	private float color;
-	private int debug;
 	
 	private enum BridgeSegment {
 		PRE_COLLISION,
@@ -44,12 +42,11 @@ public class HumpbackBridgeState implements ParcourState {
 		FOLLOW_PLANK,
 		ENTIRE_BRIDGE,
 		BRIDGE_TRAVERSED,
-		TEST_SENSOR,
 	}
 	
 	public HumpbackBridgeState(Robot robot) {
 		this.robot = robot;
-		this.gui = new LCDGui(3, 1);
+
 		this.SPEED_MAX = 1f;
 		this.SPEED_MIN_LEFT = .6f;
 		this.SPEED_MIN_RIGHT = .2f;
@@ -66,7 +63,6 @@ public class HumpbackBridgeState implements ParcourState {
 		this.correction = 0.f;
 		
 		this.color = 0.f;
-		this.debug = 0;
 	}
 	
 	@Override
@@ -101,9 +97,6 @@ public class HumpbackBridgeState implements ParcourState {
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
 		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 		this.robot.lowerUV();
-//		this.bridgeSegment = BridgeSegment.TEST_SENSOR;
-
-		this.debug = 0;
 		
 		this.robot.setSpeed(this.SPEED_MAX);
 		this.robot.forward();
@@ -200,7 +193,6 @@ public class HumpbackBridgeState implements ParcourState {
 			if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
 				
 				this.turning = true;
-				this.gui.setVarValue(0, this.angles[this.angle_old] - this.angles[this.angle_fresh]);
 				this.robot.turnOnSpot(this.angles[this.angle_old] - this.angles[this.angle_fresh]);
 				return;
 				
@@ -210,25 +202,12 @@ public class HumpbackBridgeState implements ParcourState {
 				this.distance = RobotComponents.inst().getUV().sample()[0];
 			} while (this.distance == Float.POSITIVE_INFINITY);
 			
-			gui.setVarValue(0, String.valueOf(this.distance), 4);
-			gui.setVarValue(1, String.valueOf(this.color), 4);
-			gui.setVarValue(2, String.valueOf(this.angles[this.angle_old] - this.angles[this.angle_fresh]));
-
 			if (this.distance > this.THRESHOLD_NO_GROUND) {
 								
 				this.SPEED_LEFT = this.SPEED_MAX;
 				this.slowDownRightMotor();
 			
 			} else {
-				
-//				if (this.cliff) {
-//
-//					this.turn_delta = -this.TURN_INCREASE;
-//					this.angle_no_cliff = this.angles[this.angle_fresh];
-//					this.SPEED_RIGHT = this.SPEED_MAX;
-//					this.cliff = false;
-//					
-//				}
 				
 				this.SPEED_RIGHT = this.SPEED_MAX;
 				this.slowDownLeftMotor();
@@ -238,13 +217,6 @@ public class HumpbackBridgeState implements ParcourState {
 			break;
 			
 		case BRIDGE_TRAVERSED:
-			
-			break;
-			
-		case TEST_SENSOR:
-			
-			this.robot.stop();
-			gui.setVarValue(0, color);
 			
 			break;
 		}
