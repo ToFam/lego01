@@ -17,7 +17,14 @@ import util.Util;
 import util.lcdGui.LCDGui;
 
 public class SuspBridgeState implements ParcourState {
+	
+	
+	public enum S_SuspBridgeState {
+		BEFORE_DOTS, RETREAT, TURNING, HOLD_DISTANCE, ON_SUSP_RAMP_UP, WAIT_FOR_ADJUSTANCE, DRIVE_TILL_INFINITY, 
+		FULLSPEED, CATCH_AGAIN, PRE_END, END
+	}
 
+	
     private Robot robot;
     private LCDGui gui;
     

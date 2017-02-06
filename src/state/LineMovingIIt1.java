@@ -12,7 +12,12 @@ import util.Util;
 import util.lcdGui.LCDGui;
 
 public class LineMovingIIt1 implements ParcourState {
-
+	
+	public enum LMState {
+		STRAIGHT_LEFT, STRAIGHT_RIGHT, LOST_RIGHT, LOST_LEFT, SEARCH_LEFT, SEARCH_RIGHT,
+		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP
+	}
+	
     private Robot robot;
     private LCDGui gui;
     
