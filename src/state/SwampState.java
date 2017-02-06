@@ -19,7 +19,8 @@ public class SwampState implements ParcourState {
 	private enum SwampSegment {
 		PRE_BARCODE,
 		BARCODE,
-		POST_BARCODE
+		POST_BARCODE,
+		DO_NOTHING,
 	}
 	
 	public SwampState(Robot robot) {
@@ -34,7 +35,7 @@ public class SwampState implements ParcourState {
 
 	@Override
 	public void init() {
-		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+//		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
 		this.swampSegment = SwampSegment.PRE_BARCODE;
 		this.time = 0;
 		this.finished = false;
@@ -54,8 +55,7 @@ public class SwampState implements ParcourState {
 			this.distance = RobotComponents.inst().getUS().sample()[0];
 		} while (this.distance == Float.POSITIVE_INFINITY && this.distance >= 1.f);
 		
-		this.gui.setVarValue(1, String.valueOf(this.distance));
-		
+		this.gui.setVarValue(1, String.valueOf(this.color));
 		
 		switch (this.swampSegment) {
 			case PRE_BARCODE:
@@ -89,7 +89,8 @@ public class SwampState implements ParcourState {
 			case POST_BARCODE:
 				
 				if (this.color > 0.8f) {
-					this.finished = true;
+//					this.finished = true;
+					this.swampSegment = SwampSegment.DO_NOTHING;
 					
 					this.robot.stop();
 		            
@@ -101,6 +102,11 @@ public class SwampState implements ParcourState {
 				this.robot.forward();
 				
 				break;
+				
+			case DO_NOTHING:
+				
+				break;
+				
 		}
 	}
 
