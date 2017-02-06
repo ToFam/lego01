@@ -6,6 +6,8 @@ import robot.action.Move;
 import robot.action.RobotAction;
 import robot.action.Stop;
 import robot.action.TurnOnSpot;
+import robot.action.TurnOnSpotExact;
+import robot.action.TurnOnSpotFast;
 import sensor.modes.ColorSensorMode;
 
 /**
@@ -174,6 +176,34 @@ public class Robot
 	{
 		action = new TurnOnSpot(degree, speedLeft, speedRight);
         action.start();
+	}
+	
+	
+	
+
+	/**
+	 * Turn the Robot pretty exactly around its axis.
+	 * 
+	 * @param degree Makes the Robot turn to the given degree count of the gyro sensor.
+	 */
+	public void turnOnSpotExact(float destinyDegree)
+	{
+		action = new TurnOnSpotExact(destinyDegree, speedLeft, speedRight);
+		action.start();
+	}
+	
+	
+
+
+	/**
+	 * Turn the Robot pretty fast but not exactly around its axis.
+	 * 
+	 * @param degree Makes the Robot turn to the given degree count of the gyro sensor.
+	 */
+	public void turnOnSpotFast(float destinyDegree)
+	{
+		action = new TurnOnSpotFast(destinyDegree, speedLeft, speedRight);
+		action.start();
 	}
 	
 	

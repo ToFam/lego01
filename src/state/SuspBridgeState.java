@@ -47,7 +47,7 @@ public class SuspBridgeState implements ParcourState {
     
     public SuspBridgeState(Robot robot) {
         this.robot = robot;
-        this.gui = new LCDGui(4, 1);
+        this.gui = new LCDGui(2, 1);
     }
     
 	@Override
@@ -220,8 +220,8 @@ public class SuspBridgeState implements ParcourState {
 
     			gui.writeLine("Saved ramp");
     			gui.writeLine("Val is: " + String.valueOf(rampAngle));
-    			gui.writeLine("GyrCount: " + String.valueOf(rampGyrosCount));
-    			gui.writeLine("CutCount: " + String.valueOf(cuttedCounter));
+    			//gui.writeLine("GyrCount: " + String.valueOf(rampGyrosCount));
+    			//gui.writeLine("CutCount: " + String.valueOf(cuttedCounter));
     			if (param_debugWaits)
     			{
     				robot.stop();
@@ -231,8 +231,12 @@ public class SuspBridgeState implements ParcourState {
     			
     			robot.stop();
     			float curAngle = gyroSensor.sample()[0];
+
+    			gui.writeLine("Gonna turn");
+    			if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
     			
-    			robot.turnOnSpot(rampAngle - curAngle);
+    			//robot.turnOnSpot(rampAngle - curAngle);
+    			robot.turnOnSpotExact(rampAngle);
     			
     			state = S_SuspBridgeState.WAIT_FOR_ADJUSTANCE;
     		}
@@ -242,6 +246,9 @@ public class SuspBridgeState implements ParcourState {
     	case WAIT_FOR_ADJUSTANCE:
     		if (robot.finished())
     		{
+    			gui.writeLine("Adjusted");
+    			if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
 
     			gui.writeLine("Adjusted");
     			
@@ -296,6 +303,7 @@ public class SuspBridgeState implements ParcourState {
     	
     	
 		gui.setVarValue(0,  uvSensor.sample()[0], 5);
+		gui.setVarValue(1,  gyroSensor.sample()[0], 5);
 		//gui.setVarValue(1,  RobotComponents.inst().getGyroSensor().sample()[0], 5);
     	
         if (Util.isPressed(Button.ID_UP))

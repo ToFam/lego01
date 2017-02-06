@@ -1,10 +1,8 @@
 package robot.action;
 
-import lejos.hardware.lcd.LCD;
 import robot.RobotComponents;
-import util.lcdGui.LCDGui;
 
-public class TurnOnSpot implements RobotAction {
+public class TurnOnSpotExact implements RobotAction {
     
     private float deg;
     
@@ -14,16 +12,13 @@ public class TurnOnSpot implements RobotAction {
     private float gyroValue;
     private float goalValue;
     private boolean goalGreater;
-    private boolean slowMode;
     private boolean finished;
     
-    private static final float turnOnSpot_angleToSlowDown = 50f;
-    private static final float turnOnSpot_slowDownSpeedFactor = 0.4f;
-    private static final float turnOnSpot_stopBeforeAngle = 4f;
+    private static final float turnOnSpot_slowSpeedFactor = 0.3f;
     
-    public TurnOnSpot(float degree, float speedLeft, float speedRight)
+    public TurnOnSpotExact(float destinyDegree, float speedLeft, float speedRight)
     {
-        deg = degree;
+        deg = destinyDegree;
         this.speedLeft = speedLeft;
         this.speedRight = speedRight;
     }
@@ -43,14 +38,14 @@ public class TurnOnSpot implements RobotAction {
     }
     
     public void start() {
-        RobotComponents.inst().getLeftMotor().setSpeed(speedLeft);
-        RobotComponents.inst().getRightMotor().setSpeed(speedRight);
+        RobotComponents.inst().getLeftMotor().setSpeed(speedLeft * turnOnSpot_slowSpeedFactor);
+        RobotComponents.inst().getRightMotor().setSpeed(speedRight * turnOnSpot_slowSpeedFactor);
         gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
-        goalValue = gyroValue + deg;
+        goalValue = /*gyroValue + */deg;
         goalGreater = gyroValue < goalValue;
         
-        float addition = goalGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
-        goalValue += addition;
+        //float addition = goalGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
+        //goalValue += addition;
         
         if (goalGreater)
         {
@@ -61,7 +56,7 @@ public class TurnOnSpot implements RobotAction {
             startTurnOnSpot(false);
         }
         
-        slowMode = false;
+        //slowMode = false;
         finished = false;
     }
     
@@ -80,7 +75,7 @@ public class TurnOnSpot implements RobotAction {
             //LCD.drawString(String.valueOf(gyroValue), 4, 2);
             //LCD.drawString(String.valueOf(goalValue), 4, 4);
             
-            if (slowMode == false && Math.abs(gyroValue - goalValue) < turnOnSpot_angleToSlowDown)
+            /*if (slowMode == false && Math.abs(gyroValue - goalValue) < turnOnSpot_angleToSlowDown)
             {
                 slowMode = true;
                 RobotComponents.inst().getLeftMotor().stop(true);
@@ -96,7 +91,7 @@ public class TurnOnSpot implements RobotAction {
                 {
                     startTurnOnSpot(false);
                 }
-            }
+            }*/
             
             gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
         }
