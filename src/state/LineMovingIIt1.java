@@ -15,7 +15,8 @@ public class LineMovingIIt1 implements ParcourState {
 	
 	public enum LMState {
 		STRAIGHT_LEFT, STRAIGHT_RIGHT, LOST_RIGHT, LOST_LEFT, SEARCH_LEFT, SEARCH_RIGHT,
-		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP
+		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP,
+		FIND_LINE_START, FIND_LINE_SHORT_STRAIGHT, FIND_LINE_TURNLEFT, FIND_LINE_TURNRIGHT, FIND_LINE_STRAIGTRIGHT, FIND_LINE_STRAIGHTLEFT
 	}
 	
     private Robot robot;
@@ -33,6 +34,8 @@ public class LineMovingIIt1 implements ParcourState {
     private float param_minTurnSpeed = 0.5f;
     private float param_maxTurnSpeed = 1f;
     private int param_timeWhenNextGyroValueIsTaken = 50;
+    
+    private float param_find_angle = 30f;
     private boolean param_debugWaits = false;
     
     private boolean end_of_line = false;
@@ -98,207 +101,267 @@ public class LineMovingIIt1 implements ParcourState {
     private float[] lastGyros = new float[10];
     private int lastGyrosIndex = 0;
     private int timeCounter = 0;
+    private float gyroStartFindValue = 0f;
     
     @Override
     public void update(int elapsedTime) {
 
     	timeCounter += elapsedTime;
     	
-    	if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
+    	switch (curStat)
     	{
-    		float colorVal = RobotComponents.inst().getColorSensor().sample()[0];
+    	case FIND_LINE_START:
+    		gyroStartFindValue = gyroSensor.sample()[0];
+    		robot.turnOnSpot(param_find_angle);
     		
-    		if (colorVal < param_redThreshhold)
+    		curStat = LMState.FIND_LINE_SHORT_STRAIGHT;
+    		switchStateIfLineFound();
+    		break;
+    	case FIND_LINE_SHORT_STRAIGHT:
+    		if (robot.finished())
     		{
-    			//gui.writeLine("Lost line");
-    			robot.stop();
-    			
-    			lostAngle = gyroSensor.sample()[0];
-    			searchIteration = 0;
-    			curStat = (curStat == LMState.STRAIGHT_LEFT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
-    			
-    			if (curStat == LMState.SEARCH_LEFT)
-    			{
-    				startTurnLeft = true;
-        			//robot.turnOnSpot(param_searchAngles[searchIteration]);
-    				turnRobotDegreesGyro(param_searchAngles[searchIteration]);
-    			}
-    			else 
-    			{
-    				startTurnLeft = false;
-        			//robot.turnOnSpot(-param_searchAngles[searchIteration]);
-        			turnRobotDegreesGyro(-param_searchAngles[searchIteration]);
-    			}
-    			
-    			if (param_debugWaits)
-    			{
-        			//gui.writeLine("Wait for DOWN");
-        			while(Util.isPressed(Button.ID_DOWN) == false) {}
-    			}
+        		robot.move(-180);
+        		curStat = LMState.FIND_LINE_TURNRIGHT;
     		}
-    		else if (false)
+    		switchStateIfLineFound();
+    		break;
+    	case FIND_LINE_TURNRIGHT:
+    		if (robot.finished())
     		{
-    			//Fährt schön geradeaus
+    			float curGyro = gyroSensor.sample()[0];
+    			float toTurn = gyroStartFindValue - curGyro - param_find_angle;
     			
-    			if (timeCounter >= param_timeWhenNextGyroValueIsTaken)
-    			{
-    				lastGyros[lastGyrosIndex] = gyroSensor.sample()[0];
-    				lastGyrosIndex++;
-    				if (lastGyrosIndex >= lastGyros.length)
-    				{
-    					lastGyrosIndex = 0;
-    				}
-    				
-    				float relTurn = 0f;
-    				
-    				float fac = 1f;
-    				
-    				for (int i = lastGyrosIndex + lastGyros.length; i > lastGyrosIndex; i--)
-    				{
-    					float first = lastGyros[(i) % lastGyros.length];
-    					float second = lastGyros[(i - 1) % lastGyros.length];
-    					relTurn += (first - second) * fac;
-
-    					fac *= 0.5f;
-    				}
-    				
-    				gui.setVarValue(0, relTurn);
-
-					//robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
-
-	    			//robot.forward();
-    			}
+        		robot.turnOnSpot(toTurn);
+        		curStat = LMState.FIND_LINE_TURNRIGHT;
     		}
-    	}
-    	
-    	if (curStat == LMState.SEARCH_LEFT || curStat == LMState.SEARCH_RIGHT)
-    	{
-    		float colorNow = colorSensor.sample()[0];
-    		
-    		if (colorNow > param_redThreshhold)
+    		switchStateIfLineFound();
+    		break;
+    	case FIND_LINE_STRAIGTRIGHT:
+    		if (robot.finished())
     		{
-    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_RIGHT : LMState.STRAIGHT_LEFT);
-    			
-
-    			//gui.writeLine("Found line");
-    			if (param_debugWaits)
-    			{
-        			//gui.writeLine("Wait for DOWN");
-        			while(Util.isPressed(Button.ID_DOWN) == false) {}
-    			}
-
-    			lastAngle = gyroSensor.sample()[0];
-    			float estimatedDiff = lastAngle - preLastAngle;
-    			estimatedDiff *= 0.002f;
-    			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
-
-    			preLastAngle = lastAngle;
-    			
-    	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
-    	        //robot.setSpeed(1f, 1f);
-
-    	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
-    			robot.forward();
+        		robot.move(-360);
+        		curStat = LMState.FIND_LINE_TURNLEFT;
     		}
-    		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
+    		switchStateIfLineFound();
+    		break;
+    	case FIND_LINE_TURNLEFT:
+    		if (robot.finished())
     		{
-    			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
+    			float curGyro = gyroSensor.sample()[0];
+    			float toTurn = gyroStartFindValue - curGyro + param_find_angle;
     			
-    			if (curStat == LMState.SEARCH_RIGHT && startTurnLeft == false
-    				|| curStat == LMState.SEARCH_LEFT && startTurnLeft)
-    			{
-    				searchIteration++;
-    			}
-    			
-    			if (searchIteration >= param_searchAngles.length)
-    			{
-    				curStat = LMState.SEARCH_LINE_END;
-    			}
-    			else
-    			{
-    				float curGyro = gyroSensor.sample()[0];
-        			float turnDegree = param_searchAngles[searchIteration];
+        		robot.turnOnSpot(toTurn);
+        		curStat = LMState.FIND_LINE_STRAIGHTLEFT;
+    		}
+    		switchStateIfLineFound();
+    		break;
+    	case FIND_LINE_STRAIGHTLEFT:
+    		if (robot.finished())
+    		{
+        		robot.move(-360);
+        		curStat = LMState.FIND_LINE_TURNRIGHT;
+    		}
+    		switchStateIfLineFound();
+    		break;
+    	default:
+    		if (curStat == LMState.STRAIGHT_LEFT || curStat == LMState.STRAIGHT_RIGHT)
+        	{
+        		float colorVal = RobotComponents.inst().getColorSensor().sample()[0];
+        		
+        		if (colorVal < param_redThreshhold)
+        		{
+        			//gui.writeLine("Lost line");
+        			robot.stop();
         			
+        			lostAngle = gyroSensor.sample()[0];
+        			searchIteration = 0;
+        			curStat = (curStat == LMState.STRAIGHT_LEFT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
         			
-
-        			//gui.writeLine("Gonna turn");
+        			if (curStat == LMState.SEARCH_LEFT)
+        			{
+        				startTurnLeft = true;
+            			//robot.turnOnSpot(param_searchAngles[searchIteration]);
+        				turnRobotDegreesGyro(param_searchAngles[searchIteration]);
+        			}
+        			else 
+        			{
+        				startTurnLeft = false;
+            			//robot.turnOnSpot(-param_searchAngles[searchIteration]);
+            			turnRobotDegreesGyro(-param_searchAngles[searchIteration]);
+        			}
+        			
         			if (param_debugWaits)
         			{
             			//gui.writeLine("Wait for DOWN");
             			while(Util.isPressed(Button.ID_DOWN) == false) {}
         			}
+        		}
+        		else if (false)
+        		{
+        			//Fährt schön geradeaus
         			
-        			if (curStat == LMState.SEARCH_LEFT)
+        			if (timeCounter >= param_timeWhenNextGyroValueIsTaken)
         			{
-        				turnDegree = lostAngle - curGyro + param_searchAngles[searchIteration];
+        				lastGyros[lastGyrosIndex] = gyroSensor.sample()[0];
+        				lastGyrosIndex++;
+        				if (lastGyrosIndex >= lastGyros.length)
+        				{
+        					lastGyrosIndex = 0;
+        				}
+        				
+        				float relTurn = 0f;
+        				
+        				float fac = 1f;
+        				
+        				for (int i = lastGyrosIndex + lastGyros.length; i > lastGyrosIndex; i--)
+        				{
+        					float first = lastGyros[(i) % lastGyros.length];
+        					float second = lastGyros[(i - 1) % lastGyros.length];
+        					relTurn += (first - second) * fac;
+
+        					fac *= 0.5f;
+        				}
+        				
+        				gui.setVarValue(0, relTurn);
+
+    					//robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+
+    	    			//robot.forward();
+        			}
+        		}
+        	}
+        	
+        	if (curStat == LMState.SEARCH_LEFT || curStat == LMState.SEARCH_RIGHT)
+        	{
+        		float colorNow = colorSensor.sample()[0];
+        		
+        		if (colorNow > param_redThreshhold)
+        		{
+        			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_RIGHT : LMState.STRAIGHT_LEFT);
+        			
+
+        			//gui.writeLine("Found line");
+        			if (param_debugWaits)
+        			{
+            			//gui.writeLine("Wait for DOWN");
+            			while(Util.isPressed(Button.ID_DOWN) == false) {}
+        			}
+
+        			lastAngle = gyroSensor.sample()[0];
+        			float estimatedDiff = lastAngle - preLastAngle;
+        			estimatedDiff *= 0.002f;
+        			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
+
+        			preLastAngle = lastAngle;
+        			
+        	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+        	        //robot.setSpeed(1f, 1f);
+
+        	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
+        			robot.forward();
+        		}
+        		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
+        		{
+        			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
+        			
+        			if (curStat == LMState.SEARCH_RIGHT && startTurnLeft == false
+        				|| curStat == LMState.SEARCH_LEFT && startTurnLeft)
+        			{
+        				searchIteration++;
+        			}
+        			
+        			if (searchIteration >= param_searchAngles.length)
+        			{
+        				curStat = LMState.SEARCH_LINE_END;
         			}
         			else
         			{
-        				turnDegree = lostAngle - curGyro - param_searchAngles[searchIteration];
-        			}
+        				float curGyro = gyroSensor.sample()[0];
+            			float turnDegree = param_searchAngles[searchIteration];
+            			
+            			
 
-        			//robot.turnOnSpot(turnDegree);
-        			//turnRobotDegrees(turnDegree);
-        			turnRobotDegreesGyro(turnDegree);
+            			//gui.writeLine("Gonna turn");
+            			if (param_debugWaits)
+            			{
+                			//gui.writeLine("Wait for DOWN");
+                			while(Util.isPressed(Button.ID_DOWN) == false) {}
+            			}
+            			
+            			if (curStat == LMState.SEARCH_LEFT)
+            			{
+            				turnDegree = lostAngle - curGyro + param_searchAngles[searchIteration];
+            			}
+            			else
+            			{
+            				turnDegree = lostAngle - curGyro - param_searchAngles[searchIteration];
+            			}
+
+            			//robot.turnOnSpot(turnDegree);
+            			//turnRobotDegrees(turnDegree);
+            			turnRobotDegreesGyro(turnDegree);
+        			}
+        		}
+        	}
+        	
+        	
+        	
+        	if (curStat == LMState.SEARCH_LINE_END)
+        	{
+        		//gui.writeLine("TurnToLost");
+    			if (param_debugWaits)
+    			{
+        			while(Util.isPressed(Button.ID_DOWN) == false) {}
     			}
-    		}
-    	}
-    	
-    	
-    	
-    	if (curStat == LMState.SEARCH_LINE_END)
-    	{
-    		//gui.writeLine("TurnToLost");
-			if (param_debugWaits)
-			{
-    			while(Util.isPressed(Button.ID_DOWN) == false) {}
-			}
-			
-			curStat = LMState.SEARCH_LINE_END_TURNTOLOST;
-			
-			float currAngle = gyroSensor.sample()[0];
-			
-    		turnRobotDegreesGyro(lostAngle - currAngle);
-    	}
-    	
-    	if (curStat == LMState.SEARCH_LINE_END_TURNTOLOST)
-    	{
-    		if (robot.finished())
-    		{
-    			curStat = LMState.SEARCH_360_LINESCOUNT;
-    			search360Count = 0;
-    			search360onWhite = false;
-        		//System.out.println("Start turning for 360");
-        		turnRobotDegreesGyro(lostAngle + 360);
-    		}
-    	}
-    	
-    	if (curStat == LMState.SEARCH_360_LINESCOUNT)
-    	{
-    		if (robot.finished() == false)
-    		{
-        		float colorNow = colorSensor.sample()[0];
-        		
-        		//System.out.println("CurCol=" + String.valueOf(colorNow));
-        		
-        		if (colorNow > param_redThreshhold && search360onWhite == false)
+    			
+    			curStat = LMState.SEARCH_LINE_END_TURNTOLOST;
+    			
+    			float currAngle = gyroSensor.sample()[0];
+    			
+        		turnRobotDegreesGyro(lostAngle - currAngle);
+        	}
+        	
+        	if (curStat == LMState.SEARCH_LINE_END_TURNTOLOST)
+        	{
+        		if (robot.finished())
         		{
-        			search360onWhite = true;
-        			search360Count++;
+        			curStat = LMState.SEARCH_360_LINESCOUNT;
+        			search360Count = 0;
+        			search360onWhite = false;
+            		//System.out.println("Start turning for 360");
+            		turnRobotDegreesGyro(lostAngle + 360);
+        		}
+        	}
+        	
+        	if (curStat == LMState.SEARCH_360_LINESCOUNT)
+        	{
+        		if (robot.finished() == false)
+        		{
+            		float colorNow = colorSensor.sample()[0];
+            		
+            		//System.out.println("CurCol=" + String.valueOf(colorNow));
+            		
+            		if (colorNow > param_redThreshhold && search360onWhite == false)
+            		{
+            			search360onWhite = true;
+            			search360Count++;
+            		}
+            		else
+            		{
+            			search360onWhite = false;
+            		}
         		}
         		else
         		{
-        			search360onWhite = false;
+        			robot.stop();
+        			//gui.writeLine("Lines: " + search360Count);
+        			
+        			curStat = LMState.STOP;
         		}
-    		}
-    		else
-    		{
-    			robot.stop();
-    			//gui.writeLine("Lines: " + search360Count);
-    			
-    			curStat = LMState.STOP;
-    		}
+        	}
+    		break;
     	}
+    	
     	
     	
     	
@@ -355,4 +418,15 @@ public class LineMovingIIt1 implements ParcourState {
     	robot.turnOnSpot(degrees, 20f);
     	//robot.turnOnSpotFastBy(degrees);
     }
+    
+    private void switchStateIfLineFound()
+    {
+		float colorNow = colorSensor.sample()[0];
+		
+		if (colorNow > param_redThreshhold)
+		{
+			curStat = LMState.SEARCH_LEFT;
+		}
+    }
+    
 }
