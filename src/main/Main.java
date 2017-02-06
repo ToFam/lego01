@@ -5,6 +5,7 @@ import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.modes.ColorSensorMode;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
@@ -41,6 +42,7 @@ public class Main {
         
         this.states = new ParcourState[] {
         		new SuspBridgeState(robot),
+        		new LineMovingIIt1(robot),			// Linie nach Labyrinth
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot),			// Linie nach Labyrinth
     		new HumpbackBridgeState(robot),		// Große Brücke
@@ -85,6 +87,8 @@ public class Main {
     	boolean backToMenu = false;
     	int btn;
     	
+    	RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+    	
     	// Main Menu Loop
         while (true) {
             mainMenu.repaint();
@@ -125,6 +129,10 @@ public class Main {
 	                }
 	                else if (states[state].changeOnBarcode() && barcode())
 	                {
+	                	robot.stop();
+	        			while(Util.isPressed(Button.ID_DOWN) == false) {}
+	                	
+	                	onLine = true;
 	                	// Barcode excepted and detected, change to next state
 	    	            states[state].reset();
 	    	            if (state < states.length - 1)
