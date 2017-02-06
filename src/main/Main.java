@@ -138,9 +138,6 @@ public class Main {
 	                }
 	                else if (states[state].changeImmediately() || (states[state].changeOnBarcode() && barcode()))
 	                {
-	                	robot.stop();
-	        			while(Util.isPressed(Button.ID_DOWN) == false) {}
-	                	
 	                	onLine = true;
 	                	// Barcode excepted and detected, change to next state
 	    	            states[state].reset();
