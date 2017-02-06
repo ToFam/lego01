@@ -51,23 +51,23 @@ public class Robot
 	    action.update();
 	}
 	
-	public void raiseUV() {
-		if (!this.UVisUp()) {
+	public void raiseUS() {
+		if (!this.USisUp()) {
 			RobotComponents.inst().getMediumMotor().rotate(-210, true);
 		}
 	}
 	
-	public boolean UVisUp() {
+	public boolean USisUp() {
 		return Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) < 2;
 	}
 	
-	public void lowerUV() {
-		if (!this.UVisDown()) {
+	public void lowerUS() {
+		if (!this.USisDown()) {
 			RobotComponents.inst().getMediumMotor().rotate(210, true);
 		}
 	}
 	
-	public boolean UVisDown() {
+	public boolean USisDown() {
 		return Math.abs(RobotComponents.inst().getMediumMotor().getTachoCount()) > 208;
 	}
 	

@@ -77,6 +77,11 @@ public class SwampState implements ParcourState {
 		            return;
 				}
 				
+				if (this.time < 200) {
+					this.time += elapsedTime;
+					return;
+				}
+				
 				this.correction = (this.distance - 0.05f) * 8f;
                 robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
 	            robot.forward();

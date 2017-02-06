@@ -102,7 +102,7 @@ public class HumpbackBridgeState implements ParcourState {
 		
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
 		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
-		this.robot.lowerUV();
+		this.robot.lowerUS();
 		
 		this.robot.setSpeed(this.SPEED_MAX);
 		this.robot.forward();
@@ -171,10 +171,10 @@ public class HumpbackBridgeState implements ParcourState {
 			
 			if (this.distance > .5f)
 			{
-				this.robot.lowerUV();
+				this.robot.lowerUS();
 				this.robot.setSpeed(this.SPEED_MAX);
 				this.robot.forward();
-				while (!this.robot.UVisDown()) {}
+				while (!this.robot.USisDown()) {}
 				this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 			}
 			else
@@ -230,10 +230,10 @@ public class HumpbackBridgeState implements ParcourState {
 
 	@Override
 	public void reset() {
-		this.robot.raiseUV();
+		this.robot.raiseUS();
 		this.robot.stop();
 		
-		while (!this.robot.UVisUp()) {}
+		while (!this.robot.USisUp()) {}
 	}
 	
 	private void slowDownLeftMotor() {

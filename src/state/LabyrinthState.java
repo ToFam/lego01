@@ -69,8 +69,8 @@ public class LabyrinthState implements ParcourState
         RobotComponents.inst().getUS().setMedianFilter(100);
         robot.setSpeed(STANDARD_SPEED);
         
-        if (!robot.UVisUp())
-            robot.raiseUV();
+        if (!robot.USisUp())
+            robot.raiseUS();
         robot.forward();
         gui = new LCDGui(2, 1);
         state = State.FOLLOW;
