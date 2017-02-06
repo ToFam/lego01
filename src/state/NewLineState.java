@@ -54,6 +54,12 @@ public class NewLineState implements ParcourState {
 	}
     
     @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
+    
+    @Override
     public void init() {
         gui = new LCDGui(2, 2);
         

@@ -41,6 +41,12 @@ public class LineSlowMode implements ParcourState {
 		return true;
 	}
     
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
+    
     public void reset() {
         
     }

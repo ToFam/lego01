@@ -43,6 +43,12 @@ public class TestState implements ParcourState {
 	{
 		return true;
 	}
+    
+    @Override
+    public boolean changeImmediately()
+    {
+        return false;
+    }
 
     
     int timer = 0;
