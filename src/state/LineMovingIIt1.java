@@ -340,6 +340,7 @@ public class LineMovingIIt1 implements ParcourState {
     
     private void turnRobotDegreesGyro(float degrees)
     {
-    	robot.turnOnSpot(degrees);
+    	//robot.turnOnSpot(degrees);
+    	robot.turnOnSpotFastBy(degrees);
     }
 }

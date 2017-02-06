@@ -5,6 +5,7 @@ import robot.RobotComponents;
 public class TurnOnSpotFast implements RobotAction {
     
     private float deg;
+    private boolean turnBy = false;
     
     private float speedLeft = 0.f;
     private float speedRight = 0.f;
@@ -16,9 +17,10 @@ public class TurnOnSpotFast implements RobotAction {
     
     private static final float turnOnSpot_stopBeforeAngle = 15f;
     
-    public TurnOnSpotFast(float destinyDegree, float speedLeft, float speedRight)
+    public TurnOnSpotFast(float destinyDegree, float speedLeft, float speedRight, boolean turnBy)
     {
         deg = destinyDegree;
+        this.turnBy = turnBy;
         this.speedLeft = speedLeft;
         this.speedRight = speedRight;
     }
@@ -41,7 +43,14 @@ public class TurnOnSpotFast implements RobotAction {
         RobotComponents.inst().getLeftMotor().setSpeed(speedLeft);
         RobotComponents.inst().getRightMotor().setSpeed(speedRight);
         gyroValue = RobotComponents.inst().getGyroSensor().sample()[0];
-        goalValue = /*gyroValue + */deg;
+        if (turnBy)
+        {
+            goalValue = gyroValue + deg;
+        }
+        else
+        {
+            goalValue = /*gyroValue + */deg;
+        }
         goalGreater = gyroValue < goalValue;
         
         float addition = goalGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;

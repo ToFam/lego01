@@ -26,7 +26,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_robotSpeedOnRampUp = 0.6f;
     private float param_robotSpeedOnBridge = 1f;
     private float param_robotRetreatSpeed = 0.6f;
-    private float param_goalDistance = 0.087f;
+    private float param_goalDistance = 0.1f;
     private float param_goalDistanceRampUp = 0.058f;
     private float param_uvReachedTopOfRamp = 0.09f;
     private float param_kpStraight = 32f * 1.3f;
@@ -41,7 +41,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_uvCatchRobotAtEndWhenUnder = 0.2f;
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
-    private boolean param_debugWaits = false;
+    private boolean param_debugWaits = true;
 
     private boolean end_of_line = false;
     
@@ -246,6 +246,7 @@ public class SuspBridgeState implements ParcourState {
     	case WAIT_FOR_ADJUSTANCE:
     		if (robot.finished())
     		{
+    			gui.setVarValue(1,  gyroSensor.sample()[0], 5);
     			gui.writeLine("Adjusted");
     			if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
     			
@@ -290,8 +291,8 @@ public class SuspBridgeState implements ParcourState {
             }
     		break;
     	case PRE_END:
-    		Sound.setVolume(100);
-    		Sound.beepSequenceUp();
+    		//Sound.setVolume(100);
+    		//Sound.beepSequenceUp();
     		
     		state = S_SuspBridgeState.END;
     		break;

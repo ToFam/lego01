@@ -202,7 +202,18 @@ public class Robot
 	 */
 	public void turnOnSpotFast(float destinyDegree)
 	{
-		action = new TurnOnSpotFast(destinyDegree, speedLeft, speedRight);
+		action = new TurnOnSpotFast(destinyDegree, speedLeft, speedRight, false);
+		action.start();
+	}
+
+	/**
+	 * Turn the Robot pretty fast but not exactly around its axis.
+	 * 
+	 * @param degree Makes the Robot turn by the given degree count.
+	 */
+	public void turnOnSpotFastBy(float degree)
+	{
+		action = new TurnOnSpotFast(degree, speedLeft, speedRight, true);
 		action.start();
 	}
 	

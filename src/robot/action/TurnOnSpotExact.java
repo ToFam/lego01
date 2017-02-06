@@ -15,6 +15,7 @@ public class TurnOnSpotExact implements RobotAction {
     private boolean finished;
     
     private static final float turnOnSpot_slowSpeedFactor = 0.3f;
+    private static final float turnOnSpot_stopBeforeAngle = 1.5f;
     
     public TurnOnSpotExact(float destinyDegree, float speedLeft, float speedRight)
     {
@@ -44,8 +45,8 @@ public class TurnOnSpotExact implements RobotAction {
         goalValue = /*gyroValue + */deg;
         goalGreater = gyroValue < goalValue;
         
-        //float addition = goalGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
-        //goalValue += addition;
+        float addition = goalGreater ? -turnOnSpot_stopBeforeAngle : turnOnSpot_stopBeforeAngle;
+        goalValue += addition;
         
         if (goalGreater)
         {
