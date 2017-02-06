@@ -23,12 +23,12 @@ public class LineMovingIIt1 implements ParcourState {
     private LCDGui gui;
     
     
-    private float param_robotMaxSpeed = 1f;
+    private float param_robotMaxSpeed = 0.85f;
     private int param_colorFilterSize = 4;
     private int param_gyroFilterSize = 4;
     private float param_redThreshhold = 0.45f;
     //private float[] param_searchAngles = new float[] {6f, 10f, 16f, 24f, 32f, 64f, 80f, 100f, 120f, 140f};
-    private float[] param_searchAngles = new float[] {8f, 18f, 40f, 100f, 120f};
+    private float[] param_searchAngles = new float[] {8f, 18f, 36f, 104f};
     //private float[] param_searchAngles = new float[] {5f, 8f, 16f, 40f, 100f, 120f};
     private float param_angleWhenToTurnWithMaxSpeed = 50f;
     private float param_minTurnSpeed = 0.5f;
@@ -36,6 +36,7 @@ public class LineMovingIIt1 implements ParcourState {
     private int param_timeWhenNextGyroValueIsTaken = 50;
     
     private float param_find_angle = 30f;
+    private int param_find_moveStraigt_distance = 360 * 2;
     private boolean param_debugWaits = false;
     
     private boolean end_of_line = false;
@@ -61,7 +62,7 @@ public class LineMovingIIt1 implements ParcourState {
     public void init() {
         //gui = new LCDGui(4, 1);
         
-        curStat = LMState.SEARCH_LEFT;
+        curStat = LMState.FIND_LINE_START;
         
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	
@@ -106,6 +107,8 @@ public class LineMovingIIt1 implements ParcourState {
     @Override
     public void update(int elapsedTime) {
 
+    	gui.setVarValue(0, String.valueOf(gyroSensor.sample()[0]), 5);
+    	
     	timeCounter += elapsedTime;
     	
     	switch (curStat)
@@ -113,14 +116,24 @@ public class LineMovingIIt1 implements ParcourState {
     	case FIND_LINE_START:
     		gyroStartFindValue = gyroSensor.sample()[0];
     		robot.turnOnSpot(param_find_angle);
+        	gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
     		
+    		//gui.writeLine("Short straight");
+    		//robot.stop();
+			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+			
     		curStat = LMState.FIND_LINE_SHORT_STRAIGHT;
     		switchStateIfLineFound();
     		break;
     	case FIND_LINE_SHORT_STRAIGHT:
     		if (robot.finished())
     		{
-        		robot.move(-180);
+        		robot.move(-param_find_moveStraigt_distance / 2);
+        		
+        		//gui.writeLine("Turn right");
+        		//robot.stop();
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
         		curStat = LMState.FIND_LINE_TURNRIGHT;
     		}
     		switchStateIfLineFound();
@@ -130,16 +143,28 @@ public class LineMovingIIt1 implements ParcourState {
     		{
     			float curGyro = gyroSensor.sample()[0];
     			float toTurn = gyroStartFindValue - curGyro - param_find_angle;
+            	gui.setVarValue(2, String.valueOf(toTurn), 5);
     			
         		robot.turnOnSpot(toTurn);
-        		curStat = LMState.FIND_LINE_TURNRIGHT;
+        		
+        		//gui.writeLine("Straight right");
+        		//robot.stop();
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
+        		curStat = LMState.FIND_LINE_STRAIGTRIGHT;
     		}
     		switchStateIfLineFound();
     		break;
     	case FIND_LINE_STRAIGTRIGHT:
     		if (robot.finished())
     		{
-        		robot.move(-360);
+    			robot.setSpeed(param_robotMaxSpeed);
+        		robot.move(-param_find_moveStraigt_distance);
+        		
+        		//gui.writeLine("Turn left");
+        		//robot.stop();
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
         		curStat = LMState.FIND_LINE_TURNLEFT;
     		}
     		switchStateIfLineFound();
@@ -151,6 +176,11 @@ public class LineMovingIIt1 implements ParcourState {
     			float toTurn = gyroStartFindValue - curGyro + param_find_angle;
     			
         		robot.turnOnSpot(toTurn);
+        		
+        		//gui.writeLine("Straight left");
+        		//robot.stop();
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
         		curStat = LMState.FIND_LINE_STRAIGHTLEFT;
     		}
     		switchStateIfLineFound();
@@ -158,7 +188,13 @@ public class LineMovingIIt1 implements ParcourState {
     	case FIND_LINE_STRAIGHTLEFT:
     		if (robot.finished())
     		{
-        		robot.move(-360);
+    			robot.setSpeed(param_robotMaxSpeed);
+        		robot.move(-param_find_moveStraigt_distance);
+        		
+        		//gui.writeLine("Turn right");
+        		//robot.stop();
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			
         		curStat = LMState.FIND_LINE_TURNRIGHT;
     		}
     		switchStateIfLineFound();
@@ -260,8 +296,10 @@ public class LineMovingIIt1 implements ParcourState {
         	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
         			robot.forward();
         		}
-        		else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
+        		//else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
+        		else if (robot.finished())
         		{
+        			//robot.setSpeed(param_robotMaxSpeed);
         			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.SEARCH_LEFT : LMState.SEARCH_RIGHT);
         			
         			if (curStat == LMState.SEARCH_RIGHT && startTurnLeft == false
@@ -284,7 +322,6 @@ public class LineMovingIIt1 implements ParcourState {
             			//gui.writeLine("Gonna turn");
             			if (param_debugWaits)
             			{
-                			//gui.writeLine("Wait for DOWN");
                 			while(Util.isPressed(Button.ID_DOWN) == false) {}
             			}
             			
@@ -415,6 +452,7 @@ public class LineMovingIIt1 implements ParcourState {
     
     private void turnRobotDegreesGyro(float degrees)
     {
+    	//robot.setSpeed(1f);
     	robot.turnOnSpot(degrees, 20f);
     	//robot.turnOnSpotFastBy(degrees);
     }
