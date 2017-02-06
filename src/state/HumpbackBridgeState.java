@@ -85,8 +85,8 @@ public class HumpbackBridgeState implements ParcourState {
 	public void init() {
 		
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-		RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
-		RobotComponents.inst().getUV().setMedianFilter(1);
+		RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+		RobotComponents.inst().getUS().setMedianFilter(1);
 		RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
 		
 		this.angle_no_cliff = RobotComponents.inst().getGyroSensor().sample()[0];
@@ -166,7 +166,7 @@ public class HumpbackBridgeState implements ParcourState {
 		case FOLLOW_PLANK:
 			
 			do {
-				this.distance = RobotComponents.inst().getUV().sample()[0];
+				this.distance = RobotComponents.inst().getUS().sample()[0];
 			} while (this.distance == Float.POSITIVE_INFINITY);
 			
 			if (this.distance > .5f)
@@ -205,7 +205,7 @@ public class HumpbackBridgeState implements ParcourState {
 			}
 			
 			do {
-				this.distance = RobotComponents.inst().getUV().sample()[0];
+				this.distance = RobotComponents.inst().getUS().sample()[0];
 			} while (this.distance == Float.POSITIVE_INFINITY && this.distance >= 1.f);
 			
 			if (this.distance > this.THRESHOLD_NO_GROUND) {

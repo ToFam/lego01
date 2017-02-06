@@ -14,7 +14,7 @@ import sensor.ColorSensor;
 import sensor.GyroSensor;
 import sensor.TouchSensorAThread;
 import sensor.TouchSensorBThread;
-import sensor.UVSensor;
+import sensor.USSensor;
 
 /**
  * 
@@ -35,7 +35,7 @@ public final class RobotComponents {
 	private GyroSensor gyros = null;
 	private TouchSensorAThread touchA = null;
 	private TouchSensorBThread touchB = null;
-	private UVSensor uv = null;
+	private USSensor uv = null;
 	
 	private static RobotComponents instance;
 	
@@ -84,12 +84,12 @@ public final class RobotComponents {
 	 * Returns the ultrasonic sensor.
 	 * @return the ultrasonic sensor.
 	 */
-	public synchronized UVSensor getUV() {
+	public synchronized USSensor getUS() {
 	    if (uv == null)
 	    {
 	    	try
 	    	{
-		        uv = new UVSensor(new EV3UltrasonicSensor(SensorPort.S1));
+		        uv = new USSensor(new EV3UltrasonicSensor(SensorPort.S1));
 		        uv.start();
 	    	}
 	    	catch (IllegalArgumentException exception)

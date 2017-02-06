@@ -28,8 +28,8 @@ public class TestDriveLTWall implements ParcourState {
     @Override
     public void init() {
         robot.setSpeed(1f);
-        RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
-        RobotComponents.inst().getUV().setMedianFilter(1000);
+        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUS().setMedianFilter(1000);
         
         gui = new LCDGui(4, 2);
     }
@@ -53,9 +53,9 @@ public class TestDriveLTWall implements ParcourState {
     public void update(int elapsedTime) {
 
     	if (oldDistance == 0.0f)
-    		oldDistance = RobotComponents.inst().getUV().sample()[0];
+    		oldDistance = RobotComponents.inst().getUS().sample()[0];
     	
-    	float diff = RobotComponents.inst().getUV().sample()[0] - oldDistance;
+    	float diff = RobotComponents.inst().getUS().sample()[0] - oldDistance;
     	
     	diff *= turnFactor;
     	
@@ -63,8 +63,8 @@ public class TestDriveLTWall implements ParcourState {
     	robot.forward();
     	
     	
-    	gui.setVarValue(0, RobotComponents.inst().getUV().sample()[0]);
-    	gui.setVarValue(1, RobotComponents.inst().getUV().instSample()[0]);
+    	gui.setVarValue(0, RobotComponents.inst().getUS().sample()[0]);
+    	gui.setVarValue(1, RobotComponents.inst().getUS().instSample()[0]);
     	gui.setVarValue(2, diff);
     	
     	

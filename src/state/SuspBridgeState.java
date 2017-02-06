@@ -8,7 +8,7 @@ import robot.RobotComponents;
 import sensor.ColorSensor;
 import sensor.GyroSensor;
 import sensor.TouchSensorBThread;
-import sensor.UVSensor;
+import sensor.USSensor;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import sensor.modes.UVSensorMode;
@@ -70,14 +70,14 @@ public class SuspBridgeState implements ParcourState {
 
         RobotComponents.inst().getTouchSensorB().setMode(0);
         
-        RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
-        RobotComponents.inst().getUV().setMedianFilter(param_uvFilterSize);
+        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUS().setMedianFilter(param_uvFilterSize);
         
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
         
         gyroSensor = RobotComponents.inst().getGyroSensor();
-        uvSensor = RobotComponents.inst().getUV();
+        uvSensor = RobotComponents.inst().getUS();
         touchSensor = RobotComponents.inst().getTouchSensorB();
 
 		robot.forward();
@@ -93,7 +93,7 @@ public class SuspBridgeState implements ParcourState {
     }
     
     private GyroSensor gyroSensor;
-    private UVSensor uvSensor;
+    private USSensor uvSensor;
     private TouchSensorBThread touchSensor;
     
     private S_SuspBridgeState state;

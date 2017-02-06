@@ -2,9 +2,9 @@ package sensor;
 
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
-public class UVSensor extends SensorThread {
+public class USSensor extends SensorThread {
 	
-	public UVSensor(EV3UltrasonicSensor sensor) {
+	public USSensor(EV3UltrasonicSensor sensor) {
 		super(sensor);
 	}
 	

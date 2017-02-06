@@ -65,8 +65,8 @@ public class LabyrinthState implements ParcourState
     {
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getTouchSensorB();
-        RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
-        RobotComponents.inst().getUV().setMedianFilter(100);
+        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUS().setMedianFilter(100);
         robot.setSpeed(STANDARD_SPEED);
         
         if (!robot.UVisUp())
@@ -111,7 +111,7 @@ public class LabyrinthState implements ParcourState
             }
             else
             {
-                float samp = RobotComponents.inst().getUV().sample()[0];
+                float samp = RobotComponents.inst().getUS().sample()[0];
                 
                 float max_turn = 0.8f;
                 
