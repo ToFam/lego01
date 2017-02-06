@@ -1,8 +1,5 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
@@ -11,7 +8,6 @@ import robot.RobotComponents;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
-import state.LineSlowMode;
 import state.LineState;
 import state.ParcourState;
 import state.SuspBridgeState;
@@ -36,7 +32,9 @@ public class Main {
     private final String[] elements;
     private int state;
     
-    private float sample_old;
+    private static final float COLOR_THRESHOLD = 0.9f;
+    private boolean onLine;
+    private float colorSample;
     
     public Main() {
         this.robot = new Robot();
@@ -67,7 +65,8 @@ public class Main {
         
         this.mainMenu = new LCDChooseList(elements);
         this.state = 0;
-        this.sample_old = 0.f;
+        this.colorSample = 0.f;
+        this.onLine = false;
     }
     
     /**
@@ -76,13 +75,9 @@ public class Main {
      */
     public boolean barcode()
     {
-    	// TODO: Set values accordingly
-    	if (sample_old == 0 && (sample_old = RobotComponents.inst().getColorSensor().sample()[0]) > 5.f)
-    	{
-    		return true;
-    	}
+    	colorSample = 4.f / 5.f * colorSample + 1.f / 5.f * RobotComponents.inst().getColorSensor().sample()[0];
     	
-    	return false;
+    	return colorSample > COLOR_THRESHOLD;
     }
     
     public void run()
@@ -120,7 +115,15 @@ public class Main {
 	                robot.update();
 	                states[state].update(50);
 	                
-	                if (states[state].changeOnBarcode() && barcode())
+	                if (onLine)
+	                {
+	                    if (!barcode())
+	                    {
+	                        onLine = false;
+	                        colorSample = 0.f;
+	                    }
+	                }
+	                else if (states[state].changeOnBarcode() && barcode())
 	                {
 	                	// Barcode excepted and detected, change to next state
 	    	            states[state].reset();
