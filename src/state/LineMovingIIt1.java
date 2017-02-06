@@ -72,14 +72,14 @@ public class LineMovingIIt1 implements ParcourState {
         
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	
-        RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 1f);
-        RobotComponents.inst().getMediumMotor().resetTachoCount();
+        //RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 1f);
+        //RobotComponents.inst().getMediumMotor().resetTachoCount();
         
-        RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
-        RobotComponents.inst().getColorSensor().setMedianFilter(param_colorFilterSize);
+        //RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+        //RobotComponents.inst().getColorSensor().setMedianFilter(param_colorFilterSize);
         
-        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
+        //RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+        //RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
         
         colorSensor = RobotComponents.inst().getColorSensor();
         gyroSensor = RobotComponents.inst().getGyroSensor();
@@ -91,7 +91,7 @@ public class LineMovingIIt1 implements ParcourState {
     }
     
     public void reset() {
-        RobotComponents.inst().getMediumMotor().rotateTo(0, true);
+        //RobotComponents.inst().getMediumMotor().rotateTo(0, true);
     }
     
     private ColorSensor colorSensor;

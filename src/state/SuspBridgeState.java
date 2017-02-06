@@ -75,13 +75,13 @@ public class SuspBridgeState implements ParcourState {
     	
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
 
-        RobotComponents.inst().getTouchSensorB().setMode(0);
+        //RobotComponents.inst().getTouchSensorB().setMode(0);
         
-        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
-        RobotComponents.inst().getUS().setMedianFilter(param_uvFilterSize);
+        //RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+        //RobotComponents.inst().getUS().setMedianFilter(param_uvFilterSize);
         
-        RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
+        //RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
+        //RobotComponents.inst().getGyroSensor().setMedianFilter(param_gyroFilterSize);
         
         gyroSensor = RobotComponents.inst().getGyroSensor();
         uvSensor = RobotComponents.inst().getUS();
