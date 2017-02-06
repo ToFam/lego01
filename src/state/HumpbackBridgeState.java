@@ -180,8 +180,8 @@ public class HumpbackBridgeState implements ParcourState {
 			else
 			{
 				this.correction = (this.distance - 0.08f) * 8f;
-                robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
-	            robot.forward();
+                this.robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
+	            this.robot.forward();
 			}
 			
 			break;
