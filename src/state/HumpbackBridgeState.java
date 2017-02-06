@@ -5,7 +5,6 @@ import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import sensor.modes.UVSensorMode;
-import state.LabyrinthState.State;
 import util.lcdGui.LCDGui;
 
 public class HumpbackBridgeState implements ParcourState {
@@ -36,6 +35,7 @@ public class HumpbackBridgeState implements ParcourState {
 	private float correction;
 
 	private float color;
+	private int debug;
 	
 	private enum BridgeSegment {
 		PRE_COLLISION,
@@ -43,6 +43,7 @@ public class HumpbackBridgeState implements ParcourState {
 		POST_COLLISION,
 		FOLLOW_PLANK,
 		ENTIRE_BRIDGE,
+		BRIDGE_TRAVERSED,
 		TEST_SENSOR,
 	}
 	
@@ -51,23 +52,23 @@ public class HumpbackBridgeState implements ParcourState {
 		this.gui = new LCDGui(3, 1);
 		this.SPEED_MAX = 1f;
 		this.SPEED_MIN_LEFT = .6f;
-		this.SPEED_MIN_RIGHT = .5f;
-		this.MINUS_LEFT_DELTA = .3f;
-		this.MINUS_RIGHT_DELTA = .5f;
-		this.TURN_INCREASE = 0.05f;
+		this.SPEED_MIN_RIGHT = .2f;
+		this.MINUS_LEFT_DELTA = .5f;
+		this.MINUS_RIGHT_DELTA = .8f;
+		this.TURN_INCREASE = 0.2f;
 //		this.TURN_INCREASE = 0.00f;
 		this.turn_delta = 0.f;
 		this.THRESHOLD_NO_GROUND = .04f;
 		
-		this.GYRO_ALARM = 3;
-		this.angles = new float[50];
+		this.GYRO_ALARM = 4;
+		this.angles = new float[200];
 		this.turning = false;
 		this.correction = 0.f;
 		
 		this.color = 0.f;
+		this.debug = 0;
 	}
-//	timer, der cliff sieht und in liste zur ausgabe/manuelle Abstimmung ausgibt.
-//	Schärfere Linkskurve zulassen.
+	
 	@Override
 	public boolean changeOnBarcode()
 	{
@@ -101,6 +102,8 @@ public class HumpbackBridgeState implements ParcourState {
 		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 		this.robot.lowerUV();
 //		this.bridgeSegment = BridgeSegment.TEST_SENSOR;
+
+		this.debug = 0;
 		
 		this.robot.setSpeed(this.SPEED_MAX);
 		this.robot.forward();
@@ -189,12 +192,10 @@ public class HumpbackBridgeState implements ParcourState {
 			this.color = RobotComponents.inst().getColorSensor().sample()[0];
 			
 			if (this.color > 0.8f) {
+				this.bridgeSegment = BridgeSegment.BRIDGE_TRAVERSED;
 				this.robot.stop();
+				return;
 			}
-			
-			do {
-				this.distance = RobotComponents.inst().getUV().sample()[0];
-			} while (this.distance == Float.POSITIVE_INFINITY);
 			
 			if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
 				
@@ -204,20 +205,17 @@ public class HumpbackBridgeState implements ParcourState {
 				return;
 				
 			}
+			
+			do {
+				this.distance = RobotComponents.inst().getUV().sample()[0];
+			} while (this.distance == Float.POSITIVE_INFINITY);
+			
+			gui.setVarValue(0, String.valueOf(this.distance), 4);
+			gui.setVarValue(1, String.valueOf(this.color), 4);
+			gui.setVarValue(2, String.valueOf(this.angles[this.angle_old] - this.angles[this.angle_fresh]));
 
 			if (this.distance > this.THRESHOLD_NO_GROUND) {
-				
-//				if (!this.cliff) {
-//					
-////					if ((this.angle_no_cliff - this.angles[this.angle_fresh]) > 20) {
-////						RobotComponents.inst().getRightMotor().rotate(100, false);
-////					}
-//					
-//					this.turn_delta = -this.TURN_INCREASE;
-//					this.SPEED_LEFT = this.SPEED_MAX;
-//					this.cliff = true;
-//				}
-				
+								
 				this.SPEED_LEFT = this.SPEED_MAX;
 				this.slowDownRightMotor();
 			
@@ -239,6 +237,10 @@ public class HumpbackBridgeState implements ParcourState {
 		
 			break;
 			
+		case BRIDGE_TRAVERSED:
+			
+			break;
+			
 		case TEST_SENSOR:
 			
 			this.robot.stop();
@@ -257,7 +259,7 @@ public class HumpbackBridgeState implements ParcourState {
 	}
 	
 	private void slowDownLeftMotor() {
-//		this.turn_delta += this.TURN_INCREASE;
+		this.turn_delta = 0.f;
 		this.SPEED_LEFT = Math.max(this.SPEED_LEFT - this.MINUS_LEFT_DELTA - this.turn_delta, this.SPEED_MIN_LEFT);
 		robot.setSpeed(this.SPEED_LEFT, this.SPEED_RIGHT);
 		robot.forward();
