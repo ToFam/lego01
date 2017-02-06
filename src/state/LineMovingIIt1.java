@@ -17,7 +17,7 @@ public class LineMovingIIt1 implements ParcourState {
 		STRAIGHT_LEFT, STRAIGHT_RIGHT, LOST_RIGHT, LOST_LEFT, SEARCH_LEFT, SEARCH_RIGHT,
 		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP,
 		FIND_LINE_START, FIND_LINE_SHORT_STRAIGHT, FIND_LINE_TURNLEFT, FIND_LINE_TURNRIGHT, FIND_LINE_STRAIGTRIGHT, FIND_LINE_STRAIGHTLEFT,
-		END
+		END, DRIVE_OFFSET_FORWARD
 	}
 	
     private Robot robot;
@@ -38,6 +38,7 @@ public class LineMovingIIt1 implements ParcourState {
     
     private float param_find_angle = 30f;
     private int param_find_moveStraigt_distance = 360 * 2;
+    private int param_drive_down_of_barcode_distance = 450;
     private boolean param_debugWaits = false;
     
     private boolean end_of_line = false;
@@ -63,7 +64,7 @@ public class LineMovingIIt1 implements ParcourState {
     public void init() {
         //gui = new LCDGui(4, 1);
         
-        curStat = LMState.FIND_LINE_START;
+        curStat = LMState.DRIVE_OFFSET_FORWARD;
         
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
     	
@@ -114,6 +115,11 @@ public class LineMovingIIt1 implements ParcourState {
     	
     	switch (curStat)
     	{
+    	case DRIVE_OFFSET_FORWARD:
+    		robot.move(-param_drive_down_of_barcode_distance);
+
+    		curStat = LMState.FIND_LINE_START;
+    		break;
     	case FIND_LINE_START:
     		gyroStartFindValue = gyroSensor.sample()[0];
     		robot.turnOnSpot(param_find_angle);
