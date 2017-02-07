@@ -26,7 +26,7 @@ public class Endboss implements ParcourState {
     private static final float param_robotRetreatSpeed = 0.8f;
     private static final int param_timeLoweringTheCancnon = 2000;
     private static final int param_timePush = 10000;
-    private static final int param_mediumRotateAngle = 250;
+    private static final int param_mediumRotateAngle = 260;
     //private static final boolean param_debugWaits = false;
     
     public Endboss(Robot robot) {
@@ -131,11 +131,11 @@ public class Endboss implements ParcourState {
     			mediumStart = RobotComponents.inst().getMediumMotor().getTachoCount();
     			startWait(param_timeLoweringTheCancnon);
     			RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.1f);
-    			RobotComponents.inst().getMediumMotor().rotateTo(-param_mediumRotateAngle, true);
-    			state = EndbossState.LOWER_SHOOT;
+    			RobotComponents.inst().getMediumMotor().rotateTo(param_mediumRotateAngle, true);
+    			state = EndbossState.SHOOT;
     		}
     		break;
-    	case LOWER_SHOOT:
+    	/*case LOWER_SHOOT:
     	    if (!waiting(elapsedTime))
     	    {
     			RobotComponents.inst().getMediumMotor().stop();
@@ -143,12 +143,12 @@ public class Endboss implements ParcourState {
     			state = EndbossState.SHOOT;
     			startWait(500);
     		}
-    		break;
+    		break;*/
     	case SHOOT:
     	    if (!waiting(elapsedTime))
     	    {
     	        state = EndbossState.UPPER_SHOOT;
-                startWait(param_timeLoweringTheCancnon);
+                startWait(500);
     	    }
     	    break;
     	case UPPER_SHOOT:
@@ -156,7 +156,6 @@ public class Endboss implements ParcourState {
             {
                 RobotComponents.inst().getMediumMotor().stop();
                 RobotComponents.inst().getMediumMotor().rotateTo(mediumStart, true);
-                state = EndbossState.SHOOT;
                 robot.turnOnSpot(-90);
                 state = EndbossState.TURN;
             }
