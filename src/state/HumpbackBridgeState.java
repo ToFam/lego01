@@ -105,7 +105,7 @@ public class HumpbackBridgeState implements ParcourState {
 		this.robot.lowerUS();
 		
 		this.robot.setSpeed(this.SPEED_MAX);
-		this.robot.forward();
+		this.robot.stop();
 		
 	}
 
@@ -178,6 +178,12 @@ public class HumpbackBridgeState implements ParcourState {
 		case ON_BARCODE:
 			
 			this.gui.setVarValue(0, "ON_BARCODE");
+			
+			if (!this.robot.USisDown()) {
+				return;
+			}
+			
+			this.robot.forward();
 			
 			this.color = RobotComponents.inst().getColorSensor().sample()[0];
 			this.time += elapsedTime;
