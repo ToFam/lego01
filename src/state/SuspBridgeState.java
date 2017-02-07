@@ -21,7 +21,7 @@ public class SuspBridgeState implements ParcourState {
 	
 	public enum S_SuspBridgeState {
 		BEFORE_DOTS, RETREAT, TURNING, HOLD_DISTANCE, ON_SUSP_RAMP_UP, WAIT_FOR_ADJUSTANCE, DRIVE_TILL_INFINITY, 
-		FULLSPEED, CATCH_AGAIN, PRE_END, END
+		FULLSPEED, CATCH_AGAIN, PRE_END, END, HOLD_DISTANCE_SHORT
 	}
 
 	
@@ -41,6 +41,7 @@ public class SuspBridgeState implements ParcourState {
     private int param_gyroFilterSize = 4;
     private int param_uvFilterSize = 4;
     private int param_timeGyroMedianOnStraight = 5000;
+    private int param_samplesGyroAverageOnSraight = 5;
     private int param_timeGyroMedianOnRamp = 3000;
     private int param_minTimeOnBridge = 5000;
     private int param_minTimeOnRampDown = 3000;
@@ -50,7 +51,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_percentCutEnd = 0.2f;
     private boolean param_debugWaits = true;
 
-    private boolean end_of_line = true;
+    private boolean end_of_line = false;
     
     public SuspBridgeState(Robot robot) {
         this.robot = robot;
@@ -71,7 +72,7 @@ public class SuspBridgeState implements ParcourState {
     
     @Override
     public void init() {
-    	state = S_SuspBridgeState.BEFORE_DOTS;
+    	state = S_SuspBridgeState.HOLD_DISTANCE_SHORT;
     	
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
 
@@ -195,6 +196,36 @@ public class SuspBridgeState implements ParcourState {
             //gui.setVarValue(0, samp);
             //gui.setVarValue(0, turn);
     		break;
+    	case HOLD_DISTANCE_SHORT:
+    		robot.setSpeed(param_robotMaxSpeed);
+    		
+    		if (straightGyrosCount < param_samplesGyroAverageOnSraight)
+    		{
+    			straightGyros[straightGyrosCount] = gyroSensor.sample()[0];
+    			straightGyrosCount++;
+    		}
+    		else if (straightAngle == Float.MAX_VALUE)
+    		{
+    			straightAngle = Util.average(straightGyros, straightGyrosCount);
+    			
+    			gui.writeLine("Saved straight");
+    			gui.writeLine("Val is: " + String.valueOf(straightAngle));
+    			
+    		}
+    		else if (Math.abs((gyroSensor.sample()[0] - straightAngle)) >= param_angleStraightToSuspBridge)
+    		{
+    			state = S_SuspBridgeState.ON_SUSP_RAMP_UP;
+    			
+    			gui.writeLine("STATE OnSuspRamp");
+    			
+    		}
+    		
+    		float samp5 = uvSensor.sample()[0];
+            
+            turn = (samp5 - param_goalDistance) * param_kpStraight;
+            robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+            robot.forward();
+    		break;
     	case ON_SUSP_RAMP_UP:
     		robot.setSpeed(param_robotSpeedOnRampUp);
     		float samp2 = uvSensor.sample()[0];
@@ -285,6 +316,7 @@ public class SuspBridgeState implements ParcourState {
     			
     			timeInfinityCounter = 0;
     			robot.stop();
+    			end_of_line = true;
     			state = S_SuspBridgeState.CATCH_AGAIN;
     		}
     		break;
@@ -297,11 +329,11 @@ public class SuspBridgeState implements ParcourState {
             robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
             robot.forward();
             
-            if (uvSensor.sample()[0] > param_uvCatchRobotAtEndWhenUnder + 0.1f && timeInfinityCounter * elapsedTime >= param_minTimeOnRampDown)
+            /*if (uvSensor.sample()[0] > param_uvCatchRobotAtEndWhenUnder + 0.1f && timeInfinityCounter * elapsedTime >= param_minTimeOnRampDown)
             {
             	state = S_SuspBridgeState.PRE_END;
             	robot.stop();
-            }
+            }*/
     		break;
     	case PRE_END:
     		//Sound.setVolume(100);
