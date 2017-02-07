@@ -21,7 +21,7 @@ public class SuspBridgeState implements ParcourState {
 	
 	public enum S_SuspBridgeState {
 		BEFORE_DOTS, RETREAT, TURNING, HOLD_DISTANCE, ON_SUSP_RAMP_UP, WAIT_FOR_ADJUSTANCE, DRIVE_TILL_INFINITY, 
-		FULLSPEED, CATCH_AGAIN, PRE_END, END, HOLD_DISTANCE_SHORT
+		FULLSPEED, CATCH_AGAIN, PRE_END, END, HOLD_DISTANCE_SHORT, ON_DOTS
 	}
 
 	
@@ -72,7 +72,7 @@ public class SuspBridgeState implements ParcourState {
     
     @Override
     public void init() {
-    	state = S_SuspBridgeState.HOLD_DISTANCE_SHORT;
+    	state = S_SuspBridgeState.ON_DOTS;
     	
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
 
@@ -133,6 +133,12 @@ public class SuspBridgeState implements ParcourState {
                 robot.move(230);
                 state = S_SuspBridgeState.RETREAT;
     		}
+    		break;
+    	case ON_DOTS:
+            robot.stop();
+            robot.setSpeed(param_robotRetreatSpeed);
+            robot.move(230);
+            state = S_SuspBridgeState.RETREAT;
     		break;
     	case RETREAT:
     		if (robot.finished())
