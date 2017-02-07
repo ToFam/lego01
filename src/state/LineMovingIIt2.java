@@ -39,8 +39,8 @@ public class LineMovingIIt2 implements ParcourState {
     private float param_minTurnSpeed = 0.5f;
     private float param_maxTurnSpeed = 1f;
     private int param_timeWhenNextGyroValueIsTaken = 50;
-    private int param_angleToRecognizeFalseDirection = 160;
-    private int param_lastGyroSamplesAmountToCheckFalseDirection = 6;
+    private int param_angleToRecognizeFalseDirection = 140;
+    private int param_lastGyroSamplesAmountToCheckFalseDirection = 3;
     
     private float param_UvEndMin = 0.02f;
     private float param_UvEndMax = 0.12f;
@@ -326,28 +326,31 @@ public class LineMovingIIt2 implements ParcourState {
         				Sound.beepSequenceUp();
         				robot.stop();
         				turnRobotDegreesGyro(180);
+        				fillWithFloatMax();
         				curStat = LMState.TURN_DIRECTION;
         			}
-
-        			//gui.writeLine("Found line");
-        			if (param_debugWaits)
+        			else
         			{
-            			//gui.writeLine("Wait for DOWN");
-            			while(Util.isPressed(Button.ID_DOWN) == false) {}
+        				//gui.writeLine("Found line");
+            			if (param_debugWaits)
+            			{
+                			//gui.writeLine("Wait for DOWN");
+                			while(Util.isPressed(Button.ID_DOWN) == false) {}
+            			}
+
+            			lastAngle = gyroSensor.sample()[0];
+            			float estimatedDiff = lastAngle - preLastAngle;
+            			estimatedDiff *= 0.002f;
+            			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
+
+            			preLastAngle = lastAngle;
+            			
+            	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
+            	        //robot.setSpeed(1f, 1f);
+
+            	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
+            			robot.forward();
         			}
-
-        			lastAngle = gyroSensor.sample()[0];
-        			float estimatedDiff = lastAngle - preLastAngle;
-        			estimatedDiff *= 0.002f;
-        			estimatedDiff = estimatedDiff < -1f ? -1f : (estimatedDiff > 1f ? 1f : estimatedDiff);
-
-        			preLastAngle = lastAngle;
-        			
-        	        robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
-        	        //robot.setSpeed(1f, 1f);
-
-        	        //robot.steerFacSimonTest(estimatedDiff);//estimatedDiff);
-        			robot.forward();
         		}
         		//else if (RobotComponents.inst().getLeftMotor().isMoving() == false && RobotComponents.inst().getRightMotor().isMoving() == false)
         		else if (robot.finished())
@@ -542,15 +545,27 @@ public class LineMovingIIt2 implements ParcourState {
     	for (int i = 0; i < param_lastGyroSamplesAmountToCheckFalseDirection; i++)
     	{
     		float gyr = lastGyros[(lastGyrosIndex - i - 1 + 2 * lastGyros.length) % lastGyros.length];
-    		float absDiff = Math.abs(curGyr - gyr);
     		
-    		if (absDiff > param_angleToRecognizeFalseDirection)
+    		if (gyr != Float.MAX_VALUE)
     		{
-    			return true;
+        		float absDiff = Math.abs(curGyr - gyr);
+        		
+        		if (absDiff > param_angleToRecognizeFalseDirection)
+        		{
+        			return true;
+        		}
     		}
     	}
     	
     	return false;
+    }
+    
+    private void fillWithFloatMax()
+    {
+    	for (int i = 0; i < lastGyros.length; i++)
+    	{
+    		lastGyros[i] = Float.MAX_VALUE;
+    	}
     }
     
     private void switchStateIfLineFound()
