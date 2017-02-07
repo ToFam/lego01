@@ -50,7 +50,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
     private int param_driveTimeAfterCaught = 500;
-    private boolean param_debugWaits = true;
+    private boolean param_debugWaits = false;
 
     private boolean end_of_line = false;
     

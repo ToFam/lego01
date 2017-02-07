@@ -41,7 +41,7 @@ public class LineMovingIIt2 implements ParcourState {
     
     private float param_UvEndMin = 0.02f;
     private float param_UvEndMax = 0.12f;
-    private int param_UvTimeBetween = 600;
+    private int param_UvTimeBetween = 800;
     
     private float param_find_angle = 30f;
     private int param_find_moveStraigt_distance = 360 * 2;
@@ -442,7 +442,7 @@ public class LineMovingIIt2 implements ParcourState {
     	if (curUv >= param_UvEndMin && curUv <= param_UvEndMax)
     	{
     		uvTimeBetween += elapsedTime;
-    		if (elapsedTime >= param_UvTimeBetween)
+    		if (uvTimeBetween >= param_UvTimeBetween)
     		{
     			robot.stop();
     			change_immediately = true;
