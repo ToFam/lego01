@@ -1,11 +1,13 @@
 package state;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import robot.Robot;
 import robot.RobotComponents;
-import sensor.modes.GyroSensorMode;
-import sensor.modes.UVSensorMode;
 import util.Util;
 import util.lcdGui.LCDGui;
 
@@ -30,7 +32,7 @@ public class LabyrinthState implements ParcourState
     
     public class DeadlockDetector
     {
-        private float lastSample;
+        private List<Float> samples;
         private float elapsed;
         private float interval;
         private float minDiff;
@@ -39,12 +41,14 @@ public class LabyrinthState implements ParcourState
         {
             this.interval = interval;
             this.minDiff = minDiff;
+            samples = new LinkedList<Float>();
         }
         
         public void init()
         {
             elapsed = 0.f;
-            lastSample = RobotComponents.inst().getGyroSensor().sample()[0];
+            samples.clear();
+            samples.add(RobotComponents.inst().getGyroSensor().sample()[0]);
         }
         
         public boolean stuck(float elapsedTime)
@@ -55,13 +59,30 @@ public class LabyrinthState implements ParcourState
                 elapsed  = 0.f;
                 
                 float sample = RobotComponents.inst().getGyroSensor().sample()[0];
-                if (sample - lastSample < minDiff)
+                samples.add(sample);
+                if (samples.size() > 8)
+                    samples.remove(samples.size() - 1);
+                if (sample - samples.get(samples.size() - 2) < minDiff)
                 {
-                    lastSample = sample;
+                    LCDGui.clearLCD();
+                    for (int i = 0; i < samples.size(); i++)
+                    {
+                        LCD.drawString(String.valueOf(samples.get(i)), 2, i);
+                    }
+                    robot.stop();
+//                  while (!Util.isPressed(Button.ID_LEFT))
+//                  {
+//                      try {
+//                          Thread.sleep(100);
+//                      } catch (InterruptedException e) {
+//                          // TODO Auto-generated catch block
+//                          e.printStackTrace();
+//                      }
+//                  }
+                  LCDGui.clearLCD();
+                    
                     return true;
                 }
-                
-                lastSample = sample;
             }
             
             return false;
@@ -105,7 +126,7 @@ public class LabyrinthState implements ParcourState
     public LabyrinthState(Robot robo) 
     {
         robot = robo;
-        bernd = new DeadlockDetector(1500, 5);
+        bernd = new DeadlockDetector(2000, 5);
     }
     
 	@Override
@@ -184,7 +205,6 @@ public class LabyrinthState implements ParcourState
                         stateChangeDebug();
                         robot.setSpeed(STANDARD_SPEED);
                         robot.move(RETREAT_DEGREE);
-                        bernd.init();
                         return;
                     }
                 }
@@ -197,6 +217,7 @@ public class LabyrinthState implements ParcourState
                     robot.setSpeed(STANDARD_SPEED);
                     robot.forward();
                     turnAngle = RobotComponents.inst().getGyroSensor().sample()[0];
+                    bernd.init();
                     return;
                 }
                 
@@ -267,7 +288,7 @@ public class LabyrinthState implements ParcourState
                 if (bernd.stuck(elapsedTime))
                 {
                     robot.stop();
-                    state = State.RETREAT;
+                    state = State.RETREAT2;
                     stateChangeDebug();
                     robot.setSpeed(STANDARD_SPEED);
                     robot.move(360);
