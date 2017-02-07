@@ -13,7 +13,7 @@ public class SwampState implements ParcourState {
 	private float distance;
 	private float correction;
 	private int time;
-	private boolean inSwamp;
+	private boolean finished;
 	
 	private enum SwampSegment {
 		PRE_BARCODE,
@@ -37,9 +37,9 @@ public class SwampState implements ParcourState {
 
 		this.swampSegment = SwampSegment.BARCODE;
 		this.time = 0;
-		this.inSwamp = false;
+		this.finished = false;
 		
-		gui.setVarValue(0, this.swampSegment.toString());
+		this.gui.setVarValue(0, this.swampSegment.toString());
 		
 		this.robot.setSpeed(1.f);
 		this.robot.forward();
@@ -48,66 +48,20 @@ public class SwampState implements ParcourState {
 	@Override
 	public void update(int elapsedTime) {
 		
-		this.color = RobotComponents.inst().getColorSensor().sample()[0];
+		if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
+			this.finished = true;
+			this.robot.stop();
+			return;
+		}
 		
 		do {
 			this.distance = RobotComponents.inst().getUS().sample()[0];
 		} while (this.distance == Float.POSITIVE_INFINITY && this.distance >= 1.f);
 		
-		this.gui.setVarValue(1, String.valueOf(this.color));
+		this.correction = (this.distance - 0.08f) * 8f;
+        robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
+        robot.forward();
 		
-		switch (this.swampSegment) {
-			case PRE_BARCODE:
-				
-				if (this.color > 0.8f) {
-					this.swampSegment = SwampSegment.BARCODE;
-					this.gui.setVarValue(0, this.swampSegment.toString());
-					return;
-				}
-				
-				this.correction = (this.distance - 0.05f) * 8f;
-                robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
-	            robot.forward();
-	            
-				break;
-				
-			case BARCODE:
-				
-				if (this.color < 0.8f) {
-					this.swampSegment = SwampSegment.POST_BARCODE;
-					this.inSwamp = true;
-					this.gui.setVarValue(0, this.swampSegment.toString());
-					return;
-				}
-				
-				this.correction = (this.distance - 0.05f) * 8f;
-				this.robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
-				this.robot.forward();
-				
-				break;
-				
-			case POST_BARCODE:
-				
-				if (this.color > 0.8f) {
-//					this.finished = true;
-					this.swampSegment = SwampSegment.DO_NOTHING;
-					
-					this.robot.stop();
-		            
-		            return;
-				}
-				
-				this.correction = (this.distance - 0.03f) * 8f;
-				this.robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
-				this.robot.forward();
-				
-				break;
-				
-			case DO_NOTHING:
-				
-				break;
-				
-		}
 	}
 
 	@Override
@@ -116,12 +70,12 @@ public class SwampState implements ParcourState {
 
 	@Override
 	public boolean changeOnBarcode() {
-		return inSwamp;
+		return false;
 	}
 
 	@Override
 	public boolean changeImmediately() {
-		return false;
+		return this.finished;
 	}
 	
 }
