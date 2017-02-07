@@ -155,7 +155,7 @@ public class HumpbackBridgeState implements ParcourState {
 			break;
 		case ENTIRE_BRIDGE:
 			
-			if (rampUpCount * elapsedTime > 4000)
+			if (rampUpAngle == Float.MAX_VALUE && rampUpCount * elapsedTime > 6000)
 			{
 				rampUpAngle = Util.average(rampUpAngles, rampUpCount);
 				gui.writeLine("Set Average!");
@@ -186,7 +186,7 @@ public class HumpbackBridgeState implements ParcourState {
 				return;
 				
 			}*/
-			if (rampUpAngle != Float.MAX_VALUE && Math.abs(RobotComponents.inst().getGyroSensor().sample()[0] - rampUpAngle) > this.GYRO_ALARM)
+			if (rampUpAngle != Float.MAX_VALUE && rampUpAngle - RobotComponents.inst().getGyroSensor().sample()[0] > this.GYRO_ALARM)
 			{
 				robot.turnOnSpotExact(rampUpAngle);
 				bridgeSegment = BridgeSegment.WAIT_SHORT_TO_TURN;

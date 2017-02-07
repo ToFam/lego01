@@ -9,6 +9,7 @@ import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import sensor.modes.UVSensorMode;
+import state.BridgeTest;
 import state.Endboss;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
@@ -56,7 +57,7 @@ public class Main {
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
-    		new HumpbackBridgeState(robot),		// Grosse Brucke
+    		new BridgeTest(robot),		// Grosse Brucke
     		new LineMovingIIt1(robot, true),			// Linie nach Brucke
     		new LineMovingIIt1(robot, true),			// Linie nach Brucke
     		new LineMovingIIt2(robot, false),			// Linie nach Brucke
