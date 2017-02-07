@@ -176,6 +176,7 @@ public class LabyrinthState implements ParcourState
         case RETREAT2:
             if (robot.finished())
             {
+                last_samp = DISTANCE_SHOULD;
                 state = State.ROTATE;
                 stateChangeDebug();
                 robot.turnOnSpot(-20);
