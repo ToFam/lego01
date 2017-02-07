@@ -8,23 +8,16 @@ public class SwampState implements ParcourState {
 
 	private Robot robot;
 	private LCDGui gui;
-	private SwampSegment swampSegment;
-	private float color;
-	private float distance;
+	private float[] distances;
+	private int distance_fresh;
+	private int distance_old;
+	private float recommended;
 	private float correction;
-	private int time;
 	private boolean finished;
-	
-	private enum SwampSegment {
-		PRE_BARCODE,
-		BARCODE,
-		POST_BARCODE,
-		DO_NOTHING,
-	}
 	
 	public SwampState(Robot robot) {
 		this.robot = robot;
-		this.gui = new LCDGui(2, 1);
+		this.gui = new LCDGui(1, 1);
 	}
 
 	@Override
@@ -35,11 +28,16 @@ public class SwampState implements ParcourState {
 	@Override
 	public void init() {
 
-		this.swampSegment = SwampSegment.BARCODE;
-		this.time = 0;
 		this.finished = false;
 		
-		this.gui.setVarValue(0, this.swampSegment.toString());
+		this.distances = new float[3];
+		this.distance_fresh = this.distances.length;
+		this.distance_old = 0;
+		this.recommended = 0.05f;
+		
+		for (int i = 1; i < this.distances.length; i++) {
+			this.distances[i] = Float.NaN;
+		}
 		
 		this.robot.setSpeed(1.f);
 		this.robot.forward();
@@ -54,12 +52,27 @@ public class SwampState implements ParcourState {
 			return;
 		}
 		
-		do {
-			this.distance = RobotComponents.inst().getUS().sample()[0];
-		} while (this.distance == Float.POSITIVE_INFINITY && this.distance >= 1.f);
+		this.distance_fresh = (this.distance_fresh + 1) % this.distances.length;
+		this.distance_old = (this.distance_old + 1) % this.distances.length;
 		
-		this.correction = (this.distance - 0.08f) * 8f;
-        robot.steer(Math.max(-0.8f, Math.min(0.8f, correction)));
+		do {
+			this.distances[this.distance_fresh] = RobotComponents.inst().getUS().sample()[0];
+		} while (this.distances[this.distance_fresh] >= 1.f);
+		
+		if (this.distances[this.distance_fresh] < 0.04f &&
+				this.distances[this.distance_old] < 0.04f) {
+			this.recommended = 0.03f;
+		}
+		
+		if (this.distances[this.distance_fresh] > 0.04f &&
+				this.distances[this.distance_old] > 0.04f) {
+			this.recommended = 0.05f;
+		}
+		
+		this.gui.setVarValue(0, this.distances[this.distance_fresh]);
+		
+		this.correction = (this.distances[this.distance_fresh] - this.recommended) * 8f;
+        robot.steer(Math.max(-0.8f, Math.min(0.5f, correction)));
         robot.forward();
 		
 	}

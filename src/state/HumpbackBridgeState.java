@@ -2,10 +2,6 @@ package state;
 
 import robot.Robot;
 import robot.RobotComponents;
-import sensor.modes.ColorSensorMode;
-import sensor.modes.GyroSensorMode;
-import sensor.modes.UVSensorMode;
-import util.lcdGui.LCDGui;
 
 public class HumpbackBridgeState implements ParcourState {
 
