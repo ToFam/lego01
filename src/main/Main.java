@@ -9,6 +9,7 @@ import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import sensor.modes.UVSensorMode;
+import state.Endboss;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
@@ -66,9 +67,9 @@ public class Main {
     		//new LabyrinthState(robot),			// Wand nach Sumpf
     		new SuspBridgeState(robot),		// Hangebrucke
     		// new BossFight(robot),			// Da Endboss
-    		
+    		new Endboss(robot)
     		//new TestDriveLTWall(robot),
-    		new TestGUI(robot),
+    		//new TestGUI(robot),
     		//new TestState(robot),
         };
         
