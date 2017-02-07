@@ -1,20 +1,10 @@
 package state;
 
-import lejos.hardware.Button;
-import lejos.hardware.Sound;
-import lejos.internal.ev3.EV3Audio;
 import robot.Robot;
 import robot.RobotComponents;
-import sensor.ColorSensor;
 import sensor.GyroSensor;
 import sensor.TouchSensorBThread;
 import sensor.USSensor;
-import sensor.modes.ColorSensorMode;
-import sensor.modes.GyroSensorMode;
-import sensor.modes.UVSensorMode;
-import state.SuspBridgeState.S_SuspBridgeState;
-import util.MediumMotorTuple;
-import util.Util;
 import util.lcdGui.LCDGui;
 
 public class Endboss implements ParcourState {
@@ -22,8 +12,8 @@ public class Endboss implements ParcourState {
 	
 	public enum EndbossState
 	{
-		START,
-		DRIVE_LEFTWALL_TOBOSS,
+		START, DRIVE_LEFTWALL_TOBOSS, DRIVETOBOSS_RETREAT, DRIVETOBOSS_TURN, LOWER_SHOOT, SHOOT, UPPER_SHOOT, TURN,
+		LURE, LURE_RETREAT, LURE_TURN, PUSH, PUSH_RETREAT, PUSH_TURN, DRIVE_LTW
 		DRIVETOBOSS_RETREAT,
 		DRIVETOBOSS_TURN,
 		LOWER_SHOOT,
@@ -36,14 +26,13 @@ public class Endboss implements ParcourState {
     private LCDGui gui;
     
     
-    private float param_robotMaxSpeed = 1f;
-    private float param_goalDistance_toboss = 0.1f;
-    private float param_robotRetreatSpeed = 0.8f;
-    private int param_timeLoweringTheCancnon = 2000;
-    private int param_mediumRotateAngle = 250;
-    private boolean param_debugWaits = false;
-
-    private boolean end_of_line = false;
+    private static final float param_robotMaxSpeed = 1f;
+    private static final float param_goalDistance_toboss = 0.1f;
+    private static final float param_robotRetreatSpeed = 0.8f;
+    private static final int param_timeLoweringTheCancnon = 2000;
+    private static final int param_timePush = 10000;
+    private static final int param_mediumRotateAngle = 250;
+    //private static final boolean param_debugWaits = false;
     
     public Endboss(Robot robot) {
         this.robot = robot;
@@ -53,7 +42,7 @@ public class Endboss implements ParcourState {
 	@Override
 	public boolean changeOnBarcode()
 	{
-		return end_of_line;
+		return false;
 	}
     
     @Override
@@ -68,9 +57,9 @@ public class Endboss implements ParcourState {
     	
         robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
         
-        gyroSensor = RobotComponents.inst().getGyroSensor();
-        uvSensor = RobotComponents.inst().getUS();
-        touchSensor = RobotComponents.inst().getTouchSensorB();
+        gyros = RobotComponents.inst().getGyroSensor();
+        us = RobotComponents.inst().getUS();
+        touch = RobotComponents.inst().getTouchSensorB();
     }
 
     
@@ -82,17 +71,28 @@ public class Endboss implements ParcourState {
         
     }
     
-    private GyroSensor gyroSensor;
-    private USSensor uvSensor;
-    private TouchSensorBThread touchSensor;
+    private GyroSensor gyros;
+    private USSensor us;
+    private TouchSensorBThread touch;
     
     private EndbossState state;
 
     private float turn = 0;
     private int mediumStart = 0;
-    private int timeLower = 0;
     
+    private float waitCounter;
     
+    private void startWait(float time)
+    {
+        waitCounter = time;
+    }
+    private boolean waiting(float timeElapsed)
+    {
+        waitCounter -= timeElapsed;
+        if (waitCounter >= 0)
+            return false;
+        return true;
+    }
     
     @Override
     public void update(int elapsedTime) {
@@ -100,12 +100,12 @@ public class Endboss implements ParcourState {
     	switch (state)
     	{
     	case START:
-    		
+    		state = EndbossState.DRIVE_LEFTWALL_TOBOSS;
     		break;
     	case DRIVE_LEFTWALL_TOBOSS:
     		robot.setSpeed(param_robotMaxSpeed);
 
-    		if (touchSensor.sample()[0] == 1.0f)
+    		if (touch.sample()[0] == 1.0f)
     		{
     			robot.stop();
                 robot.setSpeed(param_robotRetreatSpeed);
@@ -114,7 +114,7 @@ public class Endboss implements ParcourState {
     		}
     		else
     		{
-        		float samp = uvSensor.sample()[0];
+        		float samp = us.sample()[0];
                 
                 turn = (samp - param_goalDistance_toboss) * 25;
                 robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
@@ -134,28 +134,92 @@ public class Endboss implements ParcourState {
     		{
     			robot.stop();
     			mediumStart = RobotComponents.inst().getMediumMotor().getTachoCount();
-    			timeLower = 0;
+    			startWait(param_timeLoweringTheCancnon);
     			RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.1f);
     			RobotComponents.inst().getMediumMotor().rotateTo(-param_mediumRotateAngle, true);
     			state = EndbossState.LOWER_SHOOT;
     		}
     		break;
     	case LOWER_SHOOT:
-    		if (timeLower * elapsedTime >= param_timeLoweringTheCancnon)
-    		{
+    	    if (!waiting(elapsedTime))
+    	    {
     			RobotComponents.inst().getMediumMotor().stop();
-    			timeLower = 0;
     			RobotComponents.inst().getMediumMotor().rotateTo(mediumStart, true);
-    			state = EndbossState.UPPER_SHOOT;
-    		}
-    		else
-    		{
-    			timeLower++;
+    			state = EndbossState.SHOOT;
+    			startWait(500);
     		}
     		break;
+    	case SHOOT:
+    	    if (!waiting(elapsedTime))
+    	    {
+    	        state = EndbossState.UPPER_SHOOT;
+                startWait(param_timeLoweringTheCancnon);
+    	    }
+    	    break;
     	case UPPER_SHOOT:
-    		
-    		break;
+            if (!waiting(elapsedTime))
+            {
+                RobotComponents.inst().getMediumMotor().stop();
+                RobotComponents.inst().getMediumMotor().rotateTo(mediumStart, true);
+                state = EndbossState.SHOOT;
+                robot.turnOnSpot(-90);
+                state = EndbossState.TURN;
+            }
+            break;
+    	case TURN:
+    	    if (robot.finished())
+    	    {
+    	        robot.setSpeed(param_robotMaxSpeed);
+    	        robot.forward();
+    	        state = EndbossState.LURE;
+    	    }
+    	    break;
+    	case LURE:
+            if (touch.sample()[0] == 1.0f)
+            {
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(330);
+                state = EndbossState.LURE_RETREAT;
+            }
+            break;
+    	case LURE_RETREAT:
+    	    if (robot.finished())
+    	    {
+    	        robot.stop();
+    	        robot.turnOnSpot(90);
+    	        state = EndbossState.LURE_TURN;
+    	    }
+    	    break;
+    	case LURE_TURN:
+    	    if (robot.finished())
+    	    {
+                robot.stop();
+                robot.setSpeed(param_robotMaxSpeed);
+                robot.forward();
+                state = EndbossState.PUSH;
+                startWait(param_timePush);
+	        }
+    	    break;
+    	case PUSH:
+    	    if (!waiting(elapsedTime))
+    	    {
+    	        robot.stop();
+    	        robot.setSpeed(param_robotRetreatSpeed);
+    	        robot.move(330);
+    	        state = EndbossState.PUSH_RETREAT;
+    	    }
+    	    break;
+    	case PUSH_RETREAT:
+    	    if (robot.finished())
+    	    {
+    	        robot.stop();
+    	        robot.turnOnSpot(180);
+    	        state = EndbossState.DRIVE_LTW;
+    	    }
+    	    break;
+    	case DRIVE_LTW:
+    	    break;
     	}
     }
 }

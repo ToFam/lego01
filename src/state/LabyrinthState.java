@@ -157,7 +157,7 @@ public class LabyrinthState implements ParcourState
                 
                 last_samp = samp;
                 turn = (samp - DISTANCE_SHOULD) * TURN_FACTOR;
-                robot.steer(Math.max(-1.f, Math.min(1.f, turn)));
+                robot.steer(Math.max(-0.8f, Math.min(.8f, turn)));
                 robot.forward();
                 
                 gui.setVarValue(0, samp);
