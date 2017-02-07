@@ -12,6 +12,7 @@ import sensor.modes.UVSensorMode;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
+import state.LineMovingIIt2;
 import state.LineState;
 import state.ParcourState;
 import state.SuspBridgeState;
@@ -52,20 +53,20 @@ public class Main {
         this.states = new ParcourState[] {
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
-    		new HumpbackBridgeState(robot),		// Große Brücke
-    		new LineMovingIIt1(robot, true),			// Linie nach Brücke
-    		new LineMovingIIt1(robot, true),			// Linie nach Brücke
-    		new LineMovingIIt1(robot, false),			// Linie nach Brücke
+    		new HumpbackBridgeState(robot),		// Grosse Brucke
+    		new LineMovingIIt1(robot, true),			// Linie nach Brucke
+    		new LineMovingIIt1(robot, true),			// Linie nach Brucke
+    		new LineMovingIIt2(robot, false),			// Linie nach Brucke
     		// new Seesaw(robot),				// Wippe
     		// new LineMovingIIt1(robot),		// Linie nach Wippe
     		new SwampState(robot),				// Sumpf
-    		new LabyrinthState(robot),			// Wand nach Sumpf
-    		// new SuspensionBridge(robot),		// Hängebrücke
+    		//new LabyrinthState(robot),			// Wand nach Sumpf
+    		new SuspBridgeState(robot),		// Hangebrucke
     		// new BossFight(robot),			// Da Endboss
     		
-    		new TestDriveLTWall(robot),
+    		//new TestDriveLTWall(robot),
     		new TestGUI(robot),
-    		new TestState(robot),
+    		//new TestState(robot),
         };
         
         this.elements = new String[states.length];

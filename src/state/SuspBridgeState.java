@@ -21,7 +21,7 @@ public class SuspBridgeState implements ParcourState {
 	
 	public enum S_SuspBridgeState {
 		BEFORE_DOTS, RETREAT, TURNING, HOLD_DISTANCE, ON_SUSP_RAMP_UP, WAIT_FOR_ADJUSTANCE, DRIVE_TILL_INFINITY, 
-		FULLSPEED, CATCH_AGAIN, PRE_END, END, HOLD_DISTANCE_SHORT, ON_DOTS
+		FULLSPEED, CATCH_AGAIN, PRE_END, END, HOLD_DISTANCE_SHORT, ON_DOTS, DRIVE_SHORT_STRAIGHT_AFTER_CAUGHT
 	}
 
 	
@@ -49,6 +49,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_uvCatchRobotAtEndWhenUnder = 0.2f;
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
+    private int param_driveTimeAfterCaught = 500;
     private boolean param_debugWaits = true;
 
     private boolean end_of_line = false;
@@ -119,6 +120,7 @@ public class SuspBridgeState implements ParcourState {
     int c = 0;
     private float turn = 0;
     private int timeInfinityCounter = 0;
+    private int timeToCatch = 0;
     
     @Override
     public void update(int elapsedTime) {
@@ -318,11 +320,24 @@ public class SuspBridgeState implements ParcourState {
     	case FULLSPEED:
     		if (uvSensor.sample()[0] < param_uvCatchRobotAtEndWhenUnder)
     		{
-    			gui.writeLine("Catched");
+    			gui.writeLine("Caught");
     			
     			timeInfinityCounter = 0;
     			robot.stop();
     			end_of_line = true;
+    			state = S_SuspBridgeState.DRIVE_SHORT_STRAIGHT_AFTER_CAUGHT;
+    		}
+    		break;
+    	case DRIVE_SHORT_STRAIGHT_AFTER_CAUGHT:
+    		if (timeToCatch * elapsedTime < param_driveTimeAfterCaught)
+    		{
+    			robot.setSpeed(param_robotSpeedOnBridge);
+        		robot.forward();
+        		timeToCatch++;
+    		}
+    		else
+    		{
+    			robot.stop();
     			state = S_SuspBridgeState.CATCH_AGAIN;
     		}
     		break;
@@ -331,7 +346,7 @@ public class SuspBridgeState implements ParcourState {
     		
     		float samp3 = uvSensor.sample()[0];
             
-            turn = (samp3 - param_goalDistance) * param_kpRamp * 0.85f;
+            turn = (samp3 - param_goalDistance) * param_kpRamp * 0.7f;
             robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
             robot.forward();
             

@@ -5,13 +5,14 @@ import robot.Robot;
 import robot.RobotComponents;
 import sensor.ColorSensor;
 import sensor.GyroSensor;
+import sensor.USSensor;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
 import util.MediumMotorTuple;
 import util.Util;
 import util.lcdGui.LCDGui;
 
-public class LineMovingIIt1 implements ParcourState {
+public class LineMovingIIt2 implements ParcourState {
 	
 	public enum LMState {
 		STRAIGHT_LEFT, STRAIGHT_RIGHT, LOST_RIGHT, LOST_LEFT, SEARCH_LEFT, SEARCH_RIGHT,
@@ -38,6 +39,10 @@ public class LineMovingIIt1 implements ParcourState {
     private int param_angleToRecognizeFalseDirection = 160;
     private int param_lastGyroSamplesAmountToCheckFalseDirection = 6;
     
+    private float param_UvEndMin = 0.02f;
+    private float param_UvEndMax = 0.12f;
+    private int param_UvTimeBetween = 600;
+    
     private float param_find_angle = 30f;
     private int param_find_moveStraigt_distance = 360 * 2;
     private int param_drive_down_of_barcode_distance = 450;
@@ -48,7 +53,7 @@ public class LineMovingIIt1 implements ParcourState {
     private boolean end_of_line = false;
     private boolean change_immediately = false;
     
-    public LineMovingIIt1(Robot robot, boolean returnImAtEnd) {
+    public LineMovingIIt2(Robot robot, boolean returnImAtEnd) {
         this.robot = robot;
         this.gui = new LCDGui(4, 1);
         this.retImAtEnd = returnImAtEnd;
@@ -85,11 +90,12 @@ public class LineMovingIIt1 implements ParcourState {
         
         colorSensor = RobotComponents.inst().getColorSensor();
         gyroSensor = RobotComponents.inst().getGyroSensor();
+        uvSensor = RobotComponents.inst().getUS();
     }
 
     
     public String getName() {
-        return "Line " + (retImAtEnd ? "RetIm" : "Barcode");
+        return "Line Wall";
     }
     
     public void reset() {
@@ -98,6 +104,7 @@ public class LineMovingIIt1 implements ParcourState {
     
     private ColorSensor colorSensor;
     private GyroSensor gyroSensor;
+    private USSensor uvSensor;
     
     private LMState curStat = LMState.SEARCH_LEFT;
     private float lostAngle = 0f;
@@ -111,11 +118,12 @@ public class LineMovingIIt1 implements ParcourState {
     private int lastGyrosIndex = 0;
     private int timeCounter = 0;
     private float gyroStartFindValue = 0f;
+    private int uvTimeBetween = 0;
     
     @Override
     public void update(int elapsedTime) {
 
-    	gui.setVarValue(0, String.valueOf(gyroSensor.sample()[0]), 5);
+    	//gui.setVarValue(0, String.valueOf(gyroSensor.sample()[0]), 5);
     	
     	timeCounter += elapsedTime;
     	
@@ -131,7 +139,7 @@ public class LineMovingIIt1 implements ParcourState {
     		{
         		gyroStartFindValue = gyroSensor.sample()[0];
         		robot.turnOnSpot(param_find_angle);
-            	gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
+            	//gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
         		
         		//gui.writeLine("Short straight");
         		//robot.stop();
@@ -159,7 +167,7 @@ public class LineMovingIIt1 implements ParcourState {
     		{
     			float curGyro = gyroSensor.sample()[0];
     			float toTurn = gyroStartFindValue - curGyro - param_find_angle;
-            	gui.setVarValue(2, String.valueOf(toTurn), 5);
+            	//gui.setVarValue(2, String.valueOf(toTurn), 5);
     			
         		robot.turnOnSpot(toTurn);
         		
@@ -277,7 +285,7 @@ public class LineMovingIIt1 implements ParcourState {
         					fac *= 0.5f;
         				}
         				
-        				gui.setVarValue(0, relTurn);
+        				//gui.setVarValue(0, relTurn);
 
     					//robot.setSpeed(param_robotMaxSpeed, param_robotMaxSpeed);
 
@@ -430,7 +438,22 @@ public class LineMovingIIt1 implements ParcourState {
     	}
     	
     	
+    	float curUv = uvSensor.sample()[0];
+    	if (curUv >= param_UvEndMin && curUv <= param_UvEndMax)
+    	{
+    		uvTimeBetween += elapsedTime;
+    		if (elapsedTime >= param_UvTimeBetween)
+    		{
+    			robot.stop();
+    			change_immediately = true;
+    		}
+    	}
+    	else
+    	{
+    		uvTimeBetween = 0;
+    	}
     	
+    	gui.setVarValue(0, uvTimeBetween);
     	
     	
     	

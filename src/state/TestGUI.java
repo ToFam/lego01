@@ -16,19 +16,19 @@ public class TestGUI implements ParcourState {
     
     public TestGUI(Robot robot) {
         this.robot = robot;
-        this.gui = new LCDGui(4,2);
+        this.gui = new LCDGui(4,1);
     }
     
     private LCDChooseList chooseList;
 
     public String getName() {
-        return "DataCollector";
+        return "Data Test";
     }
     
     @Override
     public void init() {
     	//chooseList = new LCDChooseList(new String[] {"Number 1", "Second", "Dr3i", "Vier", "5", "6", "7", "8", "9"});
-    	RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+    	//RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
     	//RobotComponents.inst().getTouchSensorB().setMode(0);
     	//RobotComponents.inst().getUV().setMode(UVSensorMode.DISTANCE.getIdf());
     	//RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
@@ -51,7 +51,7 @@ public class TestGUI implements ParcourState {
     }
 
     public void reset() {
-        
+        robot.stop();
     }
     
     int sens = 0;
@@ -62,12 +62,12 @@ public class TestGUI implements ParcourState {
     @Override
     public void update(int elapsedTime) {
 
-    	float color = RobotComponents.inst().getColorSensor().instSample()[0];
+    	float color = 0;//RobotComponents.inst().getColorSensor().instSample()[0];
     	float gyro = 0;//RobotComponents.inst().getGyroSensor().sample()[0];
-    	float uv = 0;//RobotComponents.inst().getUV().sample()[0];
+    	float uv = RobotComponents.inst().getUS().sample()[0];
     	float touch = 0;//RobotComponents.inst().getTouchSensorB().sample()[0];
     	
-    	gui.setVarValue(0, String.valueOf(color), 5);
+    	gui.setVarValue(0, String.valueOf(uv), 5);
     	
     	//tach[cou] = RobotComponents.inst().getMediumMotor().getTachoCount() % 360;
     	cols[cou] = color;
