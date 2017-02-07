@@ -1,10 +1,12 @@
 package state;
 
+import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.GyroSensor;
 import sensor.TouchSensorBThread;
 import sensor.USSensor;
+import util.Util;
 import util.lcdGui.LCDGui;
 
 public class BridgeTest implements ParcourState {
@@ -12,7 +14,12 @@ public class BridgeTest implements ParcourState {
 	
 	public enum BridgeState {
 		START, DRIVING_UP, STRAIGHT, TURNING_ON_INFINITY,
+		WAIT_FOR_UV_INIT,
+		WAIT_SHORT,
 
+		UV_ISUP,
+		UV_ISDOWN,
+		
 		END
 	}
 
@@ -78,6 +85,8 @@ public class BridgeTest implements ParcourState {
     
     private int timeStraightCounter = 0;
     
+    private int timeCount = 0;
+    
     float firstGyro = 0f;
     boolean foundBorderOnce = false;
     
@@ -109,8 +118,36 @@ public class BridgeTest implements ParcourState {
     	case START:
     		
     		firstGyro = gyroSensor.sample()[0];
-    		robot.forward();
-    		state = BridgeState.STRAIGHT;
+    		timeCount = 0;
+    		state = BridgeState.WAIT_SHORT;
+    		break;
+    	case UV_ISDOWN:
+    		
+    		break;
+    	case UV_ISUP:
+    		
+    		break;
+    	case WAIT_SHORT:
+    		timeCount++;
+    		if (timeCount * elapsedTime >= 2000)
+    		{
+        		state = BridgeState.WAIT_FOR_UV_INIT;
+    		}
+    		
+    		break;
+    	case WAIT_FOR_UV_INIT:
+    		float uvVal = uvSensor.sample()[0];
+    		
+    		if (uvVal == Float.POSITIVE_INFINITY)
+    		{
+    			robot.stop();
+    		}
+    		else
+    		{
+        		robot.forward();
+    			state = BridgeState.STRAIGHT;
+    		}
+    		
     		break;
     	case STRAIGHT:
     		if (timeStraightCounter * elapsedTime >= param_timeStraight)
@@ -154,6 +191,10 @@ public class BridgeTest implements ParcourState {
     			}
     			
     			avg /= 10f;
+    			
+    			while (Util.isPressed(Button.ID_DOWN) == false) {}
+    			
+    			robot.stop();
     			
     			robot.turnOnSpotExact(avg);
     			
