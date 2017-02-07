@@ -16,6 +16,7 @@ import state.LineMovingIIt2;
 import state.LineState;
 import state.ParcourState;
 import state.SuspBridgeState;
+import state.SwampEasy;
 import state.SwampState;
 import state.TestDriveLTWall;
 import state.TestGUI;
@@ -60,7 +61,8 @@ public class Main {
     		new LineMovingIIt2(robot, false),			// Linie nach Brucke
     		// new Seesaw(robot),				// Wippe
     		// new LineMovingIIt1(robot),		// Linie nach Wippe
-    		new SwampState(robot),				// Sumpf
+    		//new SwampState(robot),				// Sumpf
+    		new SwampEasy(robot),
     		//new LabyrinthState(robot),			// Wand nach Sumpf
     		new SuspBridgeState(robot),		// Hangebrucke
     		// new BossFight(robot),			// Da Endboss
