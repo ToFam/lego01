@@ -58,7 +58,7 @@ public class Main {
     		new LineMovingIIt1(robot, false),			// Linie nach Brücke
     		// new Seesaw(robot),				// Wippe
     		// new LineMovingIIt1(robot),		// Linie nach Wippe
-    		// new Swamp(robot),				// Sumpf
+    		new SwampState(robot),				// Sumpf
     		new LabyrinthState(robot),			// Wand nach Sumpf
     		// new SuspensionBridge(robot),		// Hängebrücke
     		// new BossFight(robot),			// Da Endboss
