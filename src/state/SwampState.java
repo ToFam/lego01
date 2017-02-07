@@ -13,6 +13,8 @@ public class SwampState implements ParcourState {
 	private int distance_old;
 	private float recommended;
 	private float correction;
+	
+	private int time;
 	private boolean finished;
 	
 	public SwampState(Robot robot) {
@@ -39,6 +41,8 @@ public class SwampState implements ParcourState {
 			this.distances[i] = Float.NaN;
 		}
 		
+		this.time = 0;
+		
 		this.robot.setSpeed(1.f);
 		this.robot.forward();
 	}
@@ -50,6 +54,13 @@ public class SwampState implements ParcourState {
 			this.finished = true;
 			this.robot.stop();
 			return;
+		}
+		
+		if (this.time > 5000) {
+			RobotComponents.inst().getRightMotor().rotate(150, false);
+			this.time = 0;
+		} else {
+			this.time += elapsedTime;
 		}
 		
 		this.distance_fresh = (this.distance_fresh + 1) % this.distances.length;
