@@ -100,9 +100,12 @@ public class LabyrinthState implements ParcourState
     }
     private State state;
     
+    private DeadlockDetector bernd;
+    
     public LabyrinthState(Robot robo) 
     {
         robot = robo;
+        bernd = new DeadlockDetector(1500, 5);
     }
     
 	@Override
@@ -181,6 +184,7 @@ public class LabyrinthState implements ParcourState
                         stateChangeDebug();
                         robot.setSpeed(STANDARD_SPEED);
                         robot.move(RETREAT_DEGREE);
+                        bernd.init();
                         return;
                     }
                 }
@@ -259,6 +263,16 @@ public class LabyrinthState implements ParcourState
                 
                 robot.steer(0.7f);
                 robot.forward();
+                
+                if (bernd.stuck(elapsedTime))
+                {
+                    robot.stop();
+                    state = State.RETREAT;
+                    stateChangeDebug();
+                    robot.setSpeed(STANDARD_SPEED);
+                    robot.move(360);
+                    return;
+                }
             }
             else
             {
