@@ -541,7 +541,8 @@ public class LineMovingIIt2 implements ParcourState {
     
     private boolean isFalseDirection()
     {
-    	float curGyr = lastGyros[lastGyrosIndex];
+    	return false;
+    	/*float curGyr = lastGyros[lastGyrosIndex];
     	for (int i = 0; i < param_lastGyroSamplesAmountToCheckFalseDirection; i++)
     	{
     		float gyr = lastGyros[(lastGyrosIndex - i - 1 + 2 * lastGyros.length) % lastGyros.length];
@@ -557,7 +558,7 @@ public class LineMovingIIt2 implements ParcourState {
     		}
     	}
     	
-    	return false;
+    	return false;*/
     }
     
     private void fillWithFloatMax()
