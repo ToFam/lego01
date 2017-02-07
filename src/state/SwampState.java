@@ -35,7 +35,7 @@ public class SwampState implements ParcourState {
 		this.distances = new float[3];
 		this.distance_fresh = this.distances.length;
 		this.distance_old = 0;
-		this.recommended = 0.05f;
+		this.recommended = 0.06f;
 		
 		for (int i = 1; i < this.distances.length; i++) {
 			this.distances[i] = Float.NaN;
@@ -70,14 +70,14 @@ public class SwampState implements ParcourState {
 			this.distances[this.distance_fresh] = RobotComponents.inst().getUS().sample()[0];
 		} while (this.distances[this.distance_fresh] >= 1.f);
 		
-		if (this.distances[this.distance_fresh] < 0.04f &&
-				this.distances[this.distance_old] < 0.04f) {
-			this.recommended = 0.03f;
+		if (this.distances[this.distance_fresh] < 0.05f &&
+				this.distances[this.distance_old] < 0.05f) {
+			this.recommended = 0.04f;
 		}
 		
-		if (this.distances[this.distance_fresh] > 0.04f &&
-				this.distances[this.distance_old] > 0.04f) {
-			this.recommended = 0.05f;
+		if (this.distances[this.distance_fresh] > 0.05f &&
+				this.distances[this.distance_old] > 0.05f) {
+			this.recommended = 0.06f;
 		}
 		
 		this.gui.setVarValue(0, this.distances[this.distance_fresh]);
