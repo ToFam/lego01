@@ -145,9 +145,11 @@ public class HumpbackBridgeState implements ParcourState {
 				
 			}
 			
-			do {
+
+			while (this.distance >= 1.f) {
+				this.robot.stop();
 				this.distance = RobotComponents.inst().getUS().sample()[0];
-			} while (this.distance >= 1.f);
+			}
 			
 			if (this.distance > this.THRESHOLD_NO_GROUND) {
 								
