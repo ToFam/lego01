@@ -36,7 +36,7 @@ public class SwampEasy implements ParcourState {
     private float param_robotSpeedOnRampUp = 0.6f;
     private float param_robotSpeedOnBridge = 1f;
     private float param_robotRetreatSpeed = 0.6f;
-    private float param_goalDistance = 0.09f;
+    private float param_goalDistance = 0.08f;
     private float param_goalDistanceRampUp = 0.058f;
     private float param_uvReachedTopOfRamp = 0.09f;
     private float param_kpStraight = 32f * 1.3f;

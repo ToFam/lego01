@@ -19,7 +19,8 @@ public class LineMovingIIt1 implements ParcourState {
 		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP,
 		FIND_LINE_START, FIND_LINE_SHORT_STRAIGHT, FIND_LINE_TURNLEFT, FIND_LINE_TURNRIGHT, FIND_LINE_STRAIGTRIGHT, FIND_LINE_STRAIGHTLEFT,
 		END, DRIVE_OFFSET_FORWARD,
-		TURN_DIRECTION
+		TURN_DIRECTION,
+		WAIT_FOR_EXACT_ROTATION, WAIT_FOR_EXACT_ROTATION_INSTANT_FINISH
 	}
 	
     private Robot robot;
@@ -40,7 +41,7 @@ public class LineMovingIIt1 implements ParcourState {
     private int param_angleToRecognizeFalseDirection = 140;
     private int param_lastGyroSamplesAmountToCheckFalseDirection = 3;
     
-    private float param_find_angle = 30f;
+    private float param_find_angle = 40f;
     private int param_find_moveStraigt_distance = 300;
     private int param_drive_down_of_barcode_distance = 450;
     private boolean param_debugWaits = false;
@@ -139,7 +140,7 @@ public class LineMovingIIt1 implements ParcourState {
     		if (robot.finished())
     		{
         		gyroStartFindValue = gyroSensor.sample()[0];
-        		robot.turnOnSpot(param_find_angle);
+        		robot.turnOnSpot((int)(param_find_angle * 0.7f));
             	gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
         		
         		//gui.writeLine("Short straight");
@@ -223,6 +224,22 @@ public class LineMovingIIt1 implements ParcourState {
         		curStat = LMState.FIND_LINE_TURNRIGHT;
     		}
     		switchStateIfLineFound();
+    		break;
+    	case WAIT_FOR_EXACT_ROTATION:
+    		if (robot.finished())
+			{
+				robot.forward();
+				curStat = LMState.END;
+				end_of_line = true;
+			}
+			
+			break;
+    	case WAIT_FOR_EXACT_ROTATION_INSTANT_FINISH:
+    		if (robot.finished())
+    		{
+				curStat = LMState.END;
+				change_immediately = true;
+    		}
     		break;
     	case END:
     		
@@ -411,14 +428,15 @@ public class LineMovingIIt1 implements ParcourState {
         		{
         			if (retImAtEnd)
         			{
-        				curStat = LMState.END;
-        				change_immediately = true;
+        				robot.turnOnSpotExact(lostAngle);
+        				
+        				curStat = LMState.WAIT_FOR_EXACT_ROTATION_INSTANT_FINISH;
         			}
         			else
         			{
-            			robot.forward();
-            			curStat = LMState.END;
-            			end_of_line = true;
+        				robot.turnOnSpotExact(lostAngle);
+        				
+        				curStat = LMState.WAIT_FOR_EXACT_ROTATION;
         			}
         			/*curStat = LMState.SEARCH_360_LINESCOUNT;
         			search360Count = 0;
