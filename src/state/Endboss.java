@@ -131,7 +131,8 @@ public class Endboss implements ParcourState {
     			mediumStart = RobotComponents.inst().getMediumMotor().getTachoCount();
     			startWait(param_timeLoweringTheCancnon);
     			RobotComponents.inst().getMediumMotor().setSpeed(RobotComponents.inst().getMediumMotor().getMaxSpeed() * 0.3f);
-    			RobotComponents.inst().getMediumMotor().rotateTo(param_mediumRotateAngle, true);
+    			//RobotComponents.inst().getMediumMotor().rotateTo(param_mediumRotateAngle, true);
+    			RobotComponents.inst().getMediumMotor().rotate(param_mediumRotateAngle, true);
     			state = EndbossState.SHOOT;
     		}
     		break;
@@ -154,8 +155,9 @@ public class Endboss implements ParcourState {
     	case UPPER_SHOOT:
             if (!waiting(elapsedTime))
             {
-                RobotComponents.inst().getMediumMotor().stop();
-                RobotComponents.inst().getMediumMotor().rotateTo(0, true);
+                //RobotComponents.inst().getMediumMotor().stop();
+                //RobotComponents.inst().getMediumMotor().rotateTo(0, true);
+    			RobotComponents.inst().getMediumMotor().rotate(-param_mediumRotateAngle, true);
                 robot.setSpeed(param_robotMaxSpeed);
                 robot.forward();
                 state = EndbossState.LURE;
