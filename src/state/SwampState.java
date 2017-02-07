@@ -14,8 +14,17 @@ public class SwampState implements ParcourState {
 	private float recommended;
 	private float correction;
 	
+	private SwampSegment swampSegment;
+	private int error;
+	
 	private int time;
 	private boolean finished;
+	
+	private enum SwampSegment {
+		NO_SWAMP,
+		SWAMP,
+		ERROR,
+	}
 	
 	public SwampState(Robot robot) {
 		this.robot = robot;
@@ -31,6 +40,8 @@ public class SwampState implements ParcourState {
 	public void init() {
 
 		this.finished = false;
+		this.swampSegment = SwampSegment.NO_SWAMP;
+		this.error = 0;
 		
 		this.distances = new float[3];
 		this.distance_fresh = this.distances.length;
@@ -51,8 +62,9 @@ public class SwampState implements ParcourState {
 	public void update(int elapsedTime) {
 		
 		if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
-			this.finished = true;
-			this.robot.stop();
+			this.swampSegment = SwampSegment.ERROR;
+			this.robot.setSpeed(0.2f);
+			this.robot.forward();
 			return;
 		}
 		
@@ -70,21 +82,49 @@ public class SwampState implements ParcourState {
 			this.distances[this.distance_fresh] = RobotComponents.inst().getUS().sample()[0];
 		} while (this.distances[this.distance_fresh] >= 1.f);
 		
-		if (this.distances[this.distance_fresh] < 0.05f &&
-				this.distances[this.distance_old] < 0.05f) {
-			this.recommended = 0.04f;
+		switch (this.swampSegment) {
+		case NO_SWAMP:
+			
+			if (this.distances[this.distance_fresh] < 0.05f &&
+					this.distances[this.distance_old] < 0.05f) {
+				this.swampSegment = SwampSegment.SWAMP;
+			}
+			
+			this.correction = (this.distances[this.distance_fresh] - 0.06f) * 8f;
+	        robot.steer(Math.max(-0.8f, Math.min(0.5f, correction)));
+	        robot.forward();
+			
+			break;
+			
+		case SWAMP:
+			
+			if (this.distances[this.distance_fresh] > 0.05f
+					&& this.distances[this.distance_old] > 0.05f) {
+				this.swampSegment = SwampSegment.NO_SWAMP;
+			}
+			
+			this.correction = (this.distances[this.distance_fresh] - 0.04f) * 8f;
+	        robot.steer(Math.max(-0.8f, Math.min(0.5f, correction)));
+	        robot.forward();
+	        
+	        break;
+	        
+		case ERROR:
+			
+			if (error == 5) {
+				this.finished = true;
+				return;
+			}
+
+			if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
+				error++;
+			} else {
+				this.swampSegment = SwampSegment.NO_SWAMP;
+			}
+			
+			break;
+	        
 		}
-		
-		if (this.distances[this.distance_fresh] > 0.05f &&
-				this.distances[this.distance_old] > 0.05f) {
-			this.recommended = 0.06f;
-		}
-		
-		this.gui.setVarValue(0, this.distances[this.distance_fresh]);
-		
-		this.correction = (this.distances[this.distance_fresh] - this.recommended) * 8f;
-        robot.steer(Math.max(-0.8f, Math.min(0.5f, correction)));
-        robot.forward();
 		
 	}
 
