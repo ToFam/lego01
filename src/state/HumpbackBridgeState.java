@@ -35,6 +35,8 @@ public class HumpbackBridgeState implements ParcourState {
 	private int time;
 	private boolean onBridge;
 	
+	private int littleCounter = 0;
+	
 	private enum BridgeSegment {
 		PRE_COLLISION,
 		COLLISION,
@@ -101,7 +103,8 @@ public class HumpbackBridgeState implements ParcourState {
 		this.time = 0;
 		
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
-		this.bridgeSegment = BridgeSegment.ON_BARCODE;
+		//this.bridgeSegment = BridgeSegment.ON_BARCODE;
+		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 		this.robot.lowerUS();
 		
 		this.robot.setSpeed(this.SPEED_MAX);
@@ -111,6 +114,12 @@ public class HumpbackBridgeState implements ParcourState {
 
 	@Override
 	public void update(int elapsedTime) {
+		
+		littleCounter++;
+		if (littleCounter * elapsedTime > 5000)
+		{
+			this.onBridge = true;
+		}
 		
 		this.angle_fresh = (this.angle_fresh + 1) % this.angles.length;
 		this.angle_old = (this.angle_old + 1) % this.angles.length;
