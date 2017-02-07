@@ -50,6 +50,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
     private int param_driveTimeAfterCaught = 500;
+    private float param_bridgeAngleOffset = -2f;
     private boolean param_debugWaits = false;
 
     private boolean end_of_line = false;
@@ -269,6 +270,7 @@ public class SuspBridgeState implements ParcourState {
     			}
     			
     			rampAngle = Util.average(cutted);
+    			rampAngle += param_bridgeAngleOffset;
 
     			gui.writeLine("Saved ramp");
     			gui.writeLine("Val is: " + String.valueOf(rampAngle));
