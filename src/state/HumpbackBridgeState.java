@@ -2,6 +2,7 @@ package state;
 
 import robot.Robot;
 import robot.RobotComponents;
+import util.Util;
 import util.lcdGui.LCDGui;
 
 public class HumpbackBridgeState implements ParcourState {
@@ -36,6 +37,9 @@ public class HumpbackBridgeState implements ParcourState {
 	private boolean onBridge;
 	
 	private int littleCounter = 0;
+	private float rampUpAngle = Float.MAX_VALUE;
+	private float[] rampUpAngles = new float[100000];
+	private int rampUpCount = 0;
 	
 	private enum BridgeSegment {
 		PRE_COLLISION,
@@ -45,6 +49,8 @@ public class HumpbackBridgeState implements ParcourState {
 		ON_BARCODE,
 		ENTIRE_BRIDGE,
 		BRIDGE_TRAVERSED,
+		
+		WAIT_SHORT_TO_TURN
 	}
 	
 	public HumpbackBridgeState(Robot robot) {
@@ -61,7 +67,7 @@ public class HumpbackBridgeState implements ParcourState {
 		this.turn_delta = 0.f;
 		this.THRESHOLD_NO_GROUND = .04f;
 		
-		this.GYRO_ALARM = 4;
+		this.GYRO_ALARM = 7;
 		this.angles = new float[200];
 		this.turning = false;
 		this.correction = 0.f;
@@ -141,8 +147,28 @@ public class HumpbackBridgeState implements ParcourState {
 		}
 		
 		switch (this.bridgeSegment) {
-			
+		case WAIT_SHORT_TO_TURN:
+			if (robot.finished())
+			{
+				bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
+			}
+			break;
 		case ENTIRE_BRIDGE:
+			
+			if (rampUpCount * elapsedTime > 4000)
+			{
+				rampUpAngle = Util.average(rampUpAngles, rampUpCount);
+				gui.writeLine("Set Average!");
+			}
+			else
+			{
+				if (rampUpCount < rampUpAngles.length)
+				{
+					rampUpAngles[rampUpCount] = RobotComponents.inst().getGyroSensor().sample()[0];
+					rampUpCount++;
+				}
+			}
+			
 			
 			this.color = RobotComponents.inst().getColorSensor().sample()[0];
 			
@@ -151,7 +177,7 @@ public class HumpbackBridgeState implements ParcourState {
 				return;
 			}
 			
-			if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
+			/*if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
 				
 				this.gui.setVarValue(0, "turning");
 				
@@ -159,6 +185,11 @@ public class HumpbackBridgeState implements ParcourState {
 				this.robot.turnOnSpot(this.angles[this.angle_old] - this.angles[this.angle_fresh]);
 				return;
 				
+			}*/
+			if (rampUpAngle != Float.MAX_VALUE && Math.abs(RobotComponents.inst().getGyroSensor().sample()[0] - rampUpAngle) > this.GYRO_ALARM)
+			{
+				robot.turnOnSpotExact(rampUpAngle);
+				bridgeSegment = BridgeSegment.WAIT_SHORT_TO_TURN;
 			}
 			
 			this.gui.setVarValue(0, "ENTIRE_BRIDGE");
