@@ -2,7 +2,6 @@ package state;
 
 import robot.Robot;
 import robot.RobotComponents;
-import sensor.modes.ColorSensorMode;
 import util.lcdGui.LCDGui;
 
 public class SwampState implements ParcourState {
@@ -14,7 +13,7 @@ public class SwampState implements ParcourState {
 	private float distance;
 	private float correction;
 	private int time;
-	private boolean finished;
+	private boolean inSwamp;
 	
 	private enum SwampSegment {
 		PRE_BARCODE,
@@ -36,9 +35,9 @@ public class SwampState implements ParcourState {
 	@Override
 	public void init() {
 
-		this.swampSegment = SwampSegment.PRE_BARCODE;
+		this.swampSegment = SwampSegment.BARCODE;
 		this.time = 0;
-		this.finished = false;
+		this.inSwamp = false;
 		
 		gui.setVarValue(0, this.swampSegment.toString());
 		
@@ -76,6 +75,7 @@ public class SwampState implements ParcourState {
 				
 				if (this.color < 0.8f) {
 					this.swampSegment = SwampSegment.POST_BARCODE;
+					this.inSwamp = true;
 					this.gui.setVarValue(0, this.swampSegment.toString());
 					return;
 				}
@@ -116,12 +116,12 @@ public class SwampState implements ParcourState {
 
 	@Override
 	public boolean changeOnBarcode() {
-		return finished;
+		return inSwamp;
 	}
 
 	@Override
 	public boolean changeImmediately() {
-		return finished;
+		return false;
 	}
 	
 }
