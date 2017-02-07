@@ -52,6 +52,7 @@ public class Main {
         
         this.states = new ParcourState[] {
     		new LabyrinthState(robot),			// Start und Labyrinth
+    		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
     		new HumpbackBridgeState(robot),		// Grosse Brucke
     		new LineMovingIIt1(robot, true),			// Linie nach Brucke

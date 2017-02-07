@@ -21,7 +21,8 @@ public class SuspBridgeState implements ParcourState {
 	
 	public enum S_SuspBridgeState {
 		BEFORE_DOTS, RETREAT, TURNING, HOLD_DISTANCE, ON_SUSP_RAMP_UP, WAIT_FOR_ADJUSTANCE, DRIVE_TILL_INFINITY, 
-		FULLSPEED, CATCH_AGAIN, PRE_END, END, HOLD_DISTANCE_SHORT, ON_DOTS, DRIVE_SHORT_STRAIGHT_AFTER_CAUGHT
+		FULLSPEED, CATCH_AGAIN, CATCH_AGAIN_RETREAT, CATCH_AGAIN_ADJUST,
+		PRE_END, END, HOLD_DISTANCE_SHORT, ON_DOTS, DRIVE_SHORT_STRAIGHT_AFTER_CAUGHT
 	}
 
 	
@@ -349,19 +350,47 @@ public class SuspBridgeState implements ParcourState {
     		}
     		break;
     	case CATCH_AGAIN:
-    		robot.setSpeed(param_robotSpeedOnBridge);
+    		boolean touchVal = touchSensor.sample()[0] == 1.0f;
     		
-    		float samp3 = uvSensor.sample()[0];
-            
-            turn = (samp3 - param_goalDistance) * param_kpRamp * 0.7f;
-            robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
-            robot.forward();
-            
-            /*if (uvSensor.sample()[0] > param_uvCatchRobotAtEndWhenUnder + 0.1f && timeInfinityCounter * elapsedTime >= param_minTimeOnRampDown)
-            {
-            	state = S_SuspBridgeState.PRE_END;
-            	robot.stop();
-            }*/
+    		if (touchVal)
+    		{
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(230);
+    			state = S_SuspBridgeState.CATCH_AGAIN_RETREAT;
+    		}
+    		else
+    		{
+        		robot.setSpeed(param_robotSpeedOnBridge);
+        		
+        		float samp3 = uvSensor.sample()[0];
+                
+                turn = (samp3 - param_goalDistance) * param_kpRamp * 0.7f;
+                robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+                robot.forward();
+                
+                /*if (uvSensor.sample()[0] > param_uvCatchRobotAtEndWhenUnder + 0.1f && timeInfinityCounter * elapsedTime >= param_minTimeOnRampDown)
+                {
+                	state = S_SuspBridgeState.PRE_END;
+                	robot.stop();
+                }*/
+    		}
+    		
+    		break;
+    	case CATCH_AGAIN_RETREAT:
+    		if (robot.finished())
+    		{
+                robot.turnOnSpot(-90);
+                state = S_SuspBridgeState.CATCH_AGAIN_ADJUST;
+    		}
+    		break;
+    	case CATCH_AGAIN_ADJUST:
+    		if (robot.finished())
+    		{
+    			robot.stop();
+    			//robot.forward();
+    			state = S_SuspBridgeState.CATCH_AGAIN;
+    		}
     		break;
     	case PRE_END:
     		//Sound.setVolume(100);

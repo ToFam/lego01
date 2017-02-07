@@ -1,6 +1,7 @@
 package state;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import robot.Robot;
 import robot.RobotComponents;
 import sensor.ColorSensor;
@@ -8,6 +9,7 @@ import sensor.GyroSensor;
 import sensor.USSensor;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
+import state.LineMovingIIt1.LMState;
 import util.MediumMotorTuple;
 import util.Util;
 import util.lcdGui.LCDGui;
@@ -18,7 +20,8 @@ public class LineMovingIIt2 implements ParcourState {
 		STRAIGHT_LEFT, STRAIGHT_RIGHT, LOST_RIGHT, LOST_LEFT, SEARCH_LEFT, SEARCH_RIGHT,
 		SEARCH_LINE_END, SEARCH_LINE_END_TURNTOLOST, SEARCH_360_LINESCOUNT, STOP,
 		FIND_LINE_START, FIND_LINE_SHORT_STRAIGHT, FIND_LINE_TURNLEFT, FIND_LINE_TURNRIGHT, FIND_LINE_STRAIGTRIGHT, FIND_LINE_STRAIGHTLEFT,
-		END, DRIVE_OFFSET_FORWARD
+		END, DRIVE_OFFSET_FORWARD,
+		TURN_DIRECTION
 	}
 	
     private Robot robot;
@@ -114,7 +117,7 @@ public class LineMovingIIt2 implements ParcourState {
     private float lastAngle = 0f;
     private boolean search360onWhite = false;
     private int search360Count = 0;
-    private float[] lastGyros = new float[10];
+    private float[] lastGyros = new float[20];
     private int lastGyrosIndex = 0;
     private int timeCounter = 0;
     private float gyroStartFindValue = 0f;
@@ -129,6 +132,13 @@ public class LineMovingIIt2 implements ParcourState {
     	
     	switch (curStat)
     	{
+    	case TURN_DIRECTION:
+    		if (robot.finished())
+    		{
+    			robot.stop();
+    			curStat = LMState.FIND_LINE_START;
+    		}
+    		break;
     	case DRIVE_OFFSET_FORWARD:
     		robot.move(-param_drive_down_of_barcode_distance);
 
@@ -302,6 +312,22 @@ public class LineMovingIIt2 implements ParcourState {
         		{
         			curStat = (curStat == LMState.SEARCH_RIGHT ? LMState.STRAIGHT_RIGHT : LMState.STRAIGHT_LEFT);
         			
+        			lastGyros[lastGyrosIndex] = gyroSensor.sample()[0];
+        			lastGyrosIndex++;
+        			if (lastGyrosIndex >= lastGyros.length)
+        			{
+        				lastGyrosIndex = 0;
+        			}
+        			
+        			boolean falseDirection = isFalseDirection();
+        			
+        			if (falseDirection)
+        			{
+        				Sound.beepSequenceUp();
+        				robot.stop();
+        				turnRobotDegreesGyro(180);
+        				curStat = LMState.TURN_DIRECTION;
+        			}
 
         			//gui.writeLine("Found line");
         			if (param_debugWaits)
@@ -508,6 +534,23 @@ public class LineMovingIIt2 implements ParcourState {
     	//robot.setSpeed(1f);
     	robot.turnOnSpot(degrees, 20f);
     	//robot.turnOnSpotFastBy(degrees);
+    }
+    
+    private boolean isFalseDirection()
+    {
+    	float curGyr = lastGyros[lastGyrosIndex];
+    	for (int i = 0; i < param_lastGyroSamplesAmountToCheckFalseDirection; i++)
+    	{
+    		float gyr = lastGyros[(lastGyrosIndex - i - 1 + 2 * lastGyros.length) % lastGyros.length];
+    		float absDiff = Math.abs(curGyr - gyr);
+    		
+    		if (absDiff > param_angleToRecognizeFalseDirection)
+    		{
+    			return true;
+    		}
+    	}
+    	
+    	return false;
     }
     
     private void switchStateIfLineFound()
