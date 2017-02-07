@@ -65,6 +65,10 @@ public class SwampState implements ParcourState {
 		
 		if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
 			this.swampSegment = SwampSegment.ERROR;
+			
+			while(!Util.isPressed(Button.DOWN.getId())) {
+				this.robot.stop();
+			}
 			return;
 		}
 		
@@ -90,11 +94,13 @@ public class SwampState implements ParcourState {
 			
 			this.gui.setVarValue(0, "NO_SWAMP");
 			
-			while(!Util.isPressed(Button.DOWN.getId())) {}
-			
 			if (this.distances[this.distance_fresh] < 0.05f &&
 					this.distances[this.distance_old] < 0.05f) {
 				this.swampSegment = SwampSegment.SWAMP;
+				
+				while(!Util.isPressed(Button.DOWN.getId())) {
+					this.robot.stop();
+				}
 			}
 			
 			this.correction = (this.distances[this.distance_fresh] - 0.06f) * 8f;
@@ -107,11 +113,13 @@ public class SwampState implements ParcourState {
 			
 			this.gui.setVarValue(0, "SWAMP");
 			
-			while(!Util.isPressed(Button.DOWN.getId())) {}
-			
 			if (this.distances[this.distance_fresh] > 0.05f
 					&& this.distances[this.distance_old] > 0.05f) {
 				this.swampSegment = SwampSegment.NO_SWAMP;
+				
+				while(!Util.isPressed(Button.DOWN.getId())) {
+					this.robot.stop();
+				}
 			}
 			
 			this.correction = (this.distances[this.distance_fresh] - 0.04f) * 8f;
@@ -123,8 +131,6 @@ public class SwampState implements ParcourState {
 		case ERROR:
 			
 			this.gui.setVarValue(0, "ERROR");
-			
-			while(!Util.isPressed(Button.DOWN.getId())) {}
 			
 			this.robot.setSpeed(0.2f);
 			this.robot.forward();
@@ -138,6 +144,10 @@ public class SwampState implements ParcourState {
 				this.error++;
 			} else {
 				this.swampSegment = SwampSegment.NO_SWAMP;
+				
+				while(!Util.isPressed(Button.DOWN.getId())) {
+					this.robot.stop();
+				}
 
 				this.robot.setSpeed(1f);
 				this.robot.forward();
