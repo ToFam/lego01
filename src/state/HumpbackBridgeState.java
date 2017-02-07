@@ -34,13 +34,14 @@ public class HumpbackBridgeState implements ParcourState {
 	private float correction;
 
 	private float color;
-	private boolean finished;
+	private boolean onBridge;
 	
 	private enum BridgeSegment {
 		PRE_COLLISION,
 		COLLISION,
 		POST_COLLISION,
 		FOLLOW_PLANK,
+		ON_BARCODE,
 		ENTIRE_BRIDGE,
 		BRIDGE_TRAVERSED,
 	}
@@ -69,7 +70,7 @@ public class HumpbackBridgeState implements ParcourState {
 	@Override
 	public boolean changeOnBarcode()
 	{
-		return true;
+		return this.onBridge;
 	}
 	
 	@Override
@@ -96,10 +97,10 @@ public class HumpbackBridgeState implements ParcourState {
 		this.SPEED_RIGHT = this.SPEED_MAX;
 		this.turn_delta = -this.TURN_INCREASE;
 		
-		this.finished = false;
+		this.onBridge = false;
 		
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
-		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
+		this.bridgeSegment = BridgeSegment.ON_BARCODE;
 		this.robot.lowerUS();
 		
 		this.robot.setSpeed(this.SPEED_MAX);
@@ -130,6 +131,57 @@ public class HumpbackBridgeState implements ParcourState {
 		}
 		
 		switch (this.bridgeSegment) {
+			
+		case ENTIRE_BRIDGE:
+			
+			this.color = RobotComponents.inst().getColorSensor().sample()[0];
+			
+			if (this.color > 0.8f) {
+				this.bridgeSegment = BridgeSegment.BRIDGE_TRAVERSED;
+				return;
+			}
+			
+			if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
+				
+				this.turning = true;
+				this.robot.turnOnSpot(this.angles[this.angle_old] - this.angles[this.angle_fresh]);
+				return;
+				
+			}
+			
+			do {
+				this.distance = RobotComponents.inst().getUS().sample()[0];
+			} while (this.distance >= 1.f);
+			
+			if (this.distance > this.THRESHOLD_NO_GROUND) {
+								
+				this.SPEED_LEFT = this.SPEED_MAX;
+				this.slowDownRightMotor();
+			
+			} else {
+				
+				this.SPEED_RIGHT = this.SPEED_MAX;
+				this.slowDownLeftMotor();
+				
+			}
+		
+			break;
+			
+		case ON_BARCODE:
+			
+			this.color = RobotComponents.inst().getColorSensor().sample()[0];
+		
+			if (this.color < 0.8f) {
+				this.onBridge = true;
+				this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
+			}
+			
+			break;
+			
+		case BRIDGE_TRAVERSED:
+			
+			break;
+		
 		case PRE_COLLISION:
 			
 			if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) 
@@ -184,45 +236,6 @@ public class HumpbackBridgeState implements ParcourState {
 			
 			break;
 			
-		case ENTIRE_BRIDGE:
-			
-			this.color = RobotComponents.inst().getColorSensor().sample()[0];
-			
-			if (this.color > 0.8f) {
-				this.bridgeSegment = BridgeSegment.BRIDGE_TRAVERSED;
-				this.finished = false;
-				return;
-			}
-			
-			if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
-				
-				this.turning = true;
-				this.robot.turnOnSpot(this.angles[this.angle_old] - this.angles[this.angle_fresh]);
-				return;
-				
-			}
-			
-			do {
-				this.distance = RobotComponents.inst().getUS().sample()[0];
-			} while (this.distance >= 1.f);
-			
-			if (this.distance > this.THRESHOLD_NO_GROUND) {
-								
-				this.SPEED_LEFT = this.SPEED_MAX;
-				this.slowDownRightMotor();
-			
-			} else {
-				
-				this.SPEED_RIGHT = this.SPEED_MAX;
-				this.slowDownLeftMotor();
-				
-			}
-		
-			break;
-			
-		case BRIDGE_TRAVERSED:
-			
-			break;
 		}
 	}
 
