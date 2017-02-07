@@ -1,7 +1,9 @@
 package state;
 
+import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
+import util.Util;
 import util.lcdGui.LCDGui;
 
 public class SwampState implements ParcourState {
@@ -63,8 +65,6 @@ public class SwampState implements ParcourState {
 		
 		if (RobotComponents.inst().getTouchSensorB().sample()[0] == 1) {
 			this.swampSegment = SwampSegment.ERROR;
-			this.robot.setSpeed(0.2f);
-			this.robot.forward();
 			return;
 		}
 		
@@ -90,6 +90,8 @@ public class SwampState implements ParcourState {
 			
 			this.gui.setVarValue(0, "NO_SWAMP");
 			
+			while(!Util.isPressed(Button.DOWN.getId())) {}
+			
 			if (this.distances[this.distance_fresh] < 0.05f &&
 					this.distances[this.distance_old] < 0.05f) {
 				this.swampSegment = SwampSegment.SWAMP;
@@ -104,6 +106,8 @@ public class SwampState implements ParcourState {
 		case SWAMP:
 			
 			this.gui.setVarValue(0, "SWAMP");
+			
+			while(!Util.isPressed(Button.DOWN.getId())) {}
 			
 			if (this.distances[this.distance_fresh] > 0.05f
 					&& this.distances[this.distance_old] > 0.05f) {
@@ -120,6 +124,11 @@ public class SwampState implements ParcourState {
 			
 			this.gui.setVarValue(0, "ERROR");
 			
+			while(!Util.isPressed(Button.DOWN.getId())) {}
+			
+			this.robot.setSpeed(0.2f);
+			this.robot.forward();
+			
 			if (this.error == 5) {
 				this.finished = true;
 				return;
@@ -129,6 +138,9 @@ public class SwampState implements ParcourState {
 				this.error++;
 			} else {
 				this.swampSegment = SwampSegment.NO_SWAMP;
+
+				this.robot.setSpeed(1f);
+				this.robot.forward();
 				this.error = 0;
 			}
 			
