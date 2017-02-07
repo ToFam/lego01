@@ -13,12 +13,7 @@ public class Endboss implements ParcourState {
 	public enum EndbossState
 	{
 		START, DRIVE_LEFTWALL_TOBOSS, DRIVETOBOSS_RETREAT, DRIVETOBOSS_TURN, LOWER_SHOOT, SHOOT, UPPER_SHOOT, TURN,
-		LURE, LURE_RETREAT, LURE_TURN, PUSH, PUSH_RETREAT, PUSH_TURN, DRIVE_LTW
-		DRIVETOBOSS_RETREAT,
-		DRIVETOBOSS_TURN,
-		LOWER_SHOOT,
-		SHOT,
-		UPPER_SHOOT
+		LURE, LURE_RETREAT, LURE_TURN, PUSH, PUSH_RETREAT, PUSH_TURN, DRIVE_LTW, DRIVE_RETREAT, DRIVE_TURN
 	}
 
 	
@@ -215,11 +210,45 @@ public class Endboss implements ParcourState {
     	    {
     	        robot.stop();
     	        robot.turnOnSpot(180);
+                robot.setSpeed(param_robotMaxSpeed);
     	        state = EndbossState.DRIVE_LTW;
     	    }
     	    break;
     	case DRIVE_LTW:
+            if (touch.sample()[0] == 1.0f)
+            {
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(330);
+                state = EndbossState.DRIVE_RETREAT;
+            }
+            else
+            {
+                float samp = us.sample()[0];
+                
+                turn = (samp - param_goalDistance_toboss) * 25;
+                robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+                robot.forward();
+            }
+            
+            break;
+    	case DRIVE_RETREAT:
+    	    if (robot.finished())
+    	    {
+    	        robot.stop();
+    	        robot.turnOnSpot(-90);
+    	        state = EndbossState.DRIVE_TURN;
+    	    }
     	    break;
-    	}
+    	case DRIVE_TURN:
+    	    if (robot.finished())
+    	    {
+    	        robot.stop();
+    	        robot.setSpeed(param_robotMaxSpeed);
+    	        robot.forward();
+    	        state = EndbossState.DRIVE_LTW;
+    	    }
+    	    break;
+    	}   
     }
 }
