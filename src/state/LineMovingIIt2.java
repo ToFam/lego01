@@ -46,7 +46,7 @@ public class LineMovingIIt2 implements ParcourState {
     private float param_UvEndMax = 0.12f;
     private int param_UvTimeBetween = 800;
     
-    private float param_find_angle = 30f;
+    private float param_find_angle = 40f;
     private int param_find_moveStraigt_distance = 300;
     private int param_drive_down_of_barcode_distance = 450;
     private boolean param_debugWaits = false;
@@ -148,7 +148,7 @@ public class LineMovingIIt2 implements ParcourState {
     		if (robot.finished())
     		{
         		gyroStartFindValue = gyroSensor.sample()[0];
-        		robot.turnOnSpot(param_find_angle);
+        		robot.turnOnSpot((int)(param_find_angle * 0.7f));
             	//gui.setVarValue(1, String.valueOf(gyroStartFindValue), 5);
         		
         		//gui.writeLine("Short straight");
