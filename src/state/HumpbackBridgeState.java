@@ -2,10 +2,12 @@ package state;
 
 import robot.Robot;
 import robot.RobotComponents;
+import util.lcdGui.LCDGui;
 
 public class HumpbackBridgeState implements ParcourState {
 
 	private final Robot robot;
+	private LCDGui gui;
 	private final float SPEED_MAX;
 	private final float SPEED_MIN_LEFT;
 	private final float SPEED_MIN_RIGHT;
@@ -30,6 +32,7 @@ public class HumpbackBridgeState implements ParcourState {
 	private float correction;
 
 	private float color;
+	private int time;
 	private boolean onBridge;
 	
 	private enum BridgeSegment {
@@ -44,11 +47,12 @@ public class HumpbackBridgeState implements ParcourState {
 	
 	public HumpbackBridgeState(Robot robot) {
 		this.robot = robot;
+		this.gui = new LCDGui(1, 1);
 
 		this.SPEED_MAX = 1f;
-		this.SPEED_MIN_LEFT = .6f;
+		this.SPEED_MIN_LEFT = .5f;
 		this.SPEED_MIN_RIGHT = .2f;
-		this.MINUS_LEFT_DELTA = .5f;
+		this.MINUS_LEFT_DELTA = .6f;
 		this.MINUS_RIGHT_DELTA = .8f;
 		this.TURN_INCREASE = 0.2f;
 //		this.TURN_INCREASE = 0.00f;
@@ -94,6 +98,7 @@ public class HumpbackBridgeState implements ParcourState {
 		this.turn_delta = -this.TURN_INCREASE;
 		
 		this.onBridge = false;
+		this.time = 0;
 		
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
 		this.bridgeSegment = BridgeSegment.ON_BARCODE;
@@ -139,12 +144,17 @@ public class HumpbackBridgeState implements ParcourState {
 			
 			if (Math.abs(this.angles[this.angle_old] - this.angles[this.angle_fresh]) > this.GYRO_ALARM) {
 				
+				this.gui.setVarValue(0, "turning");
+				
 				this.turning = true;
 				this.robot.turnOnSpot(this.angles[this.angle_old] - this.angles[this.angle_fresh]);
 				return;
 				
 			}
 			
+			this.gui.setVarValue(0, "ENTIRE_BRIDGE");
+
+			this.distance = RobotComponents.inst().getUS().sample()[0];
 
 			while (this.distance >= 1.f) {
 				this.robot.stop();
@@ -167,16 +177,40 @@ public class HumpbackBridgeState implements ParcourState {
 			
 		case ON_BARCODE:
 			
+			this.gui.setVarValue(0, "ON_BARCODE");
+			
 			this.color = RobotComponents.inst().getColorSensor().sample()[0];
+			this.time += elapsedTime;
 		
-			if (this.color < 0.8f) {
+			if (this.color < 0.8f && this.time > 500) {
 				this.onBridge = true;
 				this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
+			}
+			
+			this.distance = RobotComponents.inst().getUS().sample()[0];
+
+			while (this.distance >= 1.f) {
+				this.robot.stop();
+				this.distance = RobotComponents.inst().getUS().sample()[0];
+			}
+			
+			if (this.distance > this.THRESHOLD_NO_GROUND) {
+								
+				this.SPEED_LEFT = this.SPEED_MAX;
+				this.slowDownRightMotor();
+			
+			} else {
+				
+				this.SPEED_RIGHT = this.SPEED_MAX;
+				this.slowDownLeftMotor();
+				
 			}
 			
 			break;
 			
 		case BRIDGE_TRAVERSED:
+			
+			this.gui.setVarValue(0, "BRIDGE_TRAVERSED");
 			
 			break;
 		
