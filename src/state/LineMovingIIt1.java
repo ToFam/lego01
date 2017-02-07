@@ -41,7 +41,7 @@ public class LineMovingIIt1 implements ParcourState {
     private int param_lastGyroSamplesAmountToCheckFalseDirection = 3;
     
     private float param_find_angle = 30f;
-    private int param_find_moveStraigt_distance = 360 * 2;
+    private int param_find_moveStraigt_distance = 300;
     private int param_drive_down_of_barcode_distance = 450;
     private boolean param_debugWaits = false;
     
