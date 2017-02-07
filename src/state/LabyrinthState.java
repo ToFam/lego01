@@ -17,7 +17,8 @@ public class LabyrinthState implements ParcourState
     private static final float CRITICAL_JUMP = 0.03f;
     private static final float TURN_FACTOR = 15.f;
     private static final float STANDARD_SPEED = 1.f;
-    private static final int TIME_STRAIGHT = 100;
+    private static final int RETREAT_DEGREE = 300;
+    private static final int TIME_STRAIGHT = 500;
 
     private Robot robot;
     private LCDGui gui;
@@ -26,6 +27,46 @@ public class LabyrinthState implements ParcourState
     private float last_samp = DISTANCE_SHOULD;
     private float turnAngle = 0.f;
     private int elapsedInterval = 0;
+    
+    public class DeadlockDetector
+    {
+        private float lastSample;
+        private float elapsed;
+        private float interval;
+        private float minDiff;
+
+        public DeadlockDetector(float interval, float minDiff)
+        {
+            this.interval = interval;
+            this.minDiff = minDiff;
+        }
+        
+        public void init()
+        {
+            elapsed = 0.f;
+            lastSample = RobotComponents.inst().getGyroSensor().sample()[0];
+        }
+        
+        public boolean stuck(float elapsedTime)
+        {
+            elapsed += elapsedTime;
+            if (elapsed > interval)
+            {
+                elapsed  = 0.f;
+                
+                float sample = RobotComponents.inst().getGyroSensor().sample()[0];
+                if (sample - lastSample < minDiff)
+                {
+                    lastSample = sample;
+                    return true;
+                }
+                
+                lastSample = sample;
+            }
+            
+            return false;
+        }
+    }
     
     // Ignore this for now
     public abstract class Action 
@@ -124,7 +165,7 @@ public class LabyrinthState implements ParcourState
                 state = State.RETREAT;
                 stateChangeDebug();
                 robot.setSpeed(STANDARD_SPEED);
-                robot.move(360);
+                robot.move(RETREAT_DEGREE);
             }
             else
             {
@@ -139,7 +180,7 @@ public class LabyrinthState implements ParcourState
                         robot.stop();
                         stateChangeDebug();
                         robot.setSpeed(STANDARD_SPEED);
-                        robot.move(360);
+                        robot.move(RETREAT_DEGREE);
                         return;
                     }
                 }
@@ -234,7 +275,7 @@ public class LabyrinthState implements ParcourState
                 state = State.RETREAT;
                 stateChangeDebug();
                 robot.setSpeed(STANDARD_SPEED);
-                robot.move(360);
+                robot.move(RETREAT_DEGREE);
                 return;
             }
             elapsedInterval += elapsedTime;
