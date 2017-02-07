@@ -12,7 +12,7 @@ public class Endboss implements ParcourState {
 	
 	public enum EndbossState
 	{
-		START, DRIVE_LEFTWALL_TOBOSS, DRIVETOBOSS_RETREAT, DRIVETOBOSS_TURN, LOWER_SHOOT, SHOOT, UPPER_SHOOT, TURN,
+		START, DRIVE_LEFTWALL_TOBOSS, DRIVETOBOSS_RETREAT, DRIVETOBOSS_TURN, LOWER_SHOOT, SHOOT, UPPER_SHOOT,
 		LURE, LURE_RETREAT, LURE_TURN, PUSH, PUSH_RETREAT, PUSH_TURN, DRIVE_LTW, DRIVE_RETREAT, DRIVE_TURN
 	}
 
@@ -85,8 +85,8 @@ public class Endboss implements ParcourState {
     {
         waitCounter -= timeElapsed;
         if (waitCounter >= 0)
-            return false;
-        return true;
+            return true;
+        return false;
     }
     
     @Override
@@ -156,18 +156,11 @@ public class Endboss implements ParcourState {
             {
                 RobotComponents.inst().getMediumMotor().stop();
                 RobotComponents.inst().getMediumMotor().rotateTo(mediumStart, true);
-                robot.turnOnSpot(-90);
-                state = EndbossState.TURN;
+                robot.setSpeed(param_robotMaxSpeed);
+                robot.forward();
+                state = EndbossState.LURE;
             }
             break;
-    	case TURN:
-    	    if (robot.finished())
-    	    {
-    	        robot.setSpeed(param_robotMaxSpeed);
-    	        robot.forward();
-    	        state = EndbossState.LURE;
-    	    }
-    	    break;
     	case LURE:
             if (touch.sample()[0] == 1.0f)
             {
