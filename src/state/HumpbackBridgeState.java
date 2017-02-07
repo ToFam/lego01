@@ -275,8 +275,9 @@ public class HumpbackBridgeState implements ParcourState {
 	public void reset() {
 		this.robot.raiseUS();
 		this.robot.stop();
+		this.gui.clearLCD();
 		
-		while (!this.robot.USisUp()) {}
+//		while (!this.robot.USisUp()) {}
 	}
 	
 	private void slowDownLeftMotor() {
