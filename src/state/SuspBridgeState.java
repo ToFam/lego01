@@ -40,7 +40,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_kpRamp = 32f * 1.3f;
     private int param_gyroFilterSize = 4;
     private int param_uvFilterSize = 4;
-    private int param_timeGyroMedianOnStraight = 5000;
+    private int param_timeGyroMedianOnStraight = 4000;
     private int param_samplesGyroAverageOnSraight = 5;
     private int param_timeGyroMedianOnRamp = 3000;
     private int param_minTimeOnBridge = 5000;
@@ -50,7 +50,7 @@ public class SuspBridgeState implements ParcourState {
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
     private int param_driveTimeAfterCaught = 500;
-    private float param_bridgeAngleOffset = -2f;
+    private float param_bridgeAngleOffset = -3f;
     private boolean param_debugWaits = false;
 
     private boolean end_of_line = false;
@@ -276,18 +276,18 @@ public class SuspBridgeState implements ParcourState {
     			gui.writeLine("Val is: " + String.valueOf(rampAngle));
     			//gui.writeLine("GyrCount: " + String.valueOf(rampGyrosCount));
     			//gui.writeLine("CutCount: " + String.valueOf(cuttedCounter));
-    			if (param_debugWaits)
+    			/*if (param_debugWaits)
     			{
     				robot.stop();
         			while(Util.isPressed(Button.ID_DOWN) == false) {}
         			robot.forward();
-    			}
+    			}*/
     			
     			robot.stop();
     			float curAngle = gyroSensor.sample()[0];
 
     			gui.writeLine("Gonna turn");
-    			if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
     			
     			//robot.turnOnSpot(rampAngle - curAngle);
     			robot.turnOnSpotExact(rampAngle);
@@ -302,7 +302,7 @@ public class SuspBridgeState implements ParcourState {
     		{
     			gui.setVarValue(1,  gyroSensor.sample()[0], 5);
     			gui.writeLine("Adjusted");
-    			if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
+    			//if (param_debugWaits) { while(Util.isPressed(Button.ID_DOWN) == false) {} }
     			
 
     			gui.writeLine("Adjusted");
@@ -326,6 +326,11 @@ public class SuspBridgeState implements ParcourState {
     			
     			timeInfinityCounter = 0;
     			robot.stop();
+    			
+    			if (param_debugWaits)
+    			{
+        			while(Util.isPressed(Button.ID_DOWN) == false) {}
+    			}
     			end_of_line = true;
     			state = S_SuspBridgeState.DRIVE_SHORT_STRAIGHT_AFTER_CAUGHT;
     		}
