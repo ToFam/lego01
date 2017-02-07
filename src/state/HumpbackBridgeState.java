@@ -156,7 +156,7 @@ public class HumpbackBridgeState implements ParcourState {
 
 			this.distance = RobotComponents.inst().getUS().sample()[0];
 
-			while (this.distance >= 1.f) {
+			if (this.distance >= 1.f) {
 				this.robot.move(50);
 				this.distance = RobotComponents.inst().getUS().sample()[0];
 			}
@@ -195,7 +195,7 @@ public class HumpbackBridgeState implements ParcourState {
 			
 			this.distance = RobotComponents.inst().getUS().sample()[0];
 
-			while (this.distance >= 1.f) {
+			if (this.distance >= 1.f) {
 				this.robot.move(50);
 				this.distance = RobotComponents.inst().getUS().sample()[0];
 			}
