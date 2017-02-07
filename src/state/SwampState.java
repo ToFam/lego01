@@ -163,6 +163,7 @@ public class SwampState implements ParcourState {
 	@Override
 	public void reset() {
 		this.gui.clearLCD();
+		this.robot.stop();
 	}
 
 	@Override
