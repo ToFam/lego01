@@ -11,18 +11,12 @@ import sensor.modes.GyroSensorMode;
 import sensor.modes.USSensorMode;
 import state.BridgeTest;
 import state.Endboss;
-import state.HumpbackBridgeState;
 import state.LabyrinthState;
 import state.LineMovingIIt1;
-import state.LineMovingIIt2;
-import state.LineState;
+import state.Music;
 import state.ParcourState;
 import state.SuspBridgeState;
 import state.SwampEasy;
-import state.SwampState;
-import state.TestDriveLTWall;
-import state.TestGUI;
-import state.TestState;
 import util.Util;
 import util.lcdGui.LCDChooseList;
 import util.lcdGui.LCDGui;
@@ -58,6 +52,7 @@ public class Main {
         
     public void initStates() {
         this.states = new ParcourState[] {
+            new Music("Chacarron_Intro.aiff"),
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
