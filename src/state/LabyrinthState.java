@@ -13,14 +13,14 @@ import util.lcdGui.LCDGui;
 
 public class LabyrinthState implements ParcourState 
 {
-    private static final float DISTANCE_SHOULD = 0.1f;
+    private static final float DISTANCE_SHOULD = 0.15f;
     private static final float TOO_NEAR = 0.04f;
     private static final float TOO_FAR = 0.2f;
     private static final float CRITICAL_JUMP = 0.03f;
     private static final float TURN_FACTOR = 15.f;
     private static final float STANDARD_SPEED = 1.f;
-    private static final int RETREAT_DEGREE = 300;
-    private static final int TIME_STRAIGHT = 500;
+    private static final int RETREAT_DEGREE = 50;
+    private static final int TIME_STRAIGHT = 200;
 
     private Robot robot;
     private LCDGui gui;
@@ -299,6 +299,7 @@ public class LabyrinthState implements ParcourState
             {
                 robot.stop();
                 robot.setSpeed(STANDARD_SPEED);
+                elapsedInterval = 0;
                 state = State.STRAIGHT;
                 stateChangeDebug();
             }

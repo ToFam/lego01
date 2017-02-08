@@ -12,8 +12,28 @@ public class Endboss implements ParcourState {
 	
 	public enum EndbossState
 	{
-		START, DRIVE_LEFTWALL_TOBOSS, DRIVETOBOSS_RETREAT, DRIVETOBOSS_TURN, LOWER_SHOOT, SHOOT, UPPER_SHOOT,
-		LURE, LURE_RETREAT, LURE_TURN, PUSH, PUSH_RETREAT, PUSH_TURN, DRIVE_LTW, DRIVE_RETREAT, DRIVE_TURN
+		START, 
+		    DRIVE_LEFTWALL_TOBOSS, 
+	        DRIVETOBOSS_RETREAT, 
+	        DRIVETOBOSS_TURN, 
+	        LOWER_SHOOT, 
+	        SHOOT, 
+	        UPPER_SHOOT,
+		LURE, 
+		    LURE_RETREAT, 
+		    LURE_TURN, 
+		PUSH, 
+		    PUSH_RETREAT, 
+		    PUSH_TURN, 
+	    DRIVE_LTW, 
+		    DRIVE_RETREAT, 
+		    DRIVE_TURN, 
+	    DRIVE_LTW_ENTRY, 
+		    DRIVE_LTW_ENTRY_RETREAT, 
+		    DRIVE_LTW_ENTRY_TURN,
+		DRIVE_LTW_EXIT,
+		    DRIVE_LTW_EXIT_RETREAT,
+		    DRIVE_LTW_EXIT_TURN
 	}
 
 	
@@ -240,9 +260,79 @@ public class Endboss implements ParcourState {
     	        robot.stop();
     	        robot.setSpeed(param_robotMaxSpeed);
     	        robot.forward();
-    	        state = EndbossState.DRIVE_LTW;
+    	        state = EndbossState.DRIVE_LTW_ENTRY;
     	    }
     	    break;
-    	}   
+    	case DRIVE_LTW_ENTRY:
+            if (touch.sample()[0] == 1.0f)
+            {
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(330);
+                state = EndbossState.DRIVE_LTW_ENTRY_RETREAT;
+            }
+            else
+            {
+                float samp = us.sample()[0];
+                
+                turn = (samp - param_goalDistance_toboss) * 25;
+                robot.steer(Math.max(-0.8f, Math.min(0.1f, turn)));
+                robot.forward();
+            }
+            
+            break;
+        case DRIVE_LTW_ENTRY_RETREAT:
+            if (robot.finished())
+            {
+                robot.stop();
+                robot.turnOnSpot(-90);
+                state = EndbossState.DRIVE_LTW_ENTRY_TURN;
+            }
+            break;
+        case DRIVE_LTW_ENTRY_TURN:
+            if (robot.finished())
+            {
+                robot.stop();
+                robot.setSpeed(param_robotMaxSpeed);
+                robot.forward();
+                state = EndbossState.DRIVE_LTW_EXIT;
+            }
+            break;
+        case DRIVE_LTW_EXIT:
+            if (touch.sample()[0] == 1.0f)
+            {
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(330);
+                state = EndbossState.DRIVE_LTW_EXIT_RETREAT;
+            }
+            else
+            {
+                float samp = us.sample()[0];
+                
+                turn = (samp - param_goalDistance_toboss) * 25;
+                robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+                robot.forward();
+            }
+            
+            break;
+        case DRIVE_LTW_EXIT_RETREAT:
+            if (robot.finished())
+            {
+                robot.stop();
+                robot.turnOnSpot(-90);
+                state = EndbossState.DRIVE_LTW_EXIT_TURN;
+            }
+            break;
+        case DRIVE_LTW_EXIT_TURN:
+            if (robot.finished())
+            {
+                robot.stop();
+                robot.setSpeed(param_robotMaxSpeed);
+                robot.forward();
+                state = EndbossState.DRIVE_LTW_EXIT;
+            }
+            break;
+    	}
     }
 }
