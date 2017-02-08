@@ -59,7 +59,8 @@ public class Main {
     		new HumpbackBridgeState(robot),		// Grosse Brucke
     		new LineMovingIIt1(robot, true),			// Linie nach Brucke
     		new LineMovingIIt1(robot, true),			// Linie nach Brucke
-    		new LineMovingIIt2(robot, false),			// Linie nach Brucke
+    		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
+    		//new LineMovingIIt2(robot, false),			// Linie nach Brucke
     		// new Seesaw(robot),				// Wippe
     		// new LineMovingIIt1(robot),		// Linie nach Wippe
     		//new SwampState(robot),				// Sumpf

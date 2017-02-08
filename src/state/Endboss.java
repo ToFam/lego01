@@ -33,7 +33,11 @@ public class Endboss implements ParcourState {
 		    DRIVE_LTW_ENTRY_TURN,
 		DRIVE_LTW_EXIT,
 		    DRIVE_LTW_EXIT_RETREAT,
-		    DRIVE_LTW_EXIT_TURN
+		    DRIVE_LTW_EXIT_TURN,
+		    
+		    
+		    
+		    TURN_BLABLABLA
 	}
 
 	
@@ -42,7 +46,7 @@ public class Endboss implements ParcourState {
     
     
     private static final float param_robotMaxSpeed = 1f;
-    private static final float param_goalDistance_toboss = 0.1f;
+    private static final float param_goalDistance_toboss = 0.1f + 0.04f;
     private static final float param_robotRetreatSpeed = 0.8f;
     private static final int param_timeLoweringTheCancnon = 4000;
     private static final int param_timePush = 10000;
@@ -215,7 +219,7 @@ public class Endboss implements ParcourState {
     	    {
     	        robot.stop();
     	        robot.setSpeed(param_robotRetreatSpeed);
-    	        robot.move(330);
+    	        robot.move(450);
     	        state = EndbossState.PUSH_RETREAT;
     	    }
     	    break;
@@ -223,24 +227,31 @@ public class Endboss implements ParcourState {
     	    if (robot.finished())
     	    {
     	        robot.stop();
-    	        robot.turnOnSpot(180);
                 robot.setSpeed(param_robotMaxSpeed);
-    	        state = EndbossState.DRIVE_LTW;
+    	        robot.turnOnSpot(180);
+    	        state = EndbossState.TURN_BLABLABLA;
     	    }
     	    break;
+    	case TURN_BLABLABLA:
+    		if (robot.finished())
+    		{
+    			robot.stop();
+    			state = EndbossState.DRIVE_LTW;
+    		}
+    		break;
     	case DRIVE_LTW:
             if (touch.sample()[0] == 1.0f)
             {
                 robot.stop();
                 robot.setSpeed(param_robotRetreatSpeed);
-                robot.move(330);
+                robot.move(240);
                 state = EndbossState.DRIVE_RETREAT;
             }
             else
             {
                 float samp = us.sample()[0];
                 
-                turn = (samp - param_goalDistance_toboss) * 25;
+                turn = (samp - (param_goalDistance_toboss + 0.06f)) * 25;
                 robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
                 robot.forward();
             }
@@ -268,7 +279,7 @@ public class Endboss implements ParcourState {
             {
                 robot.stop();
                 robot.setSpeed(param_robotRetreatSpeed);
-                robot.move(330);
+                robot.move(240);
                 state = EndbossState.DRIVE_LTW_ENTRY_RETREAT;
             }
             else
@@ -303,7 +314,7 @@ public class Endboss implements ParcourState {
             {
                 robot.stop();
                 robot.setSpeed(param_robotRetreatSpeed);
-                robot.move(330);
+                robot.move(240);
                 state = EndbossState.DRIVE_LTW_EXIT_RETREAT;
             }
             else
