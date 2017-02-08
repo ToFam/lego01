@@ -6,6 +6,7 @@ import robot.RobotComponents;
 import sensor.GyroSensor;
 import sensor.TouchSensorBThread;
 import sensor.USSensor;
+import sensor.modes.UVSensorMode;
 import util.Util;
 import util.lcdGui.LCDGui;
 
@@ -20,6 +21,8 @@ public class BridgeTest implements ParcourState {
 		UV_ISUP,
 		UV_ISDOWN,
 		
+		GYRO_ALARM_TURNING,
+		
 		END
 	}
 
@@ -32,6 +35,7 @@ public class BridgeTest implements ParcourState {
     private int param_timeNoBarcode = 3000;
     private int param_timeStraight = 1000;
     private float param_thresholdAbyss = 0.075f;
+    private float param_gyroAlarm = 17f;
     private float param_maxAngleOffsetLeft = 30f;
     private boolean param_debugWaits = false;
 
@@ -98,10 +102,22 @@ public class BridgeTest implements ParcourState {
     float turn = 0;
     int noBarcodeCounter = 0;
     
+    int timeGyroCount = 0;
+    
+    int timeNoAlarm = 0;
+    boolean onceAlarm = false;
+    boolean alarmTurned = false;
+    
     
     @Override
     public void update(int elapsedTime)
     {
+    	if (uvSensor.instSample()[0] == Float.POSITIVE_INFINITY)
+    	{
+    		robot.stop();
+			uvSensor.setMode(UVSensorMode.DISTANCE.getIdf());
+    	}
+    	
     	if (noBarcodeCounter * elapsedTime >= param_timeNoBarcode)
     	{
     		end_of_line = true;
@@ -111,7 +127,7 @@ public class BridgeTest implements ParcourState {
     		noBarcodeCounter++;
     	}
     	
-    	gui.setVarValue(0, uvSensor.sample()[0]);
+    	gui.setVarValue(0, gyroSensor.instSample()[0]);
     	
     	switch (state)
     	{
@@ -128,6 +144,12 @@ public class BridgeTest implements ParcourState {
     		
     		break;
     	case WAIT_SHORT:
+    		robot.stop();
+    		if (timeCount == 0)
+    		{
+    			uvSensor.setMode(UVSensorMode.DISTANCE.getIdf());
+    		}
+    		
     		timeCount++;
     		if (timeCount * elapsedTime >= 2000)
     		{
@@ -136,7 +158,7 @@ public class BridgeTest implements ParcourState {
     		
     		break;
     	case WAIT_FOR_UV_INIT:
-    		float uvVal = uvSensor.sample()[0];
+    		float uvVal = uvSensor.instSample()[0];
     		
     		if (uvVal == Float.POSITIVE_INFINITY)
     		{
@@ -160,29 +182,37 @@ public class BridgeTest implements ParcourState {
     		}
     		break;
     	case DRIVING_UP:
+    		timeGyroCount++;
     		
+    		float sample = uvSensor.instSample()[0];
     		
-    		float sample = uvSensor.sample()[0];
+    		boolean onRamp = uvSensor.instSample()[0] > param_thresholdAbyss ? false : true;
     		
-    		boolean onRamp = uvSensor.sample()[0] > param_thresholdAbyss ? false : true;
-    		
-    		float samp = onRamp ? 0.2f : -0.6f;
+    		float samp = onRamp ? 0.07f : -0.6f;
     		
     		if (sample == Float.POSITIVE_INFINITY)
     		{
     			samp = 0.f;
     		}
-    		else
+    		else if (rampAngle == Float.MAX_VALUE)
     		{
-        		rampGyros[rampGyrosCount] = gyroSensor.sample()[0];
-        		rampGyrosCount++;
-        		if (rampGyrosCount >= rampGyros.length)
+    			if (rampGyrosCount < rampGyros.length)
+    			{
+            		rampGyros[rampGyrosCount] = gyroSensor.sample()[0];
+            		rampGyrosCount++;
+    			}
+        		/*if (rampGyrosCount >= rampGyros.length)
         		{
         			rampGyrosCount = 0;
+        		}*/
+        		
+        		if (timeGyroCount * elapsedTime >= 3000)
+        		{
+        			rampAngle = Util.average(rampGyros, rampGyrosCount);
         		}
     		}
     		
-    		if (sample == Float.POSITIVE_INFINITY && foundBorderOnce)
+    		/*if (sample == Float.POSITIVE_INFINITY && foundBorderOnce)
     		{
     			float avg = 0f;
     			for (int i = 0; i < 10; i++)
@@ -199,7 +229,7 @@ public class BridgeTest implements ParcourState {
     			robot.turnOnSpotExact(avg);
     			
     			state = BridgeState.TURNING_ON_INFINITY;
-    		}
+    		}*/
     		
     		float curGyro = gyroSensor.sample()[0];
     		/*if (foundBorderOnce == false && curGyro > firstGyro + param_maxAngleOffsetLeft)
@@ -207,15 +237,48 @@ public class BridgeTest implements ParcourState {
     			samp = 0f;
     		}*/
     		
-    		if (! onRamp)
+    		if (rampAngle != Float.MAX_VALUE && curGyro < rampAngle - param_gyroAlarm)
     		{
-    			foundBorderOnce = true;
+    			onceAlarm = true;
+    			timeNoAlarm = 0;
+    			robot.turnOnSpot(param_gyroAlarm);
+    			state = BridgeState.GYRO_ALARM_TURNING;
     		}
-            
-            turn = (samp) * 30f;
-            robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
-            robot.forward();
+    		else
+    		{
+    			if (onceAlarm && alarmTurned == false)
+    			{
+        			timeNoAlarm++;
+    			}
+        		if (! onRamp)
+        		{
+        			foundBorderOnce = true;
+        		}
+                
+                turn = (samp) * 30f;
+                robot.steer(Math.max(-0.8f, Math.min(0.53f, turn)));
+                robot.forward();
+    		}
     		
+    		
+    		if (alarmTurned == false && timeNoAlarm * elapsedTime >= 5000)
+    		{
+    			alarmTurned = true;
+    			rampAngle += 38f;
+    			gui.writeLine("Turned: " + rampAngle);
+    		}
+    		
+    		
+    		
+    		
+    		
+    		
+    		break;
+    	case GYRO_ALARM_TURNING:
+    		if (robot.finished())
+    		{
+    			state = BridgeState.DRIVING_UP;
+    		}
     		break;
     	case TURNING_ON_INFINITY:
     		if (robot.finished())
