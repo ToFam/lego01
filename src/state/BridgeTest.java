@@ -30,8 +30,8 @@ public class BridgeTest implements ParcourState {
     
     private float param_robotMaxSpeed = 1f;
     private int param_timeNoBarcode = 3000;
-    private int param_timeStraight = 2000;
-    private float param_thresholdAbyss = 0.05f;
+    private int param_timeStraight = 1000;
+    private float param_thresholdAbyss = 0.075f;
     private float param_maxAngleOffsetLeft = 30f;
     private boolean param_debugWaits = false;
 
