@@ -36,8 +36,8 @@ public class Main {
     private Robot robot;
     private LCDChooseList mainMenu;
     
-    private final ParcourState[] states;
-    private final String[] elements;
+    private ParcourState[] states;
+    private String[] elements;
     private int state;
     
     private static final float COLOR_THRESHOLD = 0.9f;
@@ -52,6 +52,10 @@ public class Main {
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
         RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());
         
+        initStates();
+    }
+        
+    public void initStates() {
         this.states = new ParcourState[] {
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LabyrinthState(robot),			// Start und Labyrinth
@@ -108,14 +112,23 @@ public class Main {
     public void run()
     {
     	boolean backToMenu = false;
+    	boolean resetStates = false;
     	int btn;
     	
     	// Main Menu Loop
         while (true) {
             mainMenu.repaint();
             
+            
+            
             do {
                 btn = Button.waitForAnyPress();
+                
+                if (btn == Button.LEFT.getId())
+                {
+                    resetStates = true;
+                    break;
+                }
                 
                 if (Util.isPressed(Button.UP.getId())) {
                     mainMenu.moveOneUp();
@@ -125,6 +138,13 @@ public class Main {
                 }
                 
             } while (btn != Button.RIGHT.getId());
+            
+            if (resetStates)
+            {
+                resetStates = false;
+                initStates();
+                continue;
+            }
 
             LCDGui.clearLCD();
             state = mainMenu.getCurrentSelected();

@@ -87,7 +87,7 @@ public class Endboss implements ParcourState {
     }
     
     public void reset() {
-        
+        robot.stop();
     }
     
     private GyroSensor gyros;
