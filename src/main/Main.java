@@ -1,13 +1,17 @@
 package main;
 
+import com.rokid.ev3.example.EventHandle;
 import com.rokid.ev3.gui.BrickButton;
 import com.rokid.ev3.gui.Container;
 import com.rokid.ev3.gui.Desktop;
 import com.rokid.ev3.gui.Event;
+import com.rokid.ev3.gui.EventHandler;
 import com.rokid.ev3.gui.Label;
 import com.rokid.ev3.gui.LabelButton;
 import com.rokid.ev3.gui.LayoutCenter;
+import com.rokid.ev3.gui.LayoutV;
 import com.rokid.ev3.gui.Popup;
+import com.rokid.ev3.gui.View;
 import com.rokid.ev3.gui.Window;
 
 import lejos.hardware.Button;
@@ -128,14 +132,26 @@ public class Main {
     	int btn;
     	
     	Desktop desktop = Desktop.getDefault();
-		
+    	
+		EHandler handler = new EHandler();
+		handler.desktop = desktop;
+    	
 		Window w = new Window("Window");
-		w.setWorkspace(new LayoutCenter());
+		w.setWorkspace(new LayoutV());
 		
 		Container ws = w.getWorkspace();
-		//ws.addChild(new Label("Window Content"));
-		ws.addChild(new LabelButton("Labyrinth 1"));
-		ws.getChild(0).moveTo(100, 2);
+
+
+		com.rokid.ev3.gui.Button v3 = new LabelButton("Labyrinth 1");
+		v3.setName("labyrinth1");
+		ws.addChild(v3);
+		v3.setHandler(handler);
+		
+		com.rokid.ev3.gui.Button v4 = new LabelButton("Labyrinth 2");
+		v4.setName("labyrinth2");
+		ws.addChild(v4);
+		v4.focus();
+		v4.setHandler(handler);
 
 		w.popup(Popup.FULLSCREEN);
 		
@@ -249,4 +265,30 @@ public class Main {
 	    m.run();
 	}
 
+	
+	class EHandler implements EventHandler {
+		Desktop desktop;
+		Window win;
+
+		public Event handle(View view, Event ev) {
+			if (ev.type == Event.GUI_PRESS) {
+				if (view.getName() == "small") {
+					Window w = new Window("Sub");
+					w.moveTo(40, 40, 100,  100);
+					w.popup(Popup.CENTER);
+					w.getWorkspace().addChild(new Label("Sub Window"));
+				} 
+				else if (view.getName() == "win") {
+					win.popup(Popup.FULLSCREEN);
+				} 
+				else if (view.getName() == "light") {
+					EventHandle.light++;
+					if (EventHandle.light >= 10)
+						EventHandle.light = 0;
+					desktop.getLED().light(EventHandle.light);
+				}
+			}
+			return ev;
+		}
+	}
 }
