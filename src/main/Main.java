@@ -1,5 +1,15 @@
 package main;
 
+import com.rokid.ev3.gui.BrickButton;
+import com.rokid.ev3.gui.Container;
+import com.rokid.ev3.gui.Desktop;
+import com.rokid.ev3.gui.Event;
+import com.rokid.ev3.gui.Label;
+import com.rokid.ev3.gui.LabelButton;
+import com.rokid.ev3.gui.LayoutCenter;
+import com.rokid.ev3.gui.Popup;
+import com.rokid.ev3.gui.Window;
+
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
@@ -35,7 +45,7 @@ import util.lcdGui.LCDGui;
  */
 public class Main {
     private Robot robot;
-    private LCDChooseList mainMenu;
+    //private LCDChooseList mainMenu;
     
     private ParcourState[] states;
     private String[] elements;
@@ -48,10 +58,10 @@ public class Main {
     public Main() {
         this.robot = new Robot();
         
-        RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
+        /*RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
         RobotComponents.inst().getTouchSensorB().setMode(0);
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());*/
         
         initStates();
     }
@@ -85,7 +95,7 @@ public class Main {
         	this.elements[i] = states[i].getName();
         }
         
-        this.mainMenu = new LCDChooseList(elements);
+        //this.mainMenu = new LCDChooseList(elements);
         this.state = 0;
         this.colorSample = 0.f;
         this.onLine = false;
@@ -117,10 +127,26 @@ public class Main {
     	boolean resetStates = false;
     	int btn;
     	
+    	Desktop desktop = Desktop.getDefault();
+		
+		Window w = new Window("Window");
+		w.setWorkspace(new LayoutCenter());
+		
+		Container ws = w.getWorkspace();
+		//ws.addChild(new Label("Window Content"));
+		ws.addChild(new LabelButton("Labyrinth 1"));
+		ws.getChild(0).moveTo(100, 2);
+
+		w.popup(Popup.FULLSCREEN);
+		
+    	
     	// Main Menu Loop
         while (true) {
-            mainMenu.repaint();
-            
+            //mainMenu.repaint();
+			desktop.refresh();
+			Event ev = desktop.eventHandle();
+			if(ev != null && ev.type == Event.KEY_PRESS && ev.intValue == BrickButton.ESC)
+				break;
             
             
             do {
@@ -132,12 +158,12 @@ public class Main {
                     break;
                 }
                 
-                if (Util.isPressed(Button.UP.getId())) {
+                /*if (Util.isPressed(Button.UP.getId())) {
                     mainMenu.moveOneUp();
                 }
                 else if (Util.isPressed(Button.DOWN.getId())) {
                     mainMenu.moveOneDown();
-                }
+                }*/
                 
             } while (btn != Button.RIGHT.getId());
             
@@ -148,8 +174,8 @@ public class Main {
                 continue;
             }
 
-            LCDGui.clearLCD();
-            state = mainMenu.getCurrentSelected();
+            //LCDGui.clearLCD();
+            //state = mainMenu.getCurrentSelected();
             
             // Normal sequential parcour operation
             while (!backToMenu)
@@ -181,7 +207,7 @@ public class Main {
 	    	            if (state < states.length - 1)
 	    	            {
 	    	            	state++;
-	    	            	mainMenu.moveOneDown();
+	    	            	//mainMenu.moveOneDown();
 	    	            }
 	    	            else
 	    	            	backToMenu = true;
