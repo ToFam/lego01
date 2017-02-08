@@ -101,6 +101,8 @@ public class Endboss implements ParcourState {
     
     private float waitCounter;
     
+    private float gyroAtPush = Float.MAX_VALUE;
+    
     private void startWait(float time)
     {
         waitCounter = time;
@@ -208,6 +210,9 @@ public class Endboss implements ParcourState {
     	    if (robot.finished())
     	    {
                 robot.stop();
+                
+                gyroAtPush = gyros.sample()[0];
+                
                 robot.setSpeed(param_robotMaxSpeed);
                 robot.forward();
                 state = EndbossState.PUSH;
@@ -228,7 +233,10 @@ public class Endboss implements ParcourState {
     	    {
     	        robot.stop();
                 robot.setSpeed(param_robotMaxSpeed);
-    	        robot.turnOnSpot(180);
+                
+                float curGyro = gyros.sample()[0];
+                
+    	        robot.turnOnSpot(180 + gyroAtPush - curGyro);
     	        state = EndbossState.TURN_BLABLABLA;
     	    }
     	    break;
