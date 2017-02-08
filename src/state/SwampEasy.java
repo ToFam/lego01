@@ -36,9 +36,9 @@ public class SwampEasy implements ParcourState {
     private float param_robotSpeedOnRampUp = 0.6f;
     private float param_robotSpeedOnBridge = 1f;
     private float param_robotRetreatSpeed = 0.6f;
-    private float param_goalDistance = 0.08f;
-    private float param_goalDistanceRampUp = 0.058f;
-    private float param_uvReachedTopOfRamp = 0.09f;
+    private float param_goalDistance = 0.08f + 0.03f;
+    private float param_goalDistanceRampUp = 0.058f + 0.03f;
+    private float param_uvReachedTopOfRamp = 0.09f + 0.03f;
     private float param_kpStraight = 32f * 1.3f;
     private float param_kpRamp = 32f * 1.3f;
     private int param_gyroFilterSize = 4;
@@ -49,7 +49,7 @@ public class SwampEasy implements ParcourState {
     private int param_minTimeOnBridge = 5000;
     private int param_minTimeOnRampDown = 3000;
     private float param_angleStraightToSuspBridge = 20f;
-    private float param_uvCatchRobotAtEndWhenUnder = 0.2f;
+    private float param_uvCatchRobotAtEndWhenUnder = 0.2f + 0.03f;
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
     private int param_driveTimeAfterCaught = 500;
@@ -212,42 +212,7 @@ public class SwampEasy implements ParcourState {
     				state = S_SuspBridgeState.GO_FULL_SPEED;
     			}
     			robot.setSpeed(param_robotMaxSpeed);
-        		
-        		/*if (straightGyrosCount * elapsedTime < param_timeGyroMedianOnStraight)
-        		{
-        			straightGyros[straightGyrosCount] = gyroSensor.sample()[0];
-        			straightGyrosCount++;
-        		}
-        		else if (straightAngle == Float.MAX_VALUE)
-        		{
-        			straightAngle = Util.average(straightGyros, straightGyrosCount);
-        			
-        			gui.writeLine("Saved straight");
-        			gui.writeLine("Val is: " + String.valueOf(straightAngle));
-        			
-        		}
-        		else if (Math.abs((gyroSensor.sample()[0] - straightAngle)) >= param_angleStraightToSuspBridge)
-        		{
-        			state = S_SuspBridgeState.ON_SUSP_RAMP_UP;
-        			
-        			gui.writeLine("STATE OnSuspRamp");
-        			
-        		}*/
-        			
-        		
-        		
-        		
-        		/*measures[c] = new MediumMotorTuple(gyroSensor.sample()[0], c);
-        		
-        		if (uvSensor.sample()[0] > uvMax)
-        		{
-        			uvMax = uvSensor.sample()[0];
-        		}
-        		
-        		measures2[c] = new MediumMotorTuple(uvSensor.sample()[0], c);
-        		c++;
-        		if (c >= measures.length)
-        			c = measures.length - 1;*/
+    			
         		float samp = uvSensor.sample()[0];
                 
                 turn = (samp - param_goalDistance) * param_kpStraight;

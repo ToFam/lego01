@@ -34,9 +34,9 @@ public class SuspBridgeState implements ParcourState {
     private float param_robotSpeedOnRampUp = 0.6f;
     private float param_robotSpeedOnBridge = 1f;
     private float param_robotRetreatSpeed = 0.6f;
-    private float param_goalDistance = 0.1f;
-    private float param_goalDistanceRampUp = 0.058f;
-    private float param_uvReachedTopOfRamp = 0.09f;
+    private float param_goalDistance = 0.1f + 0.03f;
+    private float param_goalDistanceRampUp = 0.058f + 0.03f;
+    private float param_uvReachedTopOfRamp = 0.09f + 0.03f;
     private float param_kpStraight = 32f * 1.3f;
     private float param_kpRamp = 32f * 1.3f;
     private int param_gyroFilterSize = 4;
@@ -47,11 +47,11 @@ public class SuspBridgeState implements ParcourState {
     private int param_minTimeOnBridge = 5000;
     private int param_minTimeOnRampDown = 3000;
     private float param_angleStraightToSuspBridge = 20f;
-    private float param_uvCatchRobotAtEndWhenUnder = 0.2f;
+    private float param_uvCatchRobotAtEndWhenUnder = 0.2f + 0.03f;
     private float param_percentCutBegin = 0.32f;
     private float param_percentCutEnd = 0.2f;
     private int param_driveTimeAfterCaught = 500;
-    private float param_bridgeAngleOffset = -3f;
+    private float param_bridgeAngleOffset = -2f;
     private boolean param_debugWaits = false;
 
     private boolean end_of_line = false;

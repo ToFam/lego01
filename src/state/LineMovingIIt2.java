@@ -42,8 +42,8 @@ public class LineMovingIIt2 implements ParcourState {
     private int param_angleToRecognizeFalseDirection = 140;
     private int param_lastGyroSamplesAmountToCheckFalseDirection = 3;
     
-    private float param_UvEndMin = 0.02f;
-    private float param_UvEndMax = 0.12f;
+    private float param_UvEndMin = 0.02f + 0.03f;
+    private float param_UvEndMax = 0.12f + 0.03f;
     private int param_UvTimeBetween = 800;
     
     private float param_find_angle = 40f;
