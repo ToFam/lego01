@@ -8,7 +8,7 @@ import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
-import sensor.modes.UVSensorMode;
+import sensor.modes.USSensorMode;
 import state.Endboss;
 import state.HumpbackBridgeState;
 import state.LabyrinthState;
@@ -50,7 +50,7 @@ public class Main {
         RobotComponents.inst().getColorSensor().setMode(ColorSensorMode.RED.getIdf());
         RobotComponents.inst().getTouchSensorB().setMode(0);
         RobotComponents.inst().getGyroSensor().setMode(GyroSensorMode.ANGLE.getIdf());
-        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());
         
         this.states = new ParcourState[] {
     		new LabyrinthState(robot),			// Start und Labyrinth

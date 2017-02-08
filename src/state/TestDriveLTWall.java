@@ -3,7 +3,7 @@ package state;
 import lejos.hardware.Button;
 import robot.Robot;
 import robot.RobotComponents;
-import sensor.modes.UVSensorMode;
+import sensor.modes.USSensorMode;
 import util.Util;
 import util.lcdGui.LCDGui;
 
@@ -28,7 +28,7 @@ public class TestDriveLTWall implements ParcourState {
     @Override
     public void init() {
         robot.setSpeed(1f);
-        RobotComponents.inst().getUS().setMode(UVSensorMode.DISTANCE.getIdf());
+        RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());
         RobotComponents.inst().getUS().setMedianFilter(1000);
         
         gui = new LCDGui(4, 2);

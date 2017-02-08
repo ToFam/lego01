@@ -11,7 +11,7 @@ import sensor.TouchSensorBThread;
 import sensor.USSensor;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
-import sensor.modes.UVSensorMode;
+import sensor.modes.USSensorMode;
 import util.MediumMotorTuple;
 import util.Util;
 import util.lcdGui.LCDGui;

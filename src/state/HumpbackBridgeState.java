@@ -2,6 +2,7 @@ package state;
 
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.modes.USSensorMode;
 import util.lcdGui.LCDGui;
 
 public class HumpbackBridgeState implements ParcourState {
@@ -59,7 +60,7 @@ public class HumpbackBridgeState implements ParcourState {
 		this.TURN_INCREASE = 0.2f;
 //		this.TURN_INCREASE = 0.00f;
 		this.turn_delta = 0.f;
-		this.THRESHOLD_NO_GROUND = .075f;
+		this.THRESHOLD_NO_GROUND = .08f;
 		
 		this.GYRO_ALARM = 5;
 		this.angles = new float[250];
@@ -103,8 +104,8 @@ public class HumpbackBridgeState implements ParcourState {
 		this.time = 0;
 		
 //		this.bridgeSegment = BridgeSegment.PRE_COLLISION;
-		//this.bridgeSegment = BridgeSegment.ON_BARCODE;
-		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
+		this.bridgeSegment = BridgeSegment.ON_BARCODE;
+//		this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 		this.robot.lowerUS();
 		
 		this.robot.setSpeed(this.SPEED_MAX);
@@ -115,11 +116,11 @@ public class HumpbackBridgeState implements ParcourState {
 	@Override
 	public void update(int elapsedTime) {
 		
-		littleCounter++;
-		if (littleCounter * elapsedTime > 5000)
-		{
-			this.onBridge = true;
-		}
+//		littleCounter++;
+//		if (littleCounter * elapsedTime > 5000)
+//		{
+//			this.onBridge = true;
+//		}
 		
 		this.angle_fresh = (this.angle_fresh + 1) % this.angles.length;
 		this.angle_old = (this.angle_old + 1) % this.angles.length;
@@ -166,8 +167,10 @@ public class HumpbackBridgeState implements ParcourState {
 			this.distance = RobotComponents.inst().getUS().sample()[0];
 
 			if (this.distance >= 1.f) {
-				this.robot.move(50);
-				this.distance = RobotComponents.inst().getUS().sample()[0];
+				this.robot.stop();
+				RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());;
+				this.robot.forward();
+				return;
 			}
 			
 			this.gui.setVarValue(1, this.distance);
@@ -199,30 +202,33 @@ public class HumpbackBridgeState implements ParcourState {
 			this.color = RobotComponents.inst().getColorSensor().sample()[0];
 			this.time += elapsedTime;
 		
-			if (this.color < 0.8f && this.time > 1000) {
+			if (this.color < 0.8f && this.time >= 5000) {
 				this.onBridge = true;
 				this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 			}
 			
-//			this.distance = RobotComponents.inst().getUS().sample()[0];
-//
-//			if (this.distance >= 1.f) {
-//				return;
-//			}
-//			
-//			this.gui.setVarValue(1, this.distance);
-//			
-//			if (this.distance > this.THRESHOLD_NO_GROUND) {
-//								
-//				this.SPEED_LEFT = this.SPEED_MAX;
-//				this.slowDownRightMotor();
-//			
-//			} else {
-//				
-//				this.SPEED_RIGHT = this.SPEED_MAX;
-//				this.slowDownLeftMotor();
-//				
-//			}
+			this.distance = RobotComponents.inst().getUS().sample()[0];
+
+			if (this.distance >= 1.f) {
+				this.robot.stop();
+				RobotComponents.inst().getUS().setMode(USSensorMode.DISTANCE.getIdf());
+				this.robot.forward();
+				return;
+			}
+			
+			this.gui.setVarValue(1, this.distance);
+			
+			if (this.distance > this.THRESHOLD_NO_GROUND) {
+								
+				this.SPEED_LEFT = this.SPEED_MAX;
+				this.slowDownRightMotor();
+			
+			} else {
+				
+				this.SPEED_RIGHT = this.SPEED_MAX;
+				this.slowDownLeftMotor();
+				
+			}
 			
 			break;
 			

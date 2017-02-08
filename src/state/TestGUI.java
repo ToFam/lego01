@@ -5,7 +5,7 @@ import robot.Robot;
 import robot.RobotComponents;
 import sensor.modes.ColorSensorMode;
 import sensor.modes.GyroSensorMode;
-import sensor.modes.UVSensorMode;
+import sensor.modes.USSensorMode;
 import util.Util;
 import util.lcdGui.LCDChooseList;
 import util.lcdGui.LCDGui;
