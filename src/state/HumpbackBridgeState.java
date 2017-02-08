@@ -49,7 +49,7 @@ public class HumpbackBridgeState implements ParcourState {
 	
 	public HumpbackBridgeState(Robot robot) {
 		this.robot = robot;
-		this.gui = new LCDGui(1, 1);
+		this.gui = new LCDGui(2, 1);
 
 		this.SPEED_MAX = 1f;
 		this.SPEED_MIN_LEFT = .5f;
@@ -59,10 +59,10 @@ public class HumpbackBridgeState implements ParcourState {
 		this.TURN_INCREASE = 0.2f;
 //		this.TURN_INCREASE = 0.00f;
 		this.turn_delta = 0.f;
-		this.THRESHOLD_NO_GROUND = .04f;
+		this.THRESHOLD_NO_GROUND = .075f;
 		
-		this.GYRO_ALARM = 4;
-		this.angles = new float[200];
+		this.GYRO_ALARM = 5;
+		this.angles = new float[250];
 		this.turning = false;
 		this.correction = 0.f;
 		
@@ -170,6 +170,8 @@ public class HumpbackBridgeState implements ParcourState {
 				this.distance = RobotComponents.inst().getUS().sample()[0];
 			}
 			
+			this.gui.setVarValue(1, this.distance);
+			
 			if (this.distance > this.THRESHOLD_NO_GROUND) {
 								
 				this.SPEED_LEFT = this.SPEED_MAX;
@@ -197,29 +199,30 @@ public class HumpbackBridgeState implements ParcourState {
 			this.color = RobotComponents.inst().getColorSensor().sample()[0];
 			this.time += elapsedTime;
 		
-			if (this.color < 0.8f && this.time > 500) {
+			if (this.color < 0.8f && this.time > 1000) {
 				this.onBridge = true;
 				this.bridgeSegment = BridgeSegment.ENTIRE_BRIDGE;
 			}
 			
-			this.distance = RobotComponents.inst().getUS().sample()[0];
-
-			if (this.distance >= 1.f) {
-				this.robot.move(50);
-				this.distance = RobotComponents.inst().getUS().sample()[0];
-			}
-			
-			if (this.distance > this.THRESHOLD_NO_GROUND) {
-								
-				this.SPEED_LEFT = this.SPEED_MAX;
-				this.slowDownRightMotor();
-			
-			} else {
-				
-				this.SPEED_RIGHT = this.SPEED_MAX;
-				this.slowDownLeftMotor();
-				
-			}
+//			this.distance = RobotComponents.inst().getUS().sample()[0];
+//
+//			if (this.distance >= 1.f) {
+//				return;
+//			}
+//			
+//			this.gui.setVarValue(1, this.distance);
+//			
+//			if (this.distance > this.THRESHOLD_NO_GROUND) {
+//								
+//				this.SPEED_LEFT = this.SPEED_MAX;
+//				this.slowDownRightMotor();
+//			
+//			} else {
+//				
+//				this.SPEED_RIGHT = this.SPEED_MAX;
+//				this.slowDownLeftMotor();
+//				
+//			}
 			
 			break;
 			
