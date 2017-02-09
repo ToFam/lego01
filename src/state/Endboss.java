@@ -2,6 +2,7 @@ package state;
 
 import robot.Robot;
 import robot.RobotComponents;
+import sensor.ColorSensor;
 import sensor.GyroSensor;
 import sensor.TouchSensorBThread;
 import sensor.USSensor;
@@ -35,6 +36,10 @@ public class Endboss implements ParcourState {
 		    DRIVE_LTW_EXIT_RETREAT,
 		    DRIVE_LTW_EXIT_TURN,
 		    
+		DRIVE_STRAIGHT_TILL_DOTS,
+		
+		WAIT_TO_TURN_BECAUSE_LINE,
+		    
 		    
 		    
 		    TURN_BLABLABLA
@@ -51,6 +56,7 @@ public class Endboss implements ParcourState {
     private static final int param_timeLoweringTheCancnon = 4000;
     private static final int param_timePush = 10000;
     private static final int param_mediumRotateAngle = 280;
+    private static final float param_usDistanceToDriveStraight = 0.3f;
     //private static final boolean param_debugWaits = false;
     
     public Endboss(Robot robot) {
@@ -79,6 +85,7 @@ public class Endboss implements ParcourState {
         gyros = RobotComponents.inst().getGyroSensor();
         us = RobotComponents.inst().getUS();
         touch = RobotComponents.inst().getTouchSensorB();
+        color = RobotComponents.inst().getColorSensor();
     }
 
     
@@ -93,6 +100,7 @@ public class Endboss implements ParcourState {
     private GyroSensor gyros;
     private USSensor us;
     private TouchSensorBThread touch;
+    private ColorSensor color;
     
     private EndbossState state;
 
@@ -102,6 +110,8 @@ public class Endboss implements ParcourState {
     private float waitCounter;
     
     private float gyroAtPush = Float.MAX_VALUE;
+    
+    private float gyroOnInfinity = 0f;
     
     private void startWait(float time)
     {
@@ -118,6 +128,12 @@ public class Endboss implements ParcourState {
     @Override
     public void update(int elapsedTime) {
 
+    	if (state != EndbossState.WAIT_TO_TURN_BECAUSE_LINE && color.sample()[0] >= 0.4f)
+    	{
+    		robot.stop();
+    		robot.turnOnSpot(-180);
+    	}
+    	
     	switch (state)
     	{
     	case START:
@@ -329,9 +345,23 @@ public class Endboss implements ParcourState {
             {
                 float samp = us.sample()[0];
                 
-                turn = (samp - param_goalDistance_toboss) * 25;
-                robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
-                robot.forward();
+                if (samp <= param_usDistanceToDriveStraight)
+                {
+                	gyroOnInfinity = gyros.sample()[0];
+                    
+                    turn = (samp - param_goalDistance_toboss) * 25;
+                    robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+                    robot.forward();
+                }
+                else
+                {
+                	if (Math.abs(gyros.sample()[0] - gyroOnInfinity) >= 360)
+                	{
+                		robot.setSpeed(param_robotMaxSpeed);
+                		robot.forward();
+                		state = EndbossState.DRIVE_STRAIGHT_TILL_DOTS;
+                	}
+                }
             }
             
             break;
@@ -352,6 +382,23 @@ public class Endboss implements ParcourState {
                 state = EndbossState.DRIVE_LTW_EXIT;
             }
             break;
+            
+        case DRIVE_STRAIGHT_TILL_DOTS:
+        	if (touch.sample()[0] == 1.0f)
+            {
+                robot.stop();
+                robot.setSpeed(param_robotRetreatSpeed);
+                robot.move(240);
+                state = EndbossState.DRIVE_LTW_EXIT_RETREAT;
+            }
+        	break;
+    	case WAIT_TO_TURN_BECAUSE_LINE:
+    		if (robot.finished())
+    		{
+    			robot.stop();
+    			state = EndbossState.DRIVE_LTW_EXIT;
+    		}
+    		break;
     	}
     }
 }
