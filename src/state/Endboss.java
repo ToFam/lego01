@@ -262,6 +262,7 @@ public class Endboss implements ParcourState {
     		{
     			robot.stop();
     			state = EndbossState.DRIVE_LTW_EXIT;
+    			robot.forward();
     		}
     		break;
     	case DRIVE_LTW:
@@ -363,6 +364,12 @@ public class Endboss implements ParcourState {
                 		robot.setSpeed(param_robotMaxSpeed);
                 		robot.forward();
                 		state = EndbossState.DRIVE_STRAIGHT_TILL_DOTS;
+                	}
+                	else
+                	{
+                        turn = (samp - param_goalDistance_toboss) * 25;
+                        robot.steer(Math.max(-0.8f, Math.min(0.8f, turn)));
+                        robot.forward();
                 	}
                 }
             }
