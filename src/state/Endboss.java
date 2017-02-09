@@ -131,7 +131,8 @@ public class Endboss implements ParcourState {
     	if (state != EndbossState.WAIT_TO_TURN_BECAUSE_LINE && color.sample()[0] >= 0.4f)
     	{
     		robot.stop();
-    		robot.turnOnSpot(-180);
+    		robot.turnOnSpot(180);
+    		state = EndbossState.WAIT_TO_TURN_BECAUSE_LINE;
     	}
     	
     	switch (state)
@@ -260,7 +261,7 @@ public class Endboss implements ParcourState {
     		if (robot.finished())
     		{
     			robot.stop();
-    			state = EndbossState.DRIVE_LTW;
+    			state = EndbossState.DRIVE_LTW_EXIT;
     		}
     		break;
     	case DRIVE_LTW:
@@ -295,7 +296,8 @@ public class Endboss implements ParcourState {
     	        robot.stop();
     	        robot.setSpeed(param_robotMaxSpeed);
     	        robot.forward();
-    	        state = EndbossState.DRIVE_LTW_ENTRY;
+    	        //state = EndbossState.DRIVE_LTW_ENTRY;
+    	        state = EndbossState.DRIVE_LTW_EXIT;
     	    }
     	    break;
     	case DRIVE_LTW_ENTRY:
@@ -303,7 +305,7 @@ public class Endboss implements ParcourState {
             {
                 robot.stop();
                 robot.setSpeed(param_robotRetreatSpeed);
-                robot.move(240);
+                robot.move(330);
                 state = EndbossState.DRIVE_LTW_ENTRY_RETREAT;
             }
             else
@@ -357,6 +359,7 @@ public class Endboss implements ParcourState {
                 {
                 	if (Math.abs(gyros.sample()[0] - gyroOnInfinity) >= 360)
                 	{
+                		gyroOnInfinity = gyros.sample()[0];
                 		robot.setSpeed(param_robotMaxSpeed);
                 		robot.forward();
                 		state = EndbossState.DRIVE_STRAIGHT_TILL_DOTS;
