@@ -52,7 +52,7 @@ public class Main {
         
     public void initStates() {
         this.states = new ParcourState[] {
-            new Music("Chacarron_Intro.aiff"),
+            //new Music("Chacarron_Intro.aiff"),
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LabyrinthState(robot),			// Start und Labyrinth
     		new LineMovingIIt1(robot, false),			// Linie nach Labyrinth
@@ -106,6 +106,10 @@ public class Main {
     	return average > COLOR_THRESHOLD;
     }
     
+    boolean thisOne = false;
+    int ledMode = 0;
+    int ledChangeCounter = 0;
+    
     public void run()
     {
     	boolean backToMenu = false;
@@ -154,6 +158,24 @@ public class Main {
 	            // Main loop with active state
 	            while (true)
 	            {
+	            	ledChangeCounter++;
+	            	if (ledChangeCounter * 50 >= 200 && thisOne)
+	            	{
+	            		ledChangeCounter = 0;
+	            		ledMode++;
+	            		ledMode = (ledMode % 3);
+	            		
+		            	Button.LEDPattern(ledMode + 1);
+		            	thisOne = false;
+	            	}
+	            	else if (ledChangeCounter * 50 >= 200)
+	            	{
+	            		ledChangeCounter = 0;
+	            		thisOne = true;
+		            	Button.LEDPattern(0);
+	            	}
+	            	
+	            	
 	                robot.update();
 	                states[state].update(50);
 	                
